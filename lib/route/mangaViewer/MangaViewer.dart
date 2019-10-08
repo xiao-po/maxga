@@ -26,14 +26,15 @@ class _MangaViewerState extends State<MangaViewer> {
 
   Timer chapterChangeTimer;
   Timer scrollEventTimer;
-  Timer pointDownEventTimer;
+  Timer futureViewVisitableTimer;
   bool NEXT_PAGE_CHANGE_TRUST = true;
 
   Map<int, Chapter> cachedChapterData = {};
   int loadStatus = 0;
   bool mangaFutureViewVisitable = false;
+  double mangaFutureViewOpacity = 0;
   List<Chapter> chapterList;
-
+  final futureViewAnimationDuration =  Duration(milliseconds: 200);
   PageController tabController;
   Chapter currentChapter;
   Chapter preChapter;
@@ -93,9 +94,9 @@ class _MangaViewerState extends State<MangaViewer> {
                   ),
                 ),
                 AnimatedOpacity(
-                  opacity: mangaFutureViewVisitable ? 1.0 : 0,
-                  duration: Duration(milliseconds: 200),
-                  child: MangaFutureView(
+                  opacity: mangaFutureViewOpacity,
+                  duration: futureViewAnimationDuration,
+                  child: mangaFutureViewVisitable ? MangaFutureView(
                     onPageChange: (index) => changePage(
                         index.floor() + (preChapter != null ? 1 : 0),
                         shouldJump: true),
@@ -106,7 +107,7 @@ class _MangaViewerState extends State<MangaViewer> {
                             ? (chapterImageCount - 1)
                             : chapterImageIndex),
                     title: currentChapter.title,
-                  ),
+                  ) : null,
                 )
               ],
             ),
@@ -152,11 +153,30 @@ class _MangaViewerState extends State<MangaViewer> {
 
     if (details.localPosition.dx / width > 0.33 &&
         details.localPosition.dx / width < 0.66) {
-      this.mangaFutureViewVisitable = !this.mangaFutureViewVisitable;
+
+      updateFutureViewVisitable();
+
     } else if (details.localPosition.dx / width < 0.33) {
       goPrePage();
     } else if (details.localPosition.dx / width > 0.66) {
       goNextPage();
+    }
+
+    setState(() {});
+  }
+
+  void updateFutureViewVisitable() {
+    mangaFutureViewOpacity = mangaFutureViewOpacity == 0 ? 1 : 0;
+    if (futureViewVisitableTimer != null) {
+      futureViewVisitableTimer.cancel();
+    }
+    if (mangaFutureViewOpacity == 1) {
+      this.mangaFutureViewVisitable = !this.mangaFutureViewVisitable;
+    } else {
+      futureViewVisitableTimer = Timer(futureViewAnimationDuration, () {
+        this.mangaFutureViewVisitable = !this.mangaFutureViewVisitable;
+        setState(() {});
+      });
     }
 
     setState(() {});
@@ -202,8 +222,8 @@ class _MangaViewerState extends State<MangaViewer> {
 
   changePage(int index, {bool shouldJump = false}) async {
     if (!NEXT_PAGE_CHANGE_TRUST) {
-    NEXT_PAGE_CHANGE_TRUST = true;
-    return null;
+      NEXT_PAGE_CHANGE_TRUST = true;
+      return null;
     }
     if (chapterChangeTimer != null) {
       print('chapterChangeTimer cancel');
