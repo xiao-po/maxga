@@ -26,6 +26,7 @@ class _MangaViewerState extends State<MangaViewer> {
 
   Timer chapterChangeTimer;
   Timer scrollEventTimer;
+  Timer pointDownEventTimer;
   bool NEXT_PAGE_CHANGE_TRUST = true;
 
   Map<int, Chapter> cachedChapterData = {};
@@ -84,7 +85,6 @@ class _MangaViewerState extends State<MangaViewer> {
                   onNotification: (scrollNotification) => onPageViewScroll(scrollNotification),
                   child: GestureDetector(
                     onTapUp: (details) => dispatchTapUpEvent(details, context),
-                    onDoubleTap: () => zoomImageAction(),
                     child: MangaTabView(
                       controller: tabController,
                       onPageChanged: (index) => changePage(index),
@@ -202,8 +202,8 @@ class _MangaViewerState extends State<MangaViewer> {
 
   changePage(int index, {bool shouldJump = false}) async {
     if (!NEXT_PAGE_CHANGE_TRUST) {
-      NEXT_PAGE_CHANGE_TRUST = true;
-      return null;
+    NEXT_PAGE_CHANGE_TRUST = true;
+    return null;
     }
     if (chapterChangeTimer != null) {
       print('chapterChangeTimer cancel');

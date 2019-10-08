@@ -33,6 +33,7 @@ class _IndexPageState extends State<IndexPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
+      backgroundColor: Color(0xfff5f5f5),
       appBar: AppBar(
         title: const Text('maxga'),
         actions: <Widget>[

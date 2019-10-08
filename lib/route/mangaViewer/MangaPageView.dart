@@ -300,3 +300,4 @@ class _MangaPageViewState extends State<MangaPageView> {
     }
   }
 }
+
