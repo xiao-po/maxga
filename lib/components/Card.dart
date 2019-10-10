@@ -117,9 +117,9 @@ class MangaCard extends StatelessWidget {
             alignment: Alignment.centerRight,
             child: Text(
               '${manga.chapterList[0].title} \n' +
-                  this.convertTimeToYYYYMMDD(
-                      DateTime.fromMillisecondsSinceEpoch(
-                          manga.chapterList[0].updateTime)),
+                  (manga.chapterList[0].updateTime != null ? this.convertTimeToYYYYMMDD(
+                  DateTime.fromMillisecondsSinceEpoch(
+                      manga.chapterList[0].updateTime)) : ''),
               textAlign: TextAlign.right,
               style: TextStyle(
                 color: grayFontColor

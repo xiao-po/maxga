@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/components/Card.dart';
 import 'package:maxga/http/repo/dmzj/DmzjDataRepo.dart';
+import 'package:maxga/http/repo/manhuadui/ManhuaduiDataRepo.dart';
 import 'package:maxga/model/Manga.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
@@ -82,7 +83,7 @@ class _IndexPageState extends State<IndexPage> {
 
   void getMangaList() async {
     try {
-      mangaList = await DmzjDataRepo().getLatestUpdate(page);
+      mangaList = await ManhuaduiDataRepo().getLatestUpdate(page);
 
       page++;
       this.loadStatus = 1;
@@ -110,6 +111,7 @@ class _IndexPageState extends State<IndexPage> {
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return MangaInfoPage(
         id: item.id,
+        url: item.infoUrl,
       );
     }));
   }

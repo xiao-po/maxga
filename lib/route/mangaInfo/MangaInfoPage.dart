@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/Utils/DateUtils.dart';
 import 'package:maxga/http/repo/dmzj/DmzjDataRepo.dart';
+import 'package:maxga/http/repo/manhuadui/ManhuaduiDataRepo.dart';
 import 'package:maxga/model/Chapter.dart';
 import 'package:maxga/model/Manga.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
@@ -14,7 +15,9 @@ import 'MangaInfoIntro.dart';
 
 class MangaInfoPage extends StatefulWidget {
   final int id;
-  const MangaInfoPage({Key key, this.id}) : super(key: key);
+  const MangaInfoPage({Key key, this.id, this.url}) : super(key: key);
+
+  final String url;
 
   @override
   State<StatefulWidget> createState() => _MangaInfoPageState();
@@ -49,10 +52,10 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
 
     switch(loading) {
       case 1 : {
-        final String lastUpdate = DateUtils.formatTime(
+        final String lastUpdate = latestChapter.updateTime != null ? DateUtils.formatTime(
             timestamp: latestChapter.updateTime,
             template: 'YYYY-MM-DD'
-        );
+        ) : '';
         return  <Widget>[
           MangaInfoCover(manga: manga, updateTime: '最后更新：$lastUpdate',),
           MangaInfoIntro(manga: manga),
@@ -90,7 +93,10 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
 
   void initMangaInfo() async {
     try {
-      manga = await DmzjDataRepo().getMangaInfo(widget.id);
+      manga = await ManhuaduiDataRepo().getMangaInfo(
+        id: widget.id,
+        url: widget.url,
+      );
       loading = 1;
     } catch (e) {
       loading = -1;

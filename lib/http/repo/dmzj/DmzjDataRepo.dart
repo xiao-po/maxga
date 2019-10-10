@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:maxga/http/error/NotSupportWayToGetData.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/http/repo/dmzj/model/DmzjChapterData.dart';
 import 'package:maxga/http/repo/dmzj/model/DmzjMangaInfo.dart';
@@ -16,8 +17,8 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
   );
 
   @override
-  Future<Manga> getMangaInfo(int mangaId) async {
-    final response = await http.get('http://v3api.dmzj.com/comic/comic_$mangaId.json');
+  Future<Manga> getMangaInfo({id, url}) async {
+    final response = await http.get('http://v3api.dmzj.com/comic/comic_$id.json');
     return _convertDataFromMangaInfo(json.decode(response.body));
   }
 
@@ -51,7 +52,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     latestChapter.title  = json['last_update_chapter_name'];
     latestChapter.updateTime  = json['last_updatetime'] * 1000;
     manga.chapterList = [latestChapter];
-
+    manga.infoUrl = 'http://v3api.dmzj.com/comic/comic_${json['id']}.json';
     manga.author = json['authors'];
     manga.cover = json['cover'];
     manga.title = json['title'];
