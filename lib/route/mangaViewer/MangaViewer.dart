@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/http/repo/dmzj/DmzjDataRepo.dart';
+import 'package:maxga/http/repo/manhuadui/ManhuaduiDataRepo.dart';
 import 'package:maxga/model/Chapter.dart';
 import 'package:maxga/model/Manga.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
@@ -49,7 +50,7 @@ class _MangaViewerState extends State<MangaViewer> {
   get chapterImageCount =>
       imagePageUrlList.length -
       (preChapter != null ? 1 : 0) -
-      (nextChapter != null ? 1 : 0);
+      (nextChapter != null ? 1 : 0) - 1;
 
   @override
   void initState() {
@@ -57,7 +58,7 @@ class _MangaViewerState extends State<MangaViewer> {
     currentChapter = widget.currentChapter;
     chapterList = widget.manga.chapterList.toList();
     chapterList.sort((a, b) => a.order.compareTo(b.order));
-    initChapterState(currentChapter.id).then((val) {
+    initChapterState(currentChapter).then((val) {
       _currentPageIndex = preChapter != null ? 1 : 0;
       tabController = PageController(initialPage: _currentPageIndex);
       this.loadStatus = 1;
@@ -100,11 +101,11 @@ class _MangaViewerState extends State<MangaViewer> {
                     onPageChange: (index) => changePage(
                         index.floor() + (preChapter != null ? 1 : 0),
                         shouldJump: true),
-                    imageCount: chapterImageCount,
+                    imageCount: chapterImageCount + 1,
                     pageIndex: chapterImageIndex < 1
                         ? 0
                         : (chapterImageIndex >= chapterImageCount
-                            ? (chapterImageCount - 1)
+                            ? chapterImageCount
                             : chapterImageIndex),
                     title: currentChapter.title,
                   ) : null,
@@ -130,17 +131,18 @@ class _MangaViewerState extends State<MangaViewer> {
     );
   }
 
-  Future<Chapter> getChapterData(int chapterId) async {
-    if (cachedChapterData.containsKey(chapterId)) {
-      return cachedChapterData[chapterId];
+  Future<Chapter> getChapterData(Chapter chapter) async {
+    if (cachedChapterData.containsKey(chapter.id)) {
+      return cachedChapterData[chapter.id];
     } else {
-      final dmzjMangaService = DmzjDataRepo();
+      final manhuaduiService = ManhuaduiDataRepo();
       final mangaId = widget.manga.id;
-      final result = await dmzjMangaService.getChapterInfo(mangaId, chapterId);
+      final result = await manhuaduiService.getChapterInfoTest(chapter);
+      chapter.imgUrlList = result;
       cachedChapterData.addAll({
-        chapterId: result
+        chapter.id: chapter
       });
-      return result;
+      return chapter;
     }
 
   }
@@ -247,12 +249,12 @@ class _MangaViewerState extends State<MangaViewer> {
     return index != (chapterList.length - 1) ? chapterList[index + 1] : null;
   }
 
-  Future<void> initChapterState(int chapterId) async {
-    currentChapter = await getChapterData(chapterId);
+  Future<void> initChapterState(Chapter chapter) async {
+    currentChapter = await getChapterData(chapter);
     final simplePreChapterData = getPreChapter(currentChapter);
     this.imagePageUrlList = [];
     if (simplePreChapterData != null) {
-      preChapter = await getChapterData(simplePreChapterData.id);
+      preChapter = await getChapterData(simplePreChapterData);
       this.imagePageUrlList.add(preChapter.imgUrlList.last);
     } else {
       preChapter = null;
@@ -262,7 +264,7 @@ class _MangaViewerState extends State<MangaViewer> {
 
     final simpleNextChapterData = getNextChapter(currentChapter);
     if (simpleNextChapterData != null) {
-      nextChapter = await getChapterData(simpleNextChapterData.id);
+      nextChapter = await getChapterData(simpleNextChapterData);
       this.imagePageUrlList.add(nextChapter.imgUrlList.first);
     } else {
       nextChapter = null;
@@ -276,7 +278,7 @@ class _MangaViewerState extends State<MangaViewer> {
     if (_currentPageIndex == 0 && preChapter != null) {
       print('will visit preChapter');
       toastMessage('进入上一章节');
-      await initChapterState(preChapter.id);
+      await initChapterState(preChapter);
       _currentPageIndex = imagePageUrlList.length - 2;
       // TODO： notify just preChapter
       setState(() {});
@@ -290,7 +292,7 @@ class _MangaViewerState extends State<MangaViewer> {
         nextChapter != null) {
       print('will visit nextChapter');
       toastMessage('进入下一章节', TextAlign.right);
-      await initChapterState(nextChapter.id);
+      await initChapterState(nextChapter);
       _currentPageIndex = 1;
 
       // TODO： notify just preChapter

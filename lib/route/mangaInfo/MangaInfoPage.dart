@@ -15,6 +15,7 @@ import 'MangaInfoIntro.dart';
 
 class MangaInfoPage extends StatefulWidget {
   final int id;
+
   const MangaInfoPage({Key key, this.id, this.url}) : super(key: key);
 
   final String url;
@@ -30,51 +31,46 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   Chapter latestChapter;
 
   @override
-  void initState()  {
+  void initState() {
     super.initState();
 
     initMangaInfo();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: MangaInfoWrapper(
-        title: manga != null ? manga.title : '',
-        children: buildBody(),
-      )
-    );
+        body: MangaInfoWrapper(
+      title: manga != null ? manga.title : '',
+      children: buildBody(),
+    ));
   }
 
-
   List<Widget> buildBody() {
-
-    switch(loading) {
-      case 1 : {
-        final String lastUpdate = latestChapter.updateTime != null ? DateUtils.formatTime(
-            timestamp: latestChapter.updateTime,
-            template: 'YYYY-MM-DD'
-        ) : '';
-        return  <Widget>[
-          MangaInfoCover(manga: manga, updateTime: '最后更新：$lastUpdate',),
-          MangaInfoIntro(manga: manga),
-          MangaInfoChapter(manga: manga),
-        ];
-      }
-      case 0 : {
-        return [
-          buildLoadPage()
-        ];
-      }
-      default: {
-        return [
-          ErrorPage(
-              "读取漫画信息发生了错误呢~~~"
-          )
-        ];
-      }
-
+    switch (loading) {
+      case 1:
+        {
+          final String lastUpdate = latestChapter.updateTime != null
+              ? DateUtils.formatTime(
+                  timestamp: latestChapter.updateTime, template: 'YYYY-MM-DD')
+              : '';
+          return <Widget>[
+            MangaInfoCover(
+              manga: manga,
+              updateTime: '最后更新：$lastUpdate',
+            ),
+            MangaInfoIntro(manga: manga),
+            MangaInfoChapter(manga: manga),
+          ];
+        }
+      case 0:
+        {
+          return [buildLoadPage()];
+        }
+      default:
+        {
+          return [ErrorPage("读取漫画信息发生了错误呢~~~")];
+        }
     }
   }
 
@@ -85,26 +81,28 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
         child: SizedBox(
           height: 40,
           width: 40,
-          child: CircularProgressIndicator(strokeWidth: 2,),
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+          ),
         ),
       ),
     );
   }
 
   void initMangaInfo() async {
+    ManhuaduiDataRepo repo = ManhuaduiDataRepo();
     try {
-      manga = await ManhuaduiDataRepo().getMangaInfo(
+      manga = await repo.getMangaInfo(
         id: widget.id,
         url: widget.url,
       );
+
       loading = 1;
     } catch (e) {
       loading = -1;
     }
 
-
     latestChapter = manga.getLatestChapter();
-
     setState(() {});
   }
 }

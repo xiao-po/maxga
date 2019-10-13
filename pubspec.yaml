@@ -31,6 +31,7 @@ dependencies:
   cached_network_image: 1.1.1
   provider: 3.1.0
   extended_image: 0.6.1
+  encrypt: 3.3.1
 
 
 dev_dependencies:

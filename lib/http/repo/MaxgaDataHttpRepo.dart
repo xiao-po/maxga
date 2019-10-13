@@ -6,6 +6,7 @@ abstract class MaxgaDataHttpRepo {
 
   Future<Manga> getMangaInfo({int id, String url});
 
+
   Future<List<Manga>> getLatestUpdate(int page);
 
   Future<Chapter> getChapterInfo(int comicId, int chapterId);
