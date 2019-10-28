@@ -1,6 +1,4 @@
-import 'package:maxga/http/error/NotSupportWayToGetData.dart';
 import 'package:maxga/http/repo/manhuadui/parser/ManhuaduiHtmlParser.dart';
-import 'package:maxga/model/Chapter.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:maxga/model/Manga.dart';
@@ -16,13 +14,9 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
   );
   ManhuaduiHtmlParser parser = ManhuaduiHtmlParser.getInstance();
 
-  @override
-  Future<Chapter> getChapterInfo(int comicId, int chapterId) {
-    return null;
-  }
 
-  Future<List<String>> getChapterInfoTest(Chapter chapter) async {
-    final response = await http.get('https://www.manhuadui.com${chapter.url}');
+  Future<List<String>> getChapterImageList(String url) async {
+    final response = await http.get('https://www.manhuadui.com${url}');
     var chapterImageList = parser.getMangaImageListFromMangaPage(response.body);
     var chapterImagePath = parser.getMangaImagePathFromMangaPage(response.body);
     if (chapterImagePath == "") {

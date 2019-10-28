@@ -1,10 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
-import 'package:maxga/http/error/NotSupportWayToGetData.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
-import 'package:maxga/http/repo/dmzj/model/DmzjChapterData.dart';
 import 'package:maxga/http/repo/dmzj/model/DmzjMangaInfo.dart';
 import 'package:maxga/model/Chapter.dart';
 import 'package:maxga/model/Manga.dart';
@@ -22,7 +19,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     if (url != null) {
     }
     final response = await http.get('http://v3api.dmzj.com/comic/comic_$id.json');
-    return _convertDataFromMangaInfo(json.decode(response.body));
+    return _convertDataFromMangaInfo(json.decode(response.body), id);
   }
 
   @override
@@ -32,17 +29,17 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<List<Manga>> getLatestUpdate(int page) async {
-    final response = await http.get('http://v3api.dmzj.com/latest/100/${page}.json');
+    final response = await http.get('http://v3api.dmzj.com/latest/100/$page.json');
     final responseData = (json.decode(response.body) as List<dynamic>);
     return responseData.map((item) => _convertDataFromListItem(item)).toList();
   }
 
 
   @override
-  Future<Chapter> getChapterInfo(int comicId, int chapterId) async {
-    final response = await http.get('http://v3api.dmzj.com/chapter/$comicId/$chapterId.json');
+  Future<List<String>> getChapterImageList(String url) async {
+    final response = await http.get(url);
 
-    return _convertDataFromChapterInfo(json.decode(response.body));
+    return json.decode(response.body)['page_url'].cast<String>();
   }
 
 
@@ -65,7 +62,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     return manga;
   }
 
-  Manga _convertDataFromMangaInfo(Map<String, dynamic> json) {
+  Manga _convertDataFromMangaInfo(Map<String, dynamic> json, int comicId) {
     final DmzjMangaInfo dmzjMangaInfo = DmzjMangaInfo.fromJson(json);
     final Manga manga = Manga();
     manga.author = dmzjMangaInfo.authors.map((tag) => tag.tagName).join('/');
@@ -76,11 +73,14 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     manga.id = dmzjMangaInfo.id;
     manga.status = dmzjMangaInfo.status[0].tagName;
     manga.chapterList = dmzjMangaInfo.chapters.singleWhere((item) => item.title == '连载').data;
-    manga.chapterList.forEach((chapter) => {});
+    manga.chapterList.forEach((chapter) {
+      chapter.url = 'http://v3api.dmzj.com/chapter/$comicId/${chapter.id}.json';
+    });
     manga.source = _source;
     return manga;
   }
 
+  // ignore: unused_element
   Chapter _convertDataFromChapterInfo(Map<String, dynamic> json) {
     final chapter = Chapter();
     chapter.title = json['title'];

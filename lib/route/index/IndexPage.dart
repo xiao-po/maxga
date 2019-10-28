@@ -2,11 +2,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/components/Card.dart';
-import 'package:maxga/http/repo/manhuadui/ManhuaduiDataRepo.dart';
+import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Manga.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:maxga/route/search/SearchPage.dart';
+
+import '../../Application.dart';
 
 class IndexPage extends StatefulWidget {
   final String name = 'index_page';
@@ -86,7 +88,8 @@ class _IndexPageState extends State<IndexPage> {
 
   void getMangaList() async {
     try {
-      mangaList = await ManhuaduiDataRepo().getLatestUpdate(page);
+      MaxgaDataHttpRepo repo = Application.getInstance().currentDataRepo;
+      mangaList = await repo.getLatestUpdate(page);
 
       page++;
       this.loadStatus = 1;
@@ -114,6 +117,7 @@ class _IndexPageState extends State<IndexPage> {
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return MangaInfoPage(
         url: item.infoUrl,
+        id: item.id,
       );
     }));
   }

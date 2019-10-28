@@ -1,6 +1,5 @@
 
 import 'package:encrypt/encrypt.dart';
-import 'dart:convert'; // for the utf8.encode method
 
 class ManhuaduiCrypto {
   static final key = Key.fromUtf8('123456781234567G');

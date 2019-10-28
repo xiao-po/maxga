@@ -1,7 +1,5 @@
 class SettingProvider {
 
 
-  SettingProvider.init() {
-
-  }
+  SettingProvider.init() ;
 }

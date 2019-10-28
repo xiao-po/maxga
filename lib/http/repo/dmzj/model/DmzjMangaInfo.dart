@@ -17,7 +17,7 @@ class DmzjMangaInfo {
   int hidden;
   int hotNum;
   int hitNum;
-  Null uid;
+  int uid;
   int isLock;
   int lastUpdateChapterId;
   List<DmzjTag> status;

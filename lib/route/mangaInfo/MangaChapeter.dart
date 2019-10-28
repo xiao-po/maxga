@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:maxga/Utils/DateUtils.dart';
 import 'package:maxga/components/MangaOutlineButton.dart';
 import 'package:maxga/constant/SortValue.dart';
 import 'package:maxga/model/Chapter.dart';
@@ -35,8 +34,6 @@ class _MangaInfoChapterState extends State<MangaInfoChapter> {
   Widget build(BuildContext context) {
     final EdgeInsetsGeometry containerPadding =
         const EdgeInsets.only(top: 0, bottom: 0);
-    final EdgeInsetsGeometry containerMargin =
-        const EdgeInsets.only(left: 20, right: 20);
     return Container(
       padding: containerPadding,
 //      margin: containerMargin,

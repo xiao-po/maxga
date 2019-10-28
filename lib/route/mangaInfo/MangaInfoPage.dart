@@ -1,9 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:maxga/Application.dart';
 import 'package:maxga/Utils/DateUtils.dart';
-import 'package:maxga/http/repo/dmzj/DmzjDataRepo.dart';
-import 'package:maxga/http/repo/manhuadui/ManhuaduiDataRepo.dart';
+import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Chapter.dart';
 import 'package:maxga/model/Manga.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
@@ -14,8 +13,10 @@ import 'MangaChapeter.dart';
 import 'MangaInfoIntro.dart';
 
 class MangaInfoPage extends StatefulWidget {
+  final int id;
 
-  const MangaInfoPage({Key key, this.url}) : super(key: key);
+
+  const MangaInfoPage({Key key, @required this.url,@required  this.id}) : super(key: key);
 
   final String url;
 
@@ -89,14 +90,16 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   }
 
   void initMangaInfo() async {
-    ManhuaduiDataRepo repo = ManhuaduiDataRepo();
+    MaxgaDataHttpRepo repo = Application.getInstance().currentDataRepo;
     try {
       manga = await repo.getMangaInfo(
+        id: widget.id,
         url: widget.url,
       );
 
       loading = 1;
     } catch (e) {
+      print(e);
       loading = -1;
     }
 

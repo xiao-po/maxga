@@ -1,4 +1,3 @@
-import 'package:maxga/model/Chapter.dart';
 import 'package:maxga/model/Manga.dart';
 
 abstract class MaxgaDataHttpRepo {
@@ -9,6 +8,6 @@ abstract class MaxgaDataHttpRepo {
 
   Future<List<Manga>> getLatestUpdate(int page);
 
-  Future<Chapter> getChapterInfo(int comicId, int chapterId);
+  Future<List<String>> getChapterImageList(String url);
 
 }

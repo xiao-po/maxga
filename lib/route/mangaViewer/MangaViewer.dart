@@ -3,8 +3,8 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:maxga/http/repo/dmzj/DmzjDataRepo.dart';
-import 'package:maxga/http/repo/manhuadui/ManhuaduiDataRepo.dart';
+import 'package:maxga/Application.dart';
+import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Chapter.dart';
 import 'package:maxga/model/Manga.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
@@ -135,9 +135,8 @@ class _MangaViewerState extends State<MangaViewer> {
     if (cachedChapterData.containsKey(chapter.id)) {
       return cachedChapterData[chapter.id];
     } else {
-      final manhuaduiService = ManhuaduiDataRepo();
-      final mangaId = widget.manga.id;
-      final result = await manhuaduiService.getChapterInfoTest(chapter);
+      MaxgaDataHttpRepo repo = Application.getInstance().currentDataRepo;
+      final result = await repo.getChapterImageList(chapter.url);
       chapter.imgUrlList = result;
       cachedChapterData.addAll({
         chapter.id: chapter
@@ -151,7 +150,6 @@ class _MangaViewerState extends State<MangaViewer> {
 
     print('tap up');
     final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
 
     if (details.localPosition.dx / width > 0.33 &&
         details.localPosition.dx / width < 0.66) {

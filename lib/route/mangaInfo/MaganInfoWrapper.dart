@@ -49,7 +49,7 @@ class _MangaInfoWrapperState extends State<MangaInfoWrapper> {
             title:  Text(widget.title, style: TextStyle(color: appbarTitleColor)),
             elevation: 0,
             actions: <Widget>[
-              IconButton(icon: Icon(Icons.share, color: Colors.white))
+              IconButton(icon: Icon(Icons.share, color: Colors.white), onPressed: () {},)
             ],
           ),
         ),

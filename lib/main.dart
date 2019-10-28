@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:maxga/Application.dart';
 import 'package:maxga/route/index/IndexPage.dart';
 
 void main() => runApp(MyApp());

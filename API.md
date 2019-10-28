@@ -51,7 +51,6 @@
     
     content-type: json
     
-    tip: 一页只会取 30 条数据
     
     ```
     [{
