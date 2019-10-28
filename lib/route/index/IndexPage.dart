@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/components/Card.dart';
-import 'package:maxga/http/repo/dmzj/DmzjDataRepo.dart';
 import 'package:maxga/http/repo/manhuadui/ManhuaduiDataRepo.dart';
 import 'package:maxga/model/Manga.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
@@ -56,10 +55,7 @@ class _IndexPageState extends State<IndexPage> {
           children: mangaList
               .map((item) => MangaCard(
                     manga: item,
-                    cover: CachedNetworkImage(
-                        imageUrl: item.cover,
-                        placeholder: (context, url) =>
-                            CircularProgressIndicator(strokeWidth: 2)),
+                    cover: _buildCachedNetworkImage(item),
                     onTap: () => this.goMangaInfoPage(item),
                   ))
               .toList());
@@ -69,6 +65,13 @@ class _IndexPageState extends State<IndexPage> {
         onTap: this.getMangaList,
       );
     }
+  }
+
+  CachedNetworkImage _buildCachedNetworkImage(Manga item) {
+    return CachedNetworkImage(
+        imageUrl: item.coverImgUrl,
+        placeholder: (context, url) =>
+            CircularProgressIndicator(strokeWidth: 2));
   }
 
   Center buildProcessIndicator() {
@@ -110,7 +113,6 @@ class _IndexPageState extends State<IndexPage> {
   goMangaInfoPage(Manga item) {
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return MangaInfoPage(
-        id: item.id,
         url: item.infoUrl,
       );
     }));

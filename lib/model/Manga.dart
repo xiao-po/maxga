@@ -2,32 +2,37 @@ import 'package:maxga/model/MangaSource.dart';
 
 import 'Chapter.dart';
 
-class Manga {
-  String author;
-  int id;
-  String infoUrl;
+class Manga extends MangaBase { 
+  
   List<Chapter> chapterList;
   String status; // "连载中" "已完结"
-  String cover;
-  String title;
-  String introduce;
-  List<String> typeList;
 
-  MangaSource source;
 
   Manga();
 
   Chapter getLatestChapter() {
-    Chapter lastestChapter = null;
+    Chapter latestChapter;
     for(var chapter in chapterList) {
-      if (lastestChapter == null || lastestChapter.order < chapter.order) {
-        lastestChapter = chapter;
+      if (latestChapter == null || latestChapter.order < chapter.order) {
+        latestChapter = chapter;
       }
     }
-    return lastestChapter;
+    return latestChapter;
   }
 
 
+}
+
+
+class MangaBase {
+  MangaSource source;
+  String author;
+  int id;
+  String infoUrl;
+  String coverImgUrl;
+  String title;
+  String introduce;
+  List<String> typeList;
 }
 
 

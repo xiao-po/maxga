@@ -8,12 +8,12 @@ final PageController _defaultPageController = PageController();
 const ScrollPhysics _defaultScrollPhysics = NeverScrollableScrollPhysics();
 
 /// whether should move page
-bool _defaultCanMovePage(GestureDetails gestureDetails) => true;
+  bool _defaultCanMovePage(GestureDetails gestureDetails) => true;
 
-class MangaExtendedPageView extends ExtendedImageGesturePageView {
+  class MangaExtendedPageView extends ExtendedImageGesturePageView {
   MangaExtendedPageView({
-    Key key,
-    this.scrollDirection = Axis.horizontal,
+  Key key,
+  this.scrollDirection = Axis.horizontal,
     this.reverse = false,
     PageController controller,
     ScrollPhysics physics,

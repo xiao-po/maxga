@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:maxga/http/error/NotSupportWayToGetData.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
@@ -18,6 +19,8 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<Manga> getMangaInfo({id, url}) async {
+    if (url != null) {
+    }
     final response = await http.get('http://v3api.dmzj.com/comic/comic_$id.json');
     return _convertDataFromMangaInfo(json.decode(response.body));
   }
@@ -54,7 +57,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     manga.chapterList = [latestChapter];
     manga.infoUrl = 'http://v3api.dmzj.com/comic/comic_${json['id']}.json';
     manga.author = json['authors'];
-    manga.cover = json['cover'];
+    manga.coverImgUrl = json['cover'];
     manga.title = json['title'];
     manga.id = json['id'];
     manga.typeList = (json['types'] as String).split('/');
@@ -69,7 +72,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     manga.introduce = dmzjMangaInfo.description;
     manga.typeList = dmzjMangaInfo.types.map((type) => type.tagName).toList();
     manga.title = dmzjMangaInfo.title;
-    manga.cover = dmzjMangaInfo.cover;
+    manga.coverImgUrl = dmzjMangaInfo.cover;
     manga.id = dmzjMangaInfo.id;
     manga.status = dmzjMangaInfo.status[0].tagName;
     manga.chapterList = dmzjMangaInfo.chapters.singleWhere((item) => item.title == '连载').data;
@@ -86,7 +89,6 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     chapter.comicId = json['comic_id'];
     chapter.direction = json['direction'];
     chapter.imgUrlList = json['page_url'].cast<String>();
-    chapter.imageCount = json['picnum'];
     return chapter;
   }
 

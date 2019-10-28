@@ -14,9 +14,8 @@ import 'MangaChapeter.dart';
 import 'MangaInfoIntro.dart';
 
 class MangaInfoPage extends StatefulWidget {
-  final int id;
 
-  const MangaInfoPage({Key key, this.id, this.url}) : super(key: key);
+  const MangaInfoPage({Key key, this.url}) : super(key: key);
 
   final String url;
 
@@ -93,7 +92,6 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     ManhuaduiDataRepo repo = ManhuaduiDataRepo();
     try {
       manga = await repo.getMangaInfo(
-        id: widget.id,
         url: widget.url,
       );
 

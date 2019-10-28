@@ -37,7 +37,7 @@ class MangaInfoCover extends StatelessWidget {
           child: CircularProgressIndicator(strokeWidth: 2),
         ),
       ),
-      imageUrl: manga.cover,
+      imageUrl: manga.coverImgUrl,
       alignment: Alignment.topCenter,
       fit: BoxFit.cover,
     );

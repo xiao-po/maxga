@@ -76,7 +76,7 @@ class ManhuaduiHtmlParser {
     final lastChapterTitle = mangaIntroNode[3].querySelector('a').innerHtml;
 
     Manga manga = Manga();
-    manga.cover = mangaCoverUrl;
+    manga.coverImgUrl = mangaCoverUrl;
     manga.title = mangaTitle;
     manga.id = int.parse(comicId);
     manga.status = mangaExistStatus;
@@ -131,7 +131,7 @@ class ManhuaduiHtmlParser {
     chapterList.sort((a, b) => b.order - a.order);
 
     var manga = Manga();
-    manga.cover = mangaCoverUrl;
+    manga.coverImgUrl = mangaCoverUrl;
     manga.title = mangaTitle;
     manga.status = mangaExistStatus;
     manga.author = mangaAuthor;
