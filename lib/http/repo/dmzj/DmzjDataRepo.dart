@@ -8,6 +8,8 @@ import 'package:maxga/model/Manga.dart';
 import 'package:http/http.dart' as http;
 import 'package:maxga/model/MangaSource.dart';
 
+import 'model/DmzjSearchSuggestion.dart';
+
 class DmzjDataRepo extends MaxgaDataHttpRepo {
   MangaSource _source = MangaSource(
     name: '动漫之家',
@@ -41,6 +43,22 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
 
     return json.decode(response.body)['page_url'].cast<String>();
   }
+
+
+  @override
+  Future<List<String>> getSuggestion(String words) async {
+    final response = await http.get('http://v3api.dmzj.com/search/fuzzy/0/$words.json');
+    try{
+
+      final responseData = (json.decode(response.body) as List<dynamic>);
+      return responseData.map((item) => DmzjSearchSuggestion.fromJson(item)).map((item) => item.title.replaceFirst('+', '')).toList();
+    } catch(e) {
+      print(response.request.url);
+      throw e;
+    }
+
+  }
+
 
 
   /// 用于 动漫之家 列表拿到的接口返回的数据

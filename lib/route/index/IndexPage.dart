@@ -40,7 +40,7 @@ class _IndexPageState extends State<IndexPage> {
         title: const Text('maxga'),
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.search),
+            icon: Icon(Icons.search, color: Colors.white,),
             onPressed: this.toSearch,
           )
         ],

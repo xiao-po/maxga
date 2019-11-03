@@ -10,4 +10,5 @@ abstract class MaxgaDataHttpRepo {
 
   Future<List<String>> getChapterImageList(String url);
 
+  Future<List<String>> getSuggestion(String words);
 }

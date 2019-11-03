@@ -15,6 +15,13 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
   ManhuaduiHtmlParser parser = ManhuaduiHtmlParser.getInstance();
 
 
+  @override
+  Future<List<String>> getSuggestion(String words) {
+    // TODO: implement getSuggestion
+    return null;
+  }
+
+  @override
   Future<List<String>> getChapterImageList(String url) async {
     final response = await http.get('https://www.manhuadui.com${url}');
     var chapterImageList = parser.getMangaImageListFromMangaPage(response.body);
@@ -55,6 +62,7 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
   void testDecrypt(String s) {
     ManhuaduiCrypto.decrypt(s);
   }
+
 
 
 
