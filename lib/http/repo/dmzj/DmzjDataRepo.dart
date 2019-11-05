@@ -24,10 +24,6 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     return _convertDataFromMangaInfo(json.decode(response.body), id);
   }
 
-  @override
-  Future<List<Manga>> search() async {
-    return Future(null);
-  }
 
   @override
   Future<List<Manga>> getLatestUpdate(int page) async {
@@ -49,7 +45,6 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
   Future<List<String>> getSuggestion(String words) async {
     final response = await http.get('http://v3api.dmzj.com/search/fuzzy/0/$words.json');
     try{
-
       final responseData = (json.decode(response.body) as List<dynamic>);
       return responseData.map((item) => DmzjSearchSuggestion.fromJson(item)).map((item) => item.title.replaceFirst('+', '')).toList();
     } catch(e) {
@@ -57,6 +52,14 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
       throw e;
     }
 
+  }
+
+
+  @override
+  Future<List<Manga>> getSearchManga(String keywords) async {
+    final response = await http.get('http://v3api.dmzj.com/search/show/0/$keywords/0.json');
+    final responseData = (json.decode(response.body) as List<dynamic>);
+    return responseData.map((item) => _convertDataFromSearch(item)).toList();
   }
 
 
@@ -79,6 +82,24 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     manga.source = _source;
     return manga;
   }
+
+  /// 用于 动漫之家 列表拿到的接口返回的数据
+  Manga _convertDataFromSearch(Map<String, dynamic> json) {
+    final Manga manga = Manga();
+
+    final Chapter latestChapter = Chapter();
+    latestChapter.title  = json['last_name'];
+    manga.chapterList = [latestChapter];
+    manga.infoUrl = 'http://v3api.dmzj.com/comic/comic_${json['id']}.json';
+    manga.author = json['authors'];
+    manga.coverImgUrl = json['cover'];
+    manga.title = json['title'];
+    manga.id = json['id'];
+    manga.typeList = (json['types'] as String).split('/');
+    manga.source = _source;
+    return manga;
+  }
+
 
   Manga _convertDataFromMangaInfo(Map<String, dynamic> json, int comicId) {
     final DmzjMangaInfo dmzjMangaInfo = DmzjMangaInfo.fromJson(json);
@@ -109,5 +130,6 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     chapter.imgUrlList = json['page_url'].cast<String>();
     return chapter;
   }
+
 
 }

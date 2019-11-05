@@ -1,7 +1,6 @@
 import 'package:maxga/model/Manga.dart';
 
 abstract class MaxgaDataHttpRepo {
-  Future<List<Manga>>  search();
 
   Future<Manga> getMangaInfo({int id, String url});
 
@@ -11,4 +10,6 @@ abstract class MaxgaDataHttpRepo {
   Future<List<String>> getChapterImageList(String url);
 
   Future<List<String>> getSuggestion(String words);
+
+  Future<List<Manga>> getSearchManga(String keywords);
 }

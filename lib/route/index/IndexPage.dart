@@ -6,7 +6,7 @@ import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Manga.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
-import 'package:maxga/route/search/SearchPage.dart';
+import 'package:maxga/route/search/search-page.dart';
 
 import '../../Application.dart';
 

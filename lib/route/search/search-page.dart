@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/http/repo/dmzj/DmzjDataRepo.dart';
+import 'package:maxga/route/search/search-result-page.dart';
 import 'package:maxga/service/LocalStorage.service.dart';
 
 typedef SearchListTileOnClick = void Function(String words);
@@ -106,12 +107,9 @@ class _SearchPageState extends State<SearchPage> {
       children: list
           .map((item) => ListTile(
                 leading: Icon(Icons.search),
-                title: Align(
-                  alignment: Alignment( -1.2, 0),
-                  child: Text(
-                    item,
-                    style: TextStyle(fontSize: 14),
-                  ),
+                title: Text(
+                  item,
+                  style: TextStyle(fontSize: 14),
                 ),
                 onTap: () => toSearch(item),
               ))
@@ -120,6 +118,8 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void toSearch(String words) async {
+    this.goResultPage(words);
+
     List<String> historyList = this.historySearchWords.toList();
     historyList.removeWhere((item) => item == words);
     historyList = [
@@ -128,8 +128,6 @@ class _SearchPageState extends State<SearchPage> {
     ];
     await LocalStorage.setStringList('searchHistory',historyList);
     this.historySearchWords = historyList;
-    List<String> testList = await LocalStorage.getStringList('searchHistory');
-    print(testList.length);
   }
 
   void getSuggestionAction(String words) async {
@@ -174,5 +172,14 @@ class _SearchPageState extends State<SearchPage> {
               ))
           .toList(),
     );
+  }
+
+  void goResultPage(String keywords) {
+    Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
+      return SearchResultPage(
+        keyword: keywords,
+      );
+    }));
+
   }
 }

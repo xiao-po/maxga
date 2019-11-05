@@ -45,10 +45,6 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
 
 
 
-  @override
-  Future<List<Manga>> search() {
-    return null;
-  }
 
   @override
   Future<Manga> getMangaInfo({int id, String url}) async {
@@ -59,8 +55,13 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
     return mangaInfo;
   }
 
-  void testDecrypt(String s) {
-    ManhuaduiCrypto.decrypt(s);
+  @override
+  Future<List<Manga>> getSearchManga(String keywords) async {
+
+    final response = await http.get('https://www.manhuadui.com/search/?keywords=$keywords');
+    final List<Manga> mangaList = parser.getMangaListFromSearch(response.body);
+    mangaList.forEach((item) => item.source = _source);
+    return mangaList;
   }
 
 
