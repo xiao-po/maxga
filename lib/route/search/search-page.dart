@@ -112,7 +112,8 @@ class _SearchPageState extends State<SearchPage> {
                   style: TextStyle(fontSize: 14),
                 ),
                 onTap: () => toSearch(item),
-              ))
+              )
+      )
           .toList(),
     );
   }
@@ -163,14 +164,15 @@ class _SearchPageState extends State<SearchPage> {
 
   Widget buildHistorySearchList() {
     final list = this.historySearchWords;
-    return ListView(
-      children: list
+    var historyListTiles = list
           .map((item) => ListTile(
                 title: Text(item),
                 onTap: () => toSearch(item),
                 leading: Icon(Icons.history),
               ))
-          .toList(),
+          .toList();
+    return ListView(
+      children: historyListTiles,
     );
   }
 

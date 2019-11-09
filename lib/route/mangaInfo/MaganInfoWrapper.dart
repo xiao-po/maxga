@@ -7,7 +7,9 @@ class MangaInfoWrapper extends StatefulWidget {
 
   final List<Widget> children;
 
-  const MangaInfoWrapper({Key key, this.title, this.children}) : super(key: key);
+  final Widget bottomBar;
+
+  const MangaInfoWrapper({Key key, this.title, this.children, this.bottomBar}) : super(key: key);
 
 
   @override
@@ -34,12 +36,22 @@ class _MangaInfoWrapperState extends State<MangaInfoWrapper> {
 
     return Stack(
       children: <Widget>[
-        CustomScrollView(
-          controller: scrollController,
-          slivers: <Widget>[
-            SliverList(
-              delegate: SliverChildListDelegate(widget.children),
-            )
+        Column(
+          children: <Widget>[
+            Expanded(
+              child: CustomScrollView(
+                controller: scrollController,
+                slivers: <Widget>[
+                  SliverList(
+                    delegate: SliverChildListDelegate(widget.children),
+                  )
+                ],
+              ),
+            ),
+            widget.bottomBar != null ? Align(
+              alignment: Alignment.bottomCenter,
+              child: widget.bottomBar,
+            ) : Container()
           ],
         ),
         Container(
@@ -53,6 +65,7 @@ class _MangaInfoWrapperState extends State<MangaInfoWrapper> {
             ],
           ),
         ),
+
       ],
     );
   }

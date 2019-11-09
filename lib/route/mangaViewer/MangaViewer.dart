@@ -9,7 +9,7 @@ import 'package:maxga/model/Chapter.dart';
 import 'package:maxga/model/Manga.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaViewer/MangaTab.dart';
-import 'package:maxga/route/mangaViewer/MangaViewerFutureView.dart';
+import 'package:maxga/route/mangaViewer/baseComponent/MangaViewerFutureView.dart';
 
 class MangaViewer extends StatefulWidget {
   final Manga manga;

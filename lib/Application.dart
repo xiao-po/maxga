@@ -13,7 +13,7 @@ class Application {
 
   Application() {
     print('application init');
-    currentDataRepo = ManhuaduiDataRepo();
+    currentDataRepo = DmzjDataRepo();
   }
 
 

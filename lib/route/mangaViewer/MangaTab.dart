@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'MangaExtendedPageView.dart';
+import 'baseComponent/MangaExtendedPageView.dart';
 import 'MangaImage.dart';
 
 
@@ -30,20 +30,8 @@ class MangaTabView extends StatelessWidget {
       childrenDelegate: SliverChildListDelegate(
         imgUrlList
             .map((url) => Tab(
-          child: GestureDetector(
-//            child: CachedNetworkImage(
-//              imageUrl: url,
-//              httpHeaders: _httpHeaders,
-//              fit: BoxFit.fitWidth,
-//              placeholder: (context, url) => SizedBox(
-//                height: 40,
-//                width: 40,
-//                child: CircularProgressIndicator(strokeWidth: 2),
-//              ),
-//            ),
-            child: MangaImage(
-              url: url,
-            ),
+          child: MangaImage(
+            url: url,
           ),
         ))
             .toList(),

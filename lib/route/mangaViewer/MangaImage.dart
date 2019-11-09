@@ -1,5 +1,6 @@
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 import 'MangaTab.dart';
 
@@ -13,21 +14,24 @@ class MangaImage extends StatefulWidget {
 
 }
 
-class _MangaImageState extends State<MangaImage> with SingleTickerProviderStateMixin  {
+class _MangaImageState extends State<MangaImage> with TickerProviderStateMixin  {
   Map _httpHeaders = <String, String>{
     "Referer": "http://images.dmzj.com/",
   };
   MangaImageAnimationListener _animationListener;
   AnimationController _animationController;
+  AnimationController _fadeController;
   Animation _animation;
   List<double> doubleTapScales = [1, 1.5];
   ExtendedImageGesturePageView view;
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(duration: Duration(milliseconds: 200),vsync: this);
+    _animationController =
+        AnimationController(duration: Duration(milliseconds: 200), vsync: this);
+    _fadeController =
+        AnimationController(duration: Duration(milliseconds: 200), vsync: this);
   }
-
   @override
   Widget build(BuildContext context) {
     return  ExtendedImage.network(
@@ -38,6 +42,7 @@ class _MangaImageState extends State<MangaImage> with SingleTickerProviderStateM
       alignment: Alignment.center,
       fit: BoxFit.contain,
       onDoubleTap: (state) => zoomImage(state),
+      loadStateChanged: buildMangeImage,
       initGestureConfigHandler: (state) {
         return GestureConfig(
             minScale: 1,
@@ -58,6 +63,60 @@ class _MangaImageState extends State<MangaImage> with SingleTickerProviderStateM
 //        width: double.infinity,
 //      ),
 //    );
+  }
+
+  Widget buildMangeImage(ExtendedImageState state) {
+      switch (state.extendedImageLoadState) {
+        case LoadState.loading:
+          return buildPlaceHolder();
+
+        case LoadState.completed:
+          return ExtendedRawImage(
+            image: state.extendedImageInfo?.image,
+            fit: BoxFit.contain,
+          );
+        case LoadState.failed:
+          return buildFailedPlaceHolder(state);
+        default:
+          throw Error();
+
+      }
+    }
+
+  GestureDetector buildFailedPlaceHolder(ExtendedImageState state) {
+    return GestureDetector(
+          child: Stack(
+            fit: StackFit.expand,
+            children: <Widget>[
+              Image.asset(
+                "assets/failed.jpg",
+                fit: BoxFit.fill,
+              ),
+              Positioned(
+                bottom: 0.0,
+                left: 0.0,
+                right: 0.0,
+                child: Text(
+                  "load image failed, click to reload",
+                  textAlign: TextAlign.center,
+                ),
+              )
+            ],
+          ),
+          onTap: () {
+            state.reLoadImage();
+          },
+        );
+  }
+
+  Widget buildPlaceHolder() {
+    return Align(
+      child: SizedBox(
+        height: 40,
+        width: 40,
+        child: CircularProgressIndicator(),
+      ),
+    );
   }
 
 

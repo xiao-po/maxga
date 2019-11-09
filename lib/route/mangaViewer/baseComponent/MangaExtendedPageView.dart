@@ -4,7 +4,6 @@ import 'package:flutter/gestures.dart';
 
 import 'MangaPageView.dart';
 final PageController _defaultPageController = PageController();
-//const PageScrollPhysics _kPagePhysics = PageScrollPhysics();
 const ScrollPhysics _defaultScrollPhysics = NeverScrollableScrollPhysics();
 
 /// whether should move page

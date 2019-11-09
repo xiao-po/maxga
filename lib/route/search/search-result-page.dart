@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/components/Card.dart';
-import 'package:maxga/http/repo/dmzj/DmzjDataRepo.dart';
 import 'package:maxga/model/Manga.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 
@@ -29,6 +28,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xfff8f8f8),
         appBar: AppBar(
           title: Text(widget.keyword),
         ),
