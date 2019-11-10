@@ -6,21 +6,21 @@ import 'MangaTab.dart';
 
 class MangaImage extends StatefulWidget {
   final String url;
+  final int index;
 
-  const MangaImage({Key key, this.url}) : super(key: key);
+  const MangaImage({Key key, this.url, this.index}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MangaImageState();
 
 }
 
-class _MangaImageState extends State<MangaImage> with TickerProviderStateMixin  {
+class _MangaImageState extends State<MangaImage> with SingleTickerProviderStateMixin  {
   Map _httpHeaders = <String, String>{
     "Referer": "http://images.dmzj.com/",
   };
   MangaImageAnimationListener _animationListener;
   AnimationController _animationController;
-  AnimationController _fadeController;
   Animation _animation;
   List<double> doubleTapScales = [1, 1.5];
   ExtendedImageGesturePageView view;
@@ -28,8 +28,6 @@ class _MangaImageState extends State<MangaImage> with TickerProviderStateMixin  
   void initState() {
     super.initState();
     _animationController =
-        AnimationController(duration: Duration(milliseconds: 200), vsync: this);
-    _fadeController =
         AnimationController(duration: Duration(milliseconds: 200), vsync: this);
   }
   @override
@@ -42,7 +40,7 @@ class _MangaImageState extends State<MangaImage> with TickerProviderStateMixin  
       alignment: Alignment.center,
       fit: BoxFit.contain,
       onDoubleTap: (state) => zoomImage(state),
-      loadStateChanged: buildMangeImage,
+      loadStateChanged: (state) => buildMangeImage(state),
       initGestureConfigHandler: (state) {
         return GestureConfig(
             minScale: 1,
@@ -56,13 +54,6 @@ class _MangaImageState extends State<MangaImage> with TickerProviderStateMixin  
             cacheGesture: false);
       },
     );
-//    return GestureDetector (
-//      onDoubleTap: () => {},
-//      child: Container(
-//        height: double.infinity,
-//        width: double.infinity,
-//      ),
-//    );
   }
 
   Widget buildMangeImage(ExtendedImageState state) {
@@ -71,9 +62,8 @@ class _MangaImageState extends State<MangaImage> with TickerProviderStateMixin  
           return buildPlaceHolder();
 
         case LoadState.completed:
-          return ExtendedRawImage(
-            image: state.extendedImageInfo?.image,
-            fit: BoxFit.contain,
+          return ExtendedImageGesture(
+            state, null
           );
         case LoadState.failed:
           return buildFailedPlaceHolder(state);
@@ -110,12 +100,26 @@ class _MangaImageState extends State<MangaImage> with TickerProviderStateMixin  
   }
 
   Widget buildPlaceHolder() {
-    return Align(
-      child: SizedBox(
-        height: 40,
-        width: 40,
-        child: CircularProgressIndicator(),
-      ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          '${widget.index}',
+          style: TextStyle(
+              color: Colors.white38,
+              fontSize: 40
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: 20),
+          child: SizedBox(
+            height: 40,
+            width: 40,
+            child: CircularProgressIndicator(strokeWidth: 3),
+          ),
+        )
+
+      ],
     );
   }
 
@@ -152,5 +156,11 @@ class _MangaImageState extends State<MangaImage> with TickerProviderStateMixin  
     _animation.addListener(_animationListener);
 
     _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _animationController.dispose();
   }
 }

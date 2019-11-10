@@ -32,6 +32,7 @@ dependencies:
   provider: 3.1.0
   extended_image: 0.6.1
   encrypt: 3.3.1
+  battery: 0.3.1+2
 
 
 dev_dependencies:

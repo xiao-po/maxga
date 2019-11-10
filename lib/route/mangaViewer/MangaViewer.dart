@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:battery/battery.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/Application.dart';
@@ -35,7 +36,7 @@ class _MangaViewerState extends State<MangaViewer> {
   bool mangaFutureViewVisitable = false;
   double mangaFutureViewOpacity = 0;
   List<Chapter> chapterList;
-  final futureViewAnimationDuration =  Duration(milliseconds: 200);
+  final futureViewAnimationDuration = Duration(milliseconds: 200);
   PageController tabController;
   Chapter currentChapter;
   Chapter preChapter;
@@ -50,7 +51,8 @@ class _MangaViewerState extends State<MangaViewer> {
   get chapterImageCount =>
       imagePageUrlList.length -
       (preChapter != null ? 1 : 0) -
-      (nextChapter != null ? 1 : 0) - 1;
+      (nextChapter != null ? 1 : 0) -
+      1;
 
   @override
   void initState() {
@@ -84,7 +86,8 @@ class _MangaViewerState extends State<MangaViewer> {
             body: Stack(
               children: <Widget>[
                 NotificationListener<ScrollEndNotification>(
-                  onNotification: (scrollNotification) => onPageViewScroll(scrollNotification),
+                  onNotification: (scrollNotification) =>
+                      onPageViewScroll(scrollNotification),
                   child: GestureDetector(
                     onTapUp: (details) => dispatchTapUpEvent(details, context),
                     child: MangaTabView(
@@ -94,22 +97,25 @@ class _MangaViewerState extends State<MangaViewer> {
                     ),
                   ),
                 ),
+                MangaStatusBar(currentChapter, _currentPageIndex),
                 AnimatedOpacity(
                   opacity: mangaFutureViewOpacity,
                   duration: futureViewAnimationDuration,
-                  child: mangaFutureViewVisitable ? MangaFutureView(
-                    onPageChange: (index) => changePage(
-                        index.floor() + (preChapter != null ? 1 : 0),
-                        shouldJump: true),
-                    imageCount: chapterImageCount + 1,
-                    pageIndex: chapterImageIndex < 1
-                        ? 0
-                        : (chapterImageIndex >= chapterImageCount
-                            ? chapterImageCount
-                            : chapterImageIndex),
-                    title: currentChapter.title,
-                  ) : null,
-                )
+                  child: mangaFutureViewVisitable
+                      ? MangaFeatureView(
+                          onPageChange: (index) => changePage(
+                              index.floor() + (preChapter != null ? 1 : 0),
+                              shouldJump: true),
+                          imageCount: chapterImageCount + 1,
+                          pageIndex: chapterImageIndex < 1
+                              ? 0
+                              : (chapterImageIndex >= chapterImageCount
+                                  ? chapterImageCount
+                                  : chapterImageIndex),
+                          title: currentChapter.title,
+                        )
+                      : null,
+                ),
               ],
             ),
           );
@@ -138,24 +144,18 @@ class _MangaViewerState extends State<MangaViewer> {
       MaxgaDataHttpRepo repo = Application.getInstance().currentDataRepo;
       final result = await repo.getChapterImageList(chapter.url);
       chapter.imgUrlList = result;
-      cachedChapterData.addAll({
-        chapter.id: chapter
-      });
+      cachedChapterData.addAll({chapter.id: chapter});
       return chapter;
     }
-
   }
 
   dispatchTapUpEvent(TapUpDetails details, BuildContext context) {
-
     print('tap up');
     final width = MediaQuery.of(context).size.width;
 
     if (details.localPosition.dx / width > 0.33 &&
         details.localPosition.dx / width < 0.66) {
-
       updateFutureViewVisitable();
-
     } else if (details.localPosition.dx / width < 0.33) {
       goPrePage();
     } else if (details.localPosition.dx / width > 0.66) {
@@ -299,7 +299,6 @@ class _MangaViewerState extends State<MangaViewer> {
       tabController.jumpToPage(_currentPageIndex);
       chapterChangeTimer = null;
     }
-
   }
 
   onPageViewScroll(ScrollNotification scrollNotification) {
@@ -307,15 +306,83 @@ class _MangaViewerState extends State<MangaViewer> {
       scrollEventTimer.cancel();
       scrollEventTimer = null;
     }
-    scrollEventTimer = Timer(
-      Duration(milliseconds: 300),
-        (){
-          changeChapter();
-        }
-    );
-
+    scrollEventTimer = Timer(Duration(milliseconds: 300), () => changeChapter());
 
     return true;
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    tabController.dispose();
+  }
+}
+
+class MangaStatusBar extends StatefulWidget {
+  final Chapter currentChapter;
+  final int currentIndex;
+
+  MangaStatusBar(this.currentChapter, this.currentIndex);
+
+  @override
+  State<StatefulWidget> createState() => _MangaStatusBarState();
+}
+
+class _MangaStatusBarState extends State<MangaStatusBar> {
+  final Battery _battery = Battery();
+  StreamSubscription batteryStatusSubscription;
+
+  DateTime currentTime;
+  Timer timer;
+  BatteryState batteryState = BatteryState.discharging;
+  int currentBattery = 100;
+
+
+  @override
+  void initState() {
+    super.initState();
+    this.updateTimeAndBattery();
+    waitUpdateTimeByMinute();
+    batteryStatusSubscription = _battery.onBatteryStateChanged.listen((state) => batteryState = state);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.bottomRight,
+      child: Container(
+        padding: EdgeInsets.only(left: 10, right: 20, top: 7, bottom: 4),
+        decoration: BoxDecoration(color: Color(0xff263238)),
+        child: Text(
+          '${widget.currentChapter.title} '
+              ' ${widget.currentIndex}/${widget.currentChapter.imgUrlList.length} '
+              ' ${currentTime.hour}:${currentTime.minute}  $currentBattery%',
+          style: TextStyle(color: Color(0xffeaeaea), fontSize: 13),
+        ),
+      ),
+    );
+  }
+
+  void waitUpdateTimeByMinute() {
+    int restSeconds =  60 - currentTime.second;
+    this.timer = Timer(Duration(seconds: restSeconds), () {
+      waitUpdateTimeByMinute();
+      updateTimeAndBattery();
+    });
+  }
+
+  void updateTimeAndBattery() async {
+    currentTime = DateTime.now();
+
+    currentBattery = await _battery.batteryLevel;
+    setState((){});
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    timer.cancel();
+    batteryStatusSubscription.cancel();
+
+  }
 }
