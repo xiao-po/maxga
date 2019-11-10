@@ -100,6 +100,7 @@ class _IndexPageState extends State<IndexPage> {
       this.loadStatus = 1;
     } catch (e) {
       this.loadStatus = -1;
+      print(e);
       this.showSnack("getMangaList 失败， 页面： $page");
     }
 

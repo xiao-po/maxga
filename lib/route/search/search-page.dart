@@ -158,7 +158,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void getHistorySearchList() async {
-    this.historySearchWords = await LocalStorage.getStringList('searchHistory');
+    this.historySearchWords = await LocalStorage.getStringList('searchHistory') ?? [];
     setState(() { });
   }
 

@@ -127,6 +127,7 @@ class _MangaViewerState extends State<MangaViewer> {
     return WillPopScope(
       child: Scaffold(
         key: mangaViewerKey,
+        backgroundColor: Colors.black,
         body: body,
       ),
       onWillPop: () => onBack() ,

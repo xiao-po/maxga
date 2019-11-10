@@ -89,7 +89,9 @@ class MangaCard extends StatelessWidget {
         children: <Widget>[
           buildMangaInfoIcon(icon),
           Text(' '),
-          Text(val, overflow: TextOverflow.ellipsis,),
+          Expanded(
+            child: Text(val, overflow: TextOverflow.ellipsis,),
+          ),
         ],
       ),
     );
