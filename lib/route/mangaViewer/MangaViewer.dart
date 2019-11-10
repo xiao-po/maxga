@@ -8,9 +8,11 @@ import 'package:maxga/Application.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Chapter.dart';
 import 'package:maxga/model/Manga.dart';
+import 'package:maxga/model/MangaReadProcess.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaViewer/MangaTab.dart';
 import 'package:maxga/route/mangaViewer/baseComponent/MangaViewerFutureView.dart';
+import 'package:maxga/service/MangaReadStorage.service.dart';
 
 class MangaViewer extends StatefulWidget {
   final Manga manga;
@@ -71,60 +73,64 @@ class _MangaViewerState extends State<MangaViewer> {
 
   @override
   Widget build(BuildContext context) {
+    var body;
     switch (loadStatus) {
       case 0:
         {
-          return Scaffold(
-            body: buildLoadingPage(),
-          );
+          body = buildLoadingPage();
+          break;
         }
       case 1:
         {
-          return Scaffold(
-            backgroundColor: Colors.black,
-            key: mangaViewerKey,
-            body: Stack(
-              children: <Widget>[
-                NotificationListener<ScrollEndNotification>(
-                  onNotification: (scrollNotification) =>
-                      onPageViewScroll(scrollNotification),
-                  child: GestureDetector(
-                    onTapUp: (details) => dispatchTapUpEvent(details, context),
-                    child: MangaTabView(
-                      controller: tabController,
-                      onPageChanged: (index) => changePage(index),
-                      imgUrlList: imagePageUrlList,
-                    ),
+          body = Stack(
+            children: <Widget>[
+              NotificationListener<ScrollEndNotification>(
+                onNotification: (scrollNotification) =>
+                    onPageViewScroll(scrollNotification),
+                child: GestureDetector(
+                  onTapUp: (details) => dispatchTapUpEvent(details, context),
+                  child: MangaTabView(
+                    controller: tabController,
+                    onPageChanged: (index) => changePage(index),
+                    imgUrlList: imagePageUrlList,
                   ),
                 ),
-                MangaStatusBar(currentChapter, _currentPageIndex),
-                AnimatedOpacity(
-                  opacity: mangaFutureViewOpacity,
-                  duration: futureViewAnimationDuration,
-                  child: mangaFutureViewVisitable
-                      ? MangaFeatureView(
-                          onPageChange: (index) => changePage(
-                              index.floor() + (preChapter != null ? 1 : 0),
-                              shouldJump: true),
-                          imageCount: chapterImageCount + 1,
-                          pageIndex: chapterImageIndex < 1
-                              ? 0
-                              : (chapterImageIndex >= chapterImageCount
-                                  ? chapterImageCount
-                                  : chapterImageIndex),
-                          title: currentChapter.title,
-                        )
-                      : null,
-                ),
-              ],
-            ),
+              ),
+              MangaStatusBar(currentChapter, _currentPageIndex),
+              AnimatedOpacity(
+                opacity: mangaFutureViewOpacity,
+                duration: futureViewAnimationDuration,
+                child: mangaFutureViewVisitable
+                    ? MangaFeatureView(
+                  onPageChange: (index) => changePage(
+                      index.floor() + (preChapter != null ? 1 : 0),
+                      shouldJump: true),
+                  imageCount: chapterImageCount + 1,
+                  pageIndex: chapterImageIndex < 1
+                      ? 0
+                      : (chapterImageIndex >= chapterImageCount
+                      ? chapterImageCount
+                      : chapterImageIndex),
+                  title: currentChapter.title,
+                )
+                    : null,
+              ),
+            ],
           );
+          break;
         }
       default:
         {
-          return ErrorPage('加载失败');
+          body = ErrorPage('加载失败');
         }
     }
+    return WillPopScope(
+      child: Scaffold(
+        key: mangaViewerKey,
+        body: body,
+      ),
+      onWillPop: () => onBack() ,
+    );
   }
 
   buildLoadingPage() {
@@ -315,6 +321,14 @@ class _MangaViewerState extends State<MangaViewer> {
   void dispose() {
     super.dispose();
     tabController.dispose();
+  }
+
+  onBack() {
+    var manga = widget.manga;
+    MangaReadStorageService.setMangaStatus(
+      MangaReadProcess(manga.source.key, manga.id, currentChapter.id, _currentPageIndex )
+    );
+    Navigator.pop(context);
   }
 }
 

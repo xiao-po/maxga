@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LocalStorage {
   static final _prefix = 'localstorage_';
 
-  static Future<bool> setItem(String key, String str) async {
+  static Future<bool> setString(String key, String str) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.setString('$_prefix$key', str);
   }

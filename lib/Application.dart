@@ -20,4 +20,5 @@ class Application {
   changeDataRepo() {
     currentDataRepo = ManhuaduiDataRepo();
   }
+
 }

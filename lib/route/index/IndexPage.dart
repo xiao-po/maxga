@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:maxga/Utils/BackToDeskTopUtils.dart';
 import 'package:maxga/components/Card.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Manga.dart';
@@ -18,7 +21,7 @@ class IndexPage extends StatefulWidget {
 }
 
 class _IndexPageState extends State<IndexPage> {
-  final GlobalKey scaffoldKey = GlobalKey();
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   int loadStatus = 0;
   List<Manga> mangaList;
@@ -33,19 +36,22 @@ class _IndexPageState extends State<IndexPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: scaffoldKey,
-      backgroundColor: Color(0xfff5f5f5),
-      appBar: AppBar(
-        title: const Text('maxga'),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.search, color: Colors.white,),
-            onPressed: this.toSearch,
-          )
-        ],
+    return WillPopScope(
+      child:  Scaffold(
+        key: scaffoldKey,
+        backgroundColor: Color(0xfff5f5f5),
+        appBar: AppBar(
+          title: const Text('maxga'),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.search, color: Colors.white,),
+              onPressed: this.toSearch,
+            )
+          ],
+        ),
+        body: buildIndexBody(),
       ),
-      body: buildIndexBody(),
+      onWillPop: () => onBack(),
     );
   }
 
@@ -90,7 +96,6 @@ class _IndexPageState extends State<IndexPage> {
     try {
       MaxgaDataHttpRepo repo = Application.getInstance().currentDataRepo;
       mangaList = await repo.getLatestUpdate(page);
-
       page++;
       this.loadStatus = 1;
     } catch (e) {
@@ -102,8 +107,8 @@ class _IndexPageState extends State<IndexPage> {
   }
 
   void showSnack(String message) {
-    Scaffold.of(scaffoldKey.currentContext).showSnackBar(SnackBar(
-      content: Text(message),
+    scaffoldKey.currentState.showSnackBar(SnackBar(
+      content: Text(message), duration: Duration(seconds: 2),
     ));
   }
 
@@ -120,5 +125,25 @@ class _IndexPageState extends State<IndexPage> {
         id: item.id,
       );
     }));
+  }
+
+  DateTime _lastPressedAt; //上次点击时间
+  Future<bool> onBack() async {
+    if (_lastPressedAt == null ||  DateTime.now().difference(_lastPressedAt) > Duration(seconds: 2)) {
+      //两次点击间隔超过1秒则重新计时
+      _lastPressedAt = DateTime.now();
+      showSnack('再按一次退出程序');
+      return false;
+    } else {
+      hiddenSnack();
+      await Future.delayed(Duration(milliseconds: 100));
+      AndroidBackTop.backDeskTop();
+      return false;
+    }
+
+  }
+
+  void hiddenSnack() {
+    scaffoldKey.currentState.hideCurrentSnackBar();
   }
 }

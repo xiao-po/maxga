@@ -5,9 +5,11 @@ import 'package:maxga/Utils/DateUtils.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Chapter.dart';
 import 'package:maxga/model/Manga.dart';
+import 'package:maxga/model/MangaReadProcess.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaInfo/MaganInfoWrapper.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoCover.dart';
+import 'package:maxga/service/MangaReadStorage.service.dart';
 
 import 'MangaChapeter.dart';
 import 'MangaInfoBottomBar.dart';
@@ -34,6 +36,7 @@ class MangaInfoPage extends StatefulWidget {
 
 class _MangaInfoPageState extends State<MangaInfoPage> {
   _MangaInfoPageStatus loading = _MangaInfoPageStatus.loading;
+  MangaReadProcess mangaReadProcess;
   Manga manga;
 
   Chapter latestChapter;
@@ -41,7 +44,6 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   @override
   void initState() {
     super.initState();
-
     initMangaInfo();
   }
 
@@ -116,8 +118,15 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     }
 
     latestChapter = manga.getLatestChapter();
+
+    await initMangaReadProcess();
+    print(mangaReadProcess?.chapterId);
     setState(() {});
   }
 
   onResumeProcess() {}
+
+  Future<void> initMangaReadProcess() async {
+    mangaReadProcess = await MangaReadStorageService.getMangaStatus(manga);
+  }
 }
