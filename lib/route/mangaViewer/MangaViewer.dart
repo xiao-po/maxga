@@ -17,8 +17,9 @@ import 'package:maxga/service/MangaReadStorage.service.dart';
 class MangaViewer extends StatefulWidget {
   final Manga manga;
   final Chapter currentChapter;
+  final int initIndex;
 
-  const MangaViewer({Key key, this.manga, this.currentChapter})
+  const MangaViewer({Key key, this.manga, this.currentChapter, this.initIndex = 0})
       : super(key: key);
 
   @override

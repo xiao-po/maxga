@@ -20,7 +20,7 @@ class MangaFeatureView extends StatelessWidget {
           backgroundColor: Color(0xff263238),
           elevation: 0,
           leading: BackButton(),
-          title: Text(title),
+          title: Text(title+ '  $pageIndex') ,
         ),
         BottomAppBar(
           color: Color(0xff263238),

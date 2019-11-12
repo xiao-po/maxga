@@ -130,11 +130,12 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     setState(() {});
   }
 
-  void enjoyMangaContent(Chapter chapter, {int imagePage = 1}) async {
+  void enjoyMangaContent(Chapter chapter, {int imagePage = 0}) async {
     await Navigator.push(context, MaterialPageRoute(
         builder: (context) => MangaViewer(
           manga: manga,
           currentChapter: chapter,
+          initIndex: imagePage,
         )
     ));
     initMangaReadProcess();
