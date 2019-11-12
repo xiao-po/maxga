@@ -19,6 +19,17 @@ class Manga extends MangaBase {
     }
     return latestChapter;
   }
+  Chapter getFirstChapter() {
+    Chapter firstChapter;
+    for(var chapter in chapterList) {
+      if (firstChapter == null || firstChapter.order > chapter.order) {
+        firstChapter = chapter;
+      }
+    }
+    return firstChapter;
+  }
+
+
 
 
 }

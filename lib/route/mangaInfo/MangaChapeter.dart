@@ -4,6 +4,7 @@ import 'package:maxga/components/MangaOutlineButton.dart';
 import 'package:maxga/constant/SortValue.dart';
 import 'package:maxga/model/Chapter.dart';
 import 'package:maxga/model/Manga.dart';
+import 'package:maxga/model/MangaReadProcess.dart';
 import 'package:maxga/route/mangaViewer/MangaViewer.dart';
 
 typedef EnjoyMangaCallback = void Function(Chapter chapter);
@@ -11,8 +12,11 @@ typedef EnjoyMangaCallback = void Function(Chapter chapter);
 class MangaInfoChapter extends StatefulWidget {
   final Manga manga;
 
+  final EnjoyMangaCallback onClickChapter;
+  final MangaReadProcess readStatus;
 
-  const MangaInfoChapter({Key key, this.manga}) : super(key: key);
+
+  const MangaInfoChapter({Key key, this.manga, this.onClickChapter, this.readStatus}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MangaInfoChapterState();
@@ -46,8 +50,9 @@ class _MangaInfoChapterState extends State<MangaInfoChapter> {
             ),
           ),
           _MangaChapterGrid(
+              readStatus: widget.readStatus,
               chapterList: chapterList,
-              onOpenChapter: (item) => enjoyMangaContent(context, item),
+              onOpenChapter: (item) => widget.onClickChapter(item),
           ),
         ],
       ),
@@ -67,13 +72,13 @@ class _MangaInfoChapterState extends State<MangaInfoChapter> {
               FlatButton(
                 child: Row(
                   children: <Widget>[
-                    Text('正序',
+                    Text('正序 ',
                         textAlign: TextAlign.center,
                         style: sortType == SortType.asc
                             ? highlightTextStyle
                             : textStyle),
                     Icon(Icons.swap_horiz, size: 18, color: textColor),
-                    Text('倒序',
+                    Text(' 倒序',
                         textAlign: TextAlign.center,
                         style: sortType == SortType.desc
                             ? highlightTextStyle
@@ -88,14 +93,7 @@ class _MangaInfoChapterState extends State<MangaInfoChapter> {
   }
 
 
-  void enjoyMangaContent(BuildContext context, Chapter chapter) {
-    Navigator.push(context, MaterialPageRoute(
-        builder: (context) => MangaViewer(
-          manga: widget.manga,
-          currentChapter: chapter,
-        )
-    ));
-  }
+
 
   changeSortType() {
     if (sortType == SortType.asc) {
@@ -116,12 +114,15 @@ class _MangaChapterGrid extends StatelessWidget {
   final List<Chapter> chapterList;
   final EnjoyMangaCallback onOpenChapter;
 
-  const _MangaChapterGrid({Key key, this.chapterList, this.onOpenChapter}) : super(key: key);
+  final MangaReadProcess readStatus;
+
+  const _MangaChapterGrid({Key key, this.chapterList, this.onOpenChapter, this.readStatus}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final EdgeInsetsGeometry gridPadding =
       const EdgeInsets.only(top: 0, bottom: 0, left: 5, right: 5);
+    print(readStatus);
     return GridView.count(
         padding: gridPadding,
         crossAxisCount: 3,
@@ -131,8 +132,8 @@ class _MangaChapterGrid extends StatelessWidget {
         children: chapterList
             .map((item) => Align(
                   child: MangaOutlineButton(
-                      active: true,
-                      text: Text(item.title, textAlign: TextAlign.center, style: TextStyle()),
+                      active: readStatus?.chapterId == item.id ?? null,
+                      text: Text(item.title, textAlign: TextAlign.center, overflow: TextOverflow.ellipsis,),
                       onPressed: () => onOpenChapter(item),
                   ),
                 ))

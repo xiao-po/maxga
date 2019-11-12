@@ -102,17 +102,17 @@ class _MangaViewerState extends State<MangaViewer> {
                 duration: futureViewAnimationDuration,
                 child: mangaFutureViewVisitable
                     ? MangaFeatureView(
-                  onPageChange: (index) => changePage(
-                      index.floor() + (preChapter != null ? 1 : 0),
-                      shouldJump: true),
-                  imageCount: chapterImageCount + 1,
-                  pageIndex: chapterImageIndex < 1
-                      ? 0
-                      : (chapterImageIndex >= chapterImageCount
-                      ? chapterImageCount
-                      : chapterImageIndex),
-                  title: currentChapter.title,
-                )
+                        onPageChange: (index) => changePage(
+                            index.floor() + (preChapter != null ? 1 : 0),
+                            shouldJump: true),
+                        imageCount: chapterImageCount + 1,
+                        pageIndex: chapterImageIndex < 1
+                            ? 0
+                            : (chapterImageIndex >= chapterImageCount
+                                ? chapterImageCount
+                                : chapterImageIndex),
+                        title: currentChapter.title,
+                      )
                     : null,
               ),
             ],
@@ -130,7 +130,7 @@ class _MangaViewerState extends State<MangaViewer> {
         backgroundColor: Colors.black,
         body: body,
       ),
-      onWillPop: () => onBack() ,
+      onWillPop: () => onBack(),
     );
   }
 
@@ -313,7 +313,8 @@ class _MangaViewerState extends State<MangaViewer> {
       scrollEventTimer.cancel();
       scrollEventTimer = null;
     }
-    scrollEventTimer = Timer(Duration(milliseconds: 300), () => changeChapter());
+    scrollEventTimer =
+        Timer(Duration(milliseconds: 300), () => changeChapter());
 
     return true;
   }
@@ -326,9 +327,8 @@ class _MangaViewerState extends State<MangaViewer> {
 
   onBack() {
     var manga = widget.manga;
-    MangaReadStorageService.setMangaStatus(
-      MangaReadProcess(manga.source.key, manga.id, currentChapter.id, _currentPageIndex )
-    );
+    MangaReadStorageService.setMangaStatus(MangaReadProcess(
+        manga.source.key, manga.id, currentChapter.id, _currentPageIndex));
     Navigator.pop(context);
   }
 }
@@ -352,34 +352,52 @@ class _MangaStatusBarState extends State<MangaStatusBar> {
   BatteryState batteryState = BatteryState.discharging;
   int currentBattery = 100;
 
-
   @override
   void initState() {
     super.initState();
     this.updateTimeAndBattery();
     waitUpdateTimeByMinute();
-    batteryStatusSubscription = _battery.onBatteryStateChanged.listen((state) => batteryState = state);
+    batteryStatusSubscription =
+        _battery.onBatteryStateChanged.listen((state) => batteryState = state);
   }
 
   @override
   Widget build(BuildContext context) {
+    const defaultTextStyle = TextStyle(color: Color(0xffeaeaea), fontSize: 13);
     return Align(
-      alignment: Alignment.bottomRight,
-      child: Container(
-        padding: EdgeInsets.only(left: 10, right: 20, top: 7, bottom: 4),
-        decoration: BoxDecoration(color: Color(0xff263238)),
-        child: Text(
-          '${widget.currentChapter.title} '
-              ' ${widget.currentIndex}/${widget.currentChapter.imgUrlList.length} '
-              ' ${currentTime.hour}:${currentTime.minute}  $currentBattery%',
-          style: TextStyle(color: Color(0xffeaeaea), fontSize: 13),
-        ),
-      ),
+        alignment: Alignment.bottomRight,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            Container(
+                padding: EdgeInsets.only(left: 10, right: 20, top: 7, bottom: 4),
+                decoration: BoxDecoration(color: Color(0xff263238)),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      LimitedBox(
+                        maxWidth: 130,
+                        child: Text(
+                          '${widget.currentChapter.title} ',
+                          overflow: TextOverflow.ellipsis,
+                          style: defaultTextStyle,
+                        ),
+                      ),
+                      Text(
+                        ' ${widget.currentIndex}/${widget.currentChapter.imgUrlList.length} '
+                            ' ${currentTime.hour}:${currentTime.minute}  $currentBattery%',
+                        style: defaultTextStyle,
+                      ),
+                    ]
+                )
+            )
+          ],
+        )
     );
   }
 
   void waitUpdateTimeByMinute() {
-    int restSeconds =  60 - currentTime.second;
+    int restSeconds = 60 - currentTime.second;
     this.timer = Timer(Duration(seconds: restSeconds), () {
       waitUpdateTimeByMinute();
       updateTimeAndBattery();
@@ -390,7 +408,7 @@ class _MangaStatusBarState extends State<MangaStatusBar> {
     currentTime = DateTime.now();
 
     currentBattery = await _battery.batteryLevel;
-    setState((){});
+    setState(() {});
   }
 
   @override
@@ -398,6 +416,5 @@ class _MangaStatusBarState extends State<MangaStatusBar> {
     super.dispose();
     timer.cancel();
     batteryStatusSubscription.cancel();
-
   }
 }

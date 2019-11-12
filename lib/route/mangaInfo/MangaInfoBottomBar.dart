@@ -7,8 +7,9 @@ typedef OnResumeCallBack = void Function();
 class MangaInfoBottomBar extends StatelessWidget {
   final OnCollectCallBack onCollect;
   final OnResumeCallBack onResume;
+  final bool readed;
 
-  const MangaInfoBottomBar({Key key, this.onCollect, this.onResume})
+  const MangaInfoBottomBar({Key key, this.onCollect, this.onResume, this.readed = false})
       : super(key: key);
 
   @override
@@ -39,7 +40,7 @@ class MangaInfoBottomBar extends StatelessWidget {
       shape:  RoundedRectangleBorder(
           borderRadius: new BorderRadius.circular(25.0)
       ),
-      child: Text('  继续阅读  '),
+      child: readed ? Text('  继续阅读  ') : Text('  开始阅读  '),
     );
   }
 }

@@ -9,6 +9,7 @@ import 'package:maxga/model/MangaReadProcess.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaInfo/MaganInfoWrapper.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoCover.dart';
+import 'package:maxga/route/mangaViewer/MangaViewer.dart';
 import 'package:maxga/service/MangaReadStorage.service.dart';
 
 import 'MangaChapeter.dart';
@@ -70,10 +71,15 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
                 updateTime: '最后更新：$lastUpdate',
               ),
               MangaInfoIntro(manga: manga),
-              MangaInfoChapter(manga: manga),
+              MangaInfoChapter(
+                  manga: manga,
+                  readStatus: mangaReadProcess,
+                  onClickChapter: (chapter) => enjoyMangaContent(chapter),
+              ),
             ],
             bottomBar: MangaInfoBottomBar(
               onResume: () => onResumeProcess(),
+                readed: mangaReadProcess != null
             ),
           );
         }
@@ -111,6 +117,8 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
         url: widget.url,
       );
 
+      await initMangaReadProcess();
+
       loading = _MangaInfoPageStatus.over;
     } catch (e) {
       print(e);
@@ -118,13 +126,29 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     }
 
     latestChapter = manga.getLatestChapter();
-
-    await initMangaReadProcess();
     print(mangaReadProcess?.chapterId);
     setState(() {});
   }
 
-  onResumeProcess() {}
+  void enjoyMangaContent(Chapter chapter, {int imagePage = 1}) async {
+    await Navigator.push(context, MaterialPageRoute(
+        builder: (context) => MangaViewer(
+          manga: manga,
+          currentChapter: chapter,
+        )
+    ));
+    initMangaReadProcess();
+  }
+
+  onResumeProcess() {
+    if (mangaReadProcess != null ) {
+      var chapter = manga.chapterList.firstWhere((item) => item.id == mangaReadProcess.chapterId);
+      this.enjoyMangaContent(chapter, imagePage: mangaReadProcess.imageIndex);
+    } else {
+      var chapter = manga.getFirstChapter();
+      this.enjoyMangaContent(chapter, imagePage: 0);
+    }
+  }
 
   Future<void> initMangaReadProcess() async {
     mangaReadProcess = await MangaReadStorageService.getMangaStatus(manga);
