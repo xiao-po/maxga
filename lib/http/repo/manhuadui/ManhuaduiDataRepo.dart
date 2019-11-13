@@ -5,7 +5,6 @@ import 'package:maxga/model/Manga.dart';
 import 'package:maxga/model/MangaSource.dart';
 
 import '../MaxgaDataHttpRepo.dart';
-import 'crypto/ManhuaduiCrypto.dart';
 
 class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
   MangaSource _source = MangaSource(
@@ -23,7 +22,7 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<List<String>> getChapterImageList(String url) async {
-    final response = await http.get('https://www.manhuadui.com${url}');
+    final response = await http.get('https://www.manhuadui.com$url');
     var chapterImageList = parser.getMangaImageListFromMangaPage(response.body);
     var chapterImagePath = parser.getMangaImagePathFromMangaPage(response.body);
     if (chapterImagePath == "") {

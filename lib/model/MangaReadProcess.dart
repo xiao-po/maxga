@@ -1,5 +1,3 @@
-import 'MangaSource.dart';
-
 class MangaReadProcess {
   String sourceKey;
   int id;

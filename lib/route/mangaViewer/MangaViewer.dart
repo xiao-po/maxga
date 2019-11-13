@@ -33,6 +33,7 @@ class _MangaViewerState extends State<MangaViewer> {
   Timer chapterChangeTimer;
   Timer scrollEventTimer;
   Timer futureViewVisitableTimer;
+  // ignore: non_constant_identifier_names
   bool NEXT_PAGE_CHANGE_TRUST = true;
 
   Map<int, Chapter> cachedChapterData = {};
@@ -89,9 +90,13 @@ class _MangaViewerState extends State<MangaViewer> {
 
   List<String> getImagePageUrlListFormChapter() {
     List<String> imageUrlList = [];
-    preChapter != null ? imageUrlList.add(preChapter.imgUrlList.last) : null;
+    if(preChapter != null) {
+      imageUrlList.add(preChapter.imgUrlList.last);
+    }
     imageUrlList.addAll(currentChapter.imgUrlList);
-    nextChapter != null ? imageUrlList.add(nextChapter.imgUrlList.first) : null;
+    if (nextChapter != null) {
+       imageUrlList.add(nextChapter.imgUrlList.first);
+    }
     return imageUrlList;
   }
 
@@ -410,7 +415,7 @@ class _MangaStatusBarState extends State<MangaStatusBar> {
                         ),
                       ),
                       Text(
-                        ' ${index}/${widget.currentChapter.imgUrlList.length} '
+                        ' $index/${widget.currentChapter.imgUrlList.length} '
                         ' ${currentTime.hour}:${currentTime.minute}  $currentBattery%',
                         style: defaultTextStyle,
                       ),

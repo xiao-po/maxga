@@ -79,14 +79,16 @@ class _SearchPageState extends State<SearchPage> {
 
   Widget buildSearchBody() {
     switch (searchStatus) {
-      case SearchStep.beforeInput:
-        return this.buildHistorySearchList();
-        break;
       case SearchStep.onInput:
       case SearchStep.searchStart:
         return this.buildLoadingPage();
       case SearchStep.inputOver:
         return this.buildSearchList();
+        break;
+
+      case SearchStep.beforeInput:
+      default:
+        return this.buildHistorySearchList();
         break;
     }
   }
@@ -112,8 +114,7 @@ class _SearchPageState extends State<SearchPage> {
                   style: TextStyle(fontSize: 14),
                 ),
                 onTap: () => toSearch(item),
-              )
-      )
+              ))
           .toList(),
     );
   }
@@ -123,11 +124,8 @@ class _SearchPageState extends State<SearchPage> {
 
     List<String> historyList = this.historySearchWords.toList();
     historyList.removeWhere((item) => item == words);
-    historyList = [
-      words,
-      ...historyList
-    ];
-    await LocalStorage.setStringList('searchHistory',historyList);
+    historyList = [words, ...historyList];
+    await LocalStorage.setStringList('searchHistory', historyList);
     this.historySearchWords = historyList;
   }
 
@@ -142,13 +140,12 @@ class _SearchPageState extends State<SearchPage> {
   Timer _debounce;
 
   void inputChange(String words) {
-    if (words.length != 0){
-
+    if (words.length != 0) {
       this.hasWords = true;
 
       if (_debounce?.isActive ?? false) _debounce.cancel();
       _debounce = Timer(const Duration(milliseconds: 300), () {
-      this.getSuggestionAction(words);
+        this.getSuggestionAction(words);
       });
     } else {
       this.hasWords = false;
@@ -158,19 +155,20 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void getHistorySearchList() async {
-    this.historySearchWords = await LocalStorage.getStringList('searchHistory') ?? [];
-    setState(() { });
+    this.historySearchWords =
+        await LocalStorage.getStringList('searchHistory') ?? [];
+    setState(() {});
   }
 
   Widget buildHistorySearchList() {
     final list = this.historySearchWords;
     var historyListTiles = list
-          .map((item) => ListTile(
-                title: Text(item),
-                onTap: () => toSearch(item),
-                leading: Icon(Icons.history),
-              ))
-          .toList();
+        .map((item) => ListTile(
+              title: Text(item),
+              onTap: () => toSearch(item),
+              leading: Icon(Icons.history),
+            ))
+        .toList();
     return ListView(
       children: historyListTiles,
     );
@@ -182,6 +180,5 @@ class _SearchPageState extends State<SearchPage> {
         keyword: keywords,
       );
     }));
-
   }
 }

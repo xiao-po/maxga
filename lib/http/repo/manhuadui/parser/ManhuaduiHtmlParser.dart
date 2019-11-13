@@ -141,6 +141,7 @@ class ManhuaduiHtmlParser {
 
 
     var mangaChapterListNode = document.querySelectorAll('.zj_list')[1];
+    // ignore: unused_local_variable
     final updateTime = mangaChapterListNode
         .querySelector('.zj_list_head')
         .querySelector('.zj_list_head_dat')

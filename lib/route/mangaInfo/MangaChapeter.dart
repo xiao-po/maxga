@@ -5,7 +5,6 @@ import 'package:maxga/constant/SortValue.dart';
 import 'package:maxga/model/Chapter.dart';
 import 'package:maxga/model/Manga.dart';
 import 'package:maxga/model/MangaReadProcess.dart';
-import 'package:maxga/route/mangaViewer/MangaViewer.dart';
 
 typedef EnjoyMangaCallback = void Function(Chapter chapter);
 
