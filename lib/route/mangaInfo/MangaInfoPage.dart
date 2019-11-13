@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/Application.dart';
+import 'package:maxga/Utils/MaxgaUtils.dart';
 import 'package:maxga/Utils/DateUtils.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Chapter.dart';
@@ -131,6 +132,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   }
 
   void enjoyMangaContent(Chapter chapter, {int imagePage = 0}) async {
+    await MaxgaUtils.hiddenStatusBar();
     await Navigator.push(context, MaterialPageRoute(
         builder: (context) => MangaViewer(
           manga: manga,
@@ -138,6 +140,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
           initIndex: imagePage,
         )
     ));
+    await MaxgaUtils.showStatusBar();
     initMangaReadProcess();
   }
 

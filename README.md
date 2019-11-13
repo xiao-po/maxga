@@ -1,16 +1,20 @@
 # maxga
 
-awesome manga app
+maxga 是用 flutter 开发的 漫画应用。
 
-## Getting Started
+### 进度
 
-This project is a starting point for a Flutter application.
+- [ ] 设计基础页面
+    
+    - [ ] 收藏
+    - [x] 搜索
+    - [x] 漫画详情 ( 60% ) ~~目前只是基础设计~~
+    - [x] 漫画 viewer ( 70% ) ~~功能方面有所欠缺~~
+    - [ ] 设置页面
+    
+- [ ] 漫画源
 
-A few resources to get you started if this is your first Flutter project:
+    - [x] 动漫之家 
+    - [x] 漫画堆 
+    
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.

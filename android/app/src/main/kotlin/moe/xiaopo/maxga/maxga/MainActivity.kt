@@ -14,15 +14,12 @@ import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodCall
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-
-
-
-
+import android.view.WindowManager
 
 
 class MainActivity : FlutterActivity() {
 
-    private val CHANNEL = "android/back/desktop"
+    private val CHANNEL = "android/maxga/utils"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         GeneratedPluginRegistrant.registerWith(this)
@@ -30,6 +27,15 @@ class MainActivity : FlutterActivity() {
             if (methodCall.method == "backDesktop") {
                 result.success(true)
                 moveTaskToBack(false)
+            }
+            if (methodCall.method == "hiddenStatusBar") {
+                window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                result.success(true)
+            }
+            if (methodCall.method == "showStatusBar") {
+
+                window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                result.success(true)
             }
         }
 

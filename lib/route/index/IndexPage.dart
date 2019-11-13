@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:maxga/Utils/BackToDeskTopUtils.dart';
+import 'package:maxga/Utils/MaxgaUtils.dart';
 import 'package:maxga/components/Card.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Manga.dart';
@@ -138,7 +138,7 @@ class _IndexPageState extends State<IndexPage> {
     } else {
       hiddenSnack();
       await Future.delayed(Duration(milliseconds: 100));
-      AndroidBackTop.backDeskTop();
+      MaxgaUtils.backDeskTop();
       return false;
     }
 
