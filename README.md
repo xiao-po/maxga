@@ -1,6 +1,6 @@
 # maxga
 
-awesom manga app
+awesome manga app
 
 ## Getting Started
 
