@@ -19,7 +19,8 @@ class MangaViewer extends StatefulWidget {
   final Chapter currentChapter;
   final int initIndex;
 
-  const MangaViewer({Key key, this.manga, this.currentChapter, this.initIndex = 0})
+  const MangaViewer(
+      {Key key, this.manga, this.currentChapter, this.initIndex = 0})
       : super(key: key);
 
   @override
@@ -54,8 +55,7 @@ class _MangaViewerState extends State<MangaViewer> {
   get chapterImageCount =>
       imagePageUrlList.length -
       (preChapter != null ? 1 : 0) -
-      (nextChapter != null ? 1 : 0) -
-      1;
+      (nextChapter != null ? 1 : 0);
 
   @override
   void initState() {
@@ -63,13 +63,36 @@ class _MangaViewerState extends State<MangaViewer> {
     currentChapter = widget.currentChapter;
     chapterList = widget.manga.chapterList.toList();
     chapterList.sort((a, b) => a.order.compareTo(b.order));
-    initChapterState(currentChapter).then((val) {
+    final simplePreChapterData = getPreChapter(currentChapter);
+    final simpleNextChapterData = getNextChapter(currentChapter);
+    Future.wait<Chapter>([
+      getChapterData(simplePreChapterData),
+      getChapterData(currentChapter),
+      getChapterData(simpleNextChapterData),
+    ]).then((resultChapterList) {
+      Chapter preChapterData = resultChapterList[0];
+      Chapter currentChapterData = resultChapterList[1];
+      Chapter nextChapterData = resultChapterList[2];
+
+      nextChapter = nextChapterData;
+      preChapter = preChapterData;
+      currentChapter = currentChapterData;
+      this.imagePageUrlList = getImagePageUrlListFormChapter();
       _currentPageIndex = preChapter != null ? 1 : 0;
+
       tabController = PageController(initialPage: _currentPageIndex);
       this.loadStatus = 1;
 
       setState(() {});
     });
+  }
+
+  List<String> getImagePageUrlListFormChapter() {
+    List<String> imageUrlList = [];
+    preChapter != null ? imageUrlList.add(preChapter.imgUrlList.last) : null;
+    imageUrlList.addAll(currentChapter.imgUrlList);
+    nextChapter != null ? imageUrlList.add(nextChapter.imgUrlList.first) : null;
+    return imageUrlList;
   }
 
   @override
@@ -97,7 +120,7 @@ class _MangaViewerState extends State<MangaViewer> {
                   ),
                 ),
               ),
-              MangaStatusBar(currentChapter, _currentPageIndex),
+              MangaStatusBar(currentChapter, chapterImageIndex + 1),
               AnimatedOpacity(
                 opacity: mangaFutureViewOpacity,
                 duration: futureViewAnimationDuration,
@@ -146,6 +169,9 @@ class _MangaViewerState extends State<MangaViewer> {
   }
 
   Future<Chapter> getChapterData(Chapter chapter) async {
+    if (chapter == null) {
+      return null;
+    }
     if (cachedChapterData.containsKey(chapter.id)) {
       return cachedChapterData[chapter.id];
     } else {
@@ -257,52 +283,44 @@ class _MangaViewerState extends State<MangaViewer> {
 
   Future<void> initChapterState(Chapter chapter) async {
     currentChapter = await getChapterData(chapter);
-    final simplePreChapterData = getPreChapter(currentChapter);
     this.imagePageUrlList = [];
-    if (simplePreChapterData != null) {
-      preChapter = await getChapterData(simplePreChapterData);
-      this.imagePageUrlList.add(preChapter.imgUrlList.last);
-    } else {
-      preChapter = null;
-    }
-
-    this.imagePageUrlList.addAll(currentChapter.imgUrlList);
-
-    final simpleNextChapterData = getNextChapter(currentChapter);
-    if (simpleNextChapterData != null) {
-      nextChapter = await getChapterData(simpleNextChapterData);
-      this.imagePageUrlList.add(nextChapter.imgUrlList.first);
-    } else {
-      nextChapter = null;
-    }
 
     return null;
   }
 
   void changeChapter() async {
-    print('changeChapter');
     if (_currentPageIndex == 0 && preChapter != null) {
-      print('will visit preChapter');
       toastMessage('进入上一章节');
-      await initChapterState(preChapter);
+      nextChapter = currentChapter;
+      currentChapter = preChapter;
+      preChapter = null;
+      setState(() {});
+
+      final simplePreChapterData = getPreChapter(currentChapter);
+      var preChapterData = await getChapterData(simplePreChapterData);
+      preChapter = preChapterData;
+      this.imagePageUrlList = getImagePageUrlListFormChapter();
       _currentPageIndex = imagePageUrlList.length - 2;
-      // TODO： notify just preChapter
       setState(() {});
 
       NEXT_PAGE_CHANGE_TRUST = false;
       tabController.jumpToPage(_currentPageIndex);
       chapterChangeTimer = null;
-    }
-
-    if (_currentPageIndex == (imagePageUrlList.length - 1) &&
+    } else if (_currentPageIndex == (imagePageUrlList.length - 1) &&
         nextChapter != null) {
-      print('will visit nextChapter');
+      preChapter = currentChapter;
+      currentChapter = nextChapter;
+      nextChapter = null;
       toastMessage('进入下一章节', TextAlign.right);
-      await initChapterState(nextChapter);
-      _currentPageIndex = 1;
-
-      // TODO： notify just preChapter
       setState(() {});
+
+      final simpleNextChapterData = getNextChapter(currentChapter);
+      var nextChapterData = await getChapterData(simpleNextChapterData);
+      nextChapter = nextChapterData;
+      this.imagePageUrlList = getImagePageUrlListFormChapter();
+      _currentPageIndex = preChapter != null ? 1 : 0;
+      setState(() {});
+
       NEXT_PAGE_CHANGE_TRUST = false;
       tabController.jumpToPage(_currentPageIndex);
       chapterChangeTimer = null;
@@ -316,7 +334,6 @@ class _MangaViewerState extends State<MangaViewer> {
     }
     scrollEventTimer =
         Timer(Duration(milliseconds: 300), () => changeChapter());
-
     return true;
   }
 
@@ -365,13 +382,21 @@ class _MangaStatusBarState extends State<MangaStatusBar> {
   @override
   Widget build(BuildContext context) {
     const defaultTextStyle = TextStyle(color: Color(0xffeaeaea), fontSize: 13);
+    int index = widget.currentIndex;
+    if (index > widget.currentChapter.imgUrlList.length) {
+      index = widget.currentChapter.imgUrlList.length;
+    } else if (index == 0) {
+      index = 1;
+    }
+
     return Align(
         alignment: Alignment.bottomRight,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             Container(
-                padding: EdgeInsets.only(left: 10, right: 20, top: 7, bottom: 4),
+                padding:
+                    EdgeInsets.only(left: 10, right: 20, top: 7, bottom: 4),
                 decoration: BoxDecoration(color: Color(0xff263238)),
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -385,16 +410,13 @@ class _MangaStatusBarState extends State<MangaStatusBar> {
                         ),
                       ),
                       Text(
-                        ' ${widget.currentIndex}/${widget.currentChapter.imgUrlList.length} '
-                            ' ${currentTime.hour}:${currentTime.minute}  $currentBattery%',
+                        ' ${index}/${widget.currentChapter.imgUrlList.length} '
+                        ' ${currentTime.hour}:${currentTime.minute}  $currentBattery%',
                         style: defaultTextStyle,
                       ),
-                    ]
-                )
-            )
+                    ]))
           ],
-        )
-    );
+        ));
   }
 
   void waitUpdateTimeByMinute() {
