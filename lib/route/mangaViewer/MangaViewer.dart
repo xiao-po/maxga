@@ -79,7 +79,7 @@ class _MangaViewerState extends State<MangaViewer> {
       preChapter = preChapterData;
       currentChapter = currentChapterData;
       this.imagePageUrlList = getImagePageUrlListFormChapter();
-      _currentPageIndex = preChapter != null ? 1 : 0;
+      _currentPageIndex = widget.initIndex + (preChapter != null ? 1 : 0);
 
       tabController = PageController(initialPage: _currentPageIndex);
       this.loadStatus = 1;
@@ -351,7 +351,7 @@ class _MangaViewerState extends State<MangaViewer> {
   onBack() {
     var manga = widget.manga;
     MangaReadStorageService.setMangaStatus(MangaReadProcess(
-        manga.source.key, manga.id, currentChapter.id, _currentPageIndex));
+        manga.source.key, manga.id, currentChapter.id, _currentPageIndex - (preChapter != null ? 1 : 0)));
     Navigator.pop(context);
   }
 }
