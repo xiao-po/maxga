@@ -1,3 +1,5 @@
+import 'package:connectivity/connectivity.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/Application.dart';
@@ -20,7 +22,7 @@ import 'MangaInfoIntro.dart';
 enum _MangaInfoPageStatus {
   loading,
   over,
-  error
+  error,
 }
 
 class MangaInfoPage extends StatefulWidget {
@@ -47,6 +49,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   void initState() {
     super.initState();
     initMangaInfo();
+
   }
 
   @override
@@ -119,7 +122,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
       );
 
       await initMangaReadProcess();
-
+      await Future.delayed(Duration(milliseconds: 500));
       loading = _MangaInfoPageStatus.over;
     } catch (e) {
       print(e);
@@ -157,4 +160,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   Future<void> initMangaReadProcess() async {
     mangaReadProcess = await MangaReadStorageService.getMangaStatus(manga);
   }
+
+
+
 }

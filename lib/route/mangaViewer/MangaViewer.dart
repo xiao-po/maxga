@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:battery/battery.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/Application.dart';
@@ -13,6 +14,12 @@ import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaViewer/MangaTab.dart';
 import 'package:maxga/route/mangaViewer/baseComponent/MangaViewerFutureView.dart';
 import 'package:maxga/service/MangaReadStorage.service.dart';
+
+enum MangaViewerLoadState {
+  checkNetState,
+  loadingMangaData,
+  over
+}
 
 class MangaViewer extends StatefulWidget {
   final Manga manga;
@@ -27,6 +34,7 @@ class MangaViewer extends StatefulWidget {
   State<StatefulWidget> createState() => _MangaViewerState();
 }
 
+
 class _MangaViewerState extends State<MangaViewer> {
   final mangaViewerKey = GlobalKey<ScaffoldState>();
 
@@ -37,7 +45,7 @@ class _MangaViewerState extends State<MangaViewer> {
   bool NEXT_PAGE_CHANGE_TRUST = true;
 
   Map<int, Chapter> cachedChapterData = {};
-  int loadStatus = 0;
+  MangaViewerLoadState loadStatus = MangaViewerLoadState.loadingMangaData;
   bool mangaFutureViewVisitable = false;
   double mangaFutureViewOpacity = 0;
   List<Chapter> chapterList;
@@ -61,31 +69,41 @@ class _MangaViewerState extends State<MangaViewer> {
   @override
   void initState() {
     super.initState();
+
+    Connectivity().checkConnectivity().then((connectivityResult) {
+      if (connectivityResult == ConnectivityResult.mobile) {
+        loadStatus = MangaViewerLoadState.checkNetState;
+      } else if (connectivityResult == ConnectivityResult.wifi) {
+        initMangaViewer();
+      }
+    });
+  }
+
+  void initMangaViewer() async {
     currentChapter = widget.currentChapter;
     chapterList = widget.manga.chapterList.toList();
     chapterList.sort((a, b) => a.order.compareTo(b.order));
     final simplePreChapterData = getPreChapter(currentChapter);
     final simpleNextChapterData = getNextChapter(currentChapter);
-    Future.wait<Chapter>([
+    final resultChapterList = await Future.wait<Chapter>([
       getChapterData(simplePreChapterData),
       getChapterData(currentChapter),
       getChapterData(simpleNextChapterData),
-    ]).then((resultChapterList) {
-      Chapter preChapterData = resultChapterList[0];
-      Chapter currentChapterData = resultChapterList[1];
-      Chapter nextChapterData = resultChapterList[2];
+    ]);
+    Chapter preChapterData = resultChapterList[0];
+    Chapter currentChapterData = resultChapterList[1];
+    Chapter nextChapterData = resultChapterList[2];
 
-      nextChapter = nextChapterData;
-      preChapter = preChapterData;
-      currentChapter = currentChapterData;
-      this.imagePageUrlList = getImagePageUrlListFormChapter();
-      _currentPageIndex = widget.initIndex + (preChapter != null ? 1 : 0);
+    nextChapter = nextChapterData;
+    preChapter = preChapterData;
+    currentChapter = currentChapterData;
+    this.imagePageUrlList = getImagePageUrlListFormChapter();
+    _currentPageIndex = widget.initIndex + (preChapter != null ? 1 : 0);
 
-      tabController = PageController(initialPage: _currentPageIndex);
-      this.loadStatus = 1;
+    tabController = PageController(initialPage: _currentPageIndex);
+    this.loadStatus = MangaViewerLoadState.over;
 
-      setState(() {});
-    });
+    setState(() {});
   }
 
   List<String> getImagePageUrlListFormChapter() {
@@ -104,12 +122,15 @@ class _MangaViewerState extends State<MangaViewer> {
   Widget build(BuildContext context) {
     var body;
     switch (loadStatus) {
-      case 0:
+      case MangaViewerLoadState.checkNetState: {
+        return buildCheckNetStatePage();
+      }
+      case MangaViewerLoadState.loadingMangaData:
         {
           body = buildLoadingPage();
           break;
         }
-      case 1:
+      case MangaViewerLoadState.over:
         {
           body = Stack(
             children: <Widget>[
@@ -354,6 +375,47 @@ class _MangaViewerState extends State<MangaViewer> {
         manga.source.key, manga.id, currentChapter.id, _currentPageIndex - (preChapter != null ? 1 : 0)));
     Navigator.pop(context);
   }
+
+  Widget buildCheckNetStatePage() {
+
+    var text = '1';
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        leading: BackButton(color: Colors.white),
+      ),
+      body: buildCenterContainer(
+        children: [
+          buildCenterText('检测到你现在正使用移动网络'),
+          buildCenterText('是否继续阅读？'),
+          OutlineButton(
+            borderSide: BorderSide(color: Colors.white),
+            highlightedBorderColor: Colors.white,
+
+            child: const Text('继续阅读',style: TextStyle(color: Colors.white,fontSize: 16),textAlign: TextAlign.center),
+            onPressed: () {loadStatus = MangaViewerLoadState.loadingMangaData;initMangaViewer();}
+            ),
+        ],
+      )
+    );
+  }
+
+  Container buildCenterContainer({List<Widget> children}) {
+    return Container(
+      width: double.infinity,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+
+        children: children,
+      ),
+    );
+  }
+
+  Widget buildCenterText(String text) => Padding(
+    padding: EdgeInsets.only(top: 5, bottom: 5),
+    child: Text(text,style: TextStyle(color: Colors.white,fontSize: 16),textAlign: TextAlign.center,),
+  );
 }
 
 class MangaStatusBar extends StatefulWidget {

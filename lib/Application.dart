@@ -1,5 +1,8 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/http/repo/manhuadui/ManhuaduiDataRepo.dart';
+import 'package:maxga/service/UpdateService.dart';
 
 import 'http/repo/dmzj/DmzjDataRepo.dart';
 
@@ -14,11 +17,13 @@ class Application {
   Application() {
     print('application init');
     currentDataRepo = DmzjDataRepo();
+    UpdateService.testClearData();
   }
 
 
   changeDataRepo() {
     currentDataRepo = ManhuaduiDataRepo();
   }
+
 
 }

@@ -90,10 +90,14 @@ class MangaInfoCover extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Text(
-                    '${manga.author} · ${manga.typeList.join('/')}',
-                    style: TextStyle(color: subTitleTextColor, fontSize: subtitleTextSize),
-                    textAlign: TextAlign.left,
+                  LimitedBox(
+                    maxWidth: 220,
+                    child: Text(
+                      '${manga.author} · ${manga.typeList.join('/')}',
+                      style: TextStyle(color: subTitleTextColor, fontSize: subtitleTextSize),
+                      textAlign: TextAlign.left,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                   Text(
                     '来源： ${manga.source.name}',

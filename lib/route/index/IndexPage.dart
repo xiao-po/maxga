@@ -5,11 +5,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/Utils/MaxgaUtils.dart';
 import 'package:maxga/components/Card.dart';
+import 'package:maxga/components/UpdateDialog.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Manga.dart';
+import 'package:maxga/route/Drawer/Drawer.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:maxga/route/search/search-page.dart';
+import 'package:maxga/service/UpdateService.dart';
 
 import '../../Application.dart';
 
@@ -32,23 +35,28 @@ class _IndexPageState extends State<IndexPage> {
   void initState() {
     super.initState();
     this.getMangaList();
+    this.checkUpdate();
   }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      child:  Scaffold(
+      child: Scaffold(
         key: scaffoldKey,
         backgroundColor: Color(0xfff5f5f5),
         appBar: AppBar(
           title: const Text('maxga'),
           actions: <Widget>[
             IconButton(
-              icon: Icon(Icons.search, color: Colors.white,),
+              icon: Icon(
+                Icons.search,
+                color: Colors.white,
+              ),
               onPressed: this.toSearch,
-            )
+            ),
           ],
         ),
+        drawer: MaxgaDrawer(),
         body: buildIndexBody(),
       ),
       onWillPop: () => onBack(),
@@ -109,7 +117,8 @@ class _IndexPageState extends State<IndexPage> {
 
   void showSnack(String message) {
     scaffoldKey.currentState.showSnackBar(SnackBar(
-      content: Text(message), duration: Duration(seconds: 2),
+      content: Text(message),
+      duration: Duration(seconds: 2),
     ));
   }
 
@@ -130,7 +139,8 @@ class _IndexPageState extends State<IndexPage> {
 
   DateTime _lastPressedAt; //上次点击时间
   Future<bool> onBack() async {
-    if (_lastPressedAt == null ||  DateTime.now().difference(_lastPressedAt) > Duration(seconds: 2)) {
+    if (_lastPressedAt == null ||
+        DateTime.now().difference(_lastPressedAt) > Duration(seconds: 2)) {
       //两次点击间隔超过1秒则重新计时
       _lastPressedAt = DateTime.now();
       showSnack('再按一次退出程序');
@@ -141,10 +151,63 @@ class _IndexPageState extends State<IndexPage> {
       MaxgaUtils.backDeskTop();
       return false;
     }
-
   }
 
   void hiddenSnack() {
     scaffoldKey.currentState.hideCurrentSnackBar();
+  }
+
+  checkUpdate() async {
+    final nextVersion = await UpdateService.checkUpdateStatus();
+    if (nextVersion != null) {
+      final buttonTextStyle = TextStyle(
+        color: Colors.greenAccent,
+      );
+      final buttonPadding = EdgeInsets.fromLTRB(15, 5, 15, 5);
+      scaffoldKey.currentState.showSnackBar(SnackBar(
+        duration: Duration(seconds: 3),
+        content: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Text('有新版本更新'),
+            Row(
+              children: <Widget>[
+                GestureDetector(
+                  child: Padding(
+                    padding: buttonPadding,
+                    child: Text('详情', style: buttonTextStyle),
+                  ),
+                  onTap: () {
+                    hiddenSnack();
+                    openUpdateDialog(nextVersion);
+                  },
+                ),
+                GestureDetector(
+                  child: Padding(
+                    padding: buttonPadding,
+                    child: Text('忽略', style: buttonTextStyle),
+                  ),
+                  onTap: () {
+                    hiddenSnack();
+                    UpdateService.ignoreUpdate(nextVersion);
+                  },
+                )
+              ],
+            ),
+          ],
+        ),
+      ));
+    }
+  }
+
+  openUpdateDialog(MaxgaReleaseInfo nextVersion) {
+    showDialog(
+        context: context,
+        builder: (context) => UpdateDialog(
+              text: nextVersion.description,
+              url: nextVersion.url,
+              onIgnore: () => UpdateService.ignoreUpdate(nextVersion),
+            )
+    );
   }
 }
