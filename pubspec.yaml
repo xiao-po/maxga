@@ -29,12 +29,12 @@ dependencies:
   sqflite: 1.1.7
   shared_preferences: 0.5.3+4
   cached_network_image: 1.1.1
-  provider: 3.1.0
   extended_image: 0.6.1
   encrypt: 3.3.1
   battery: 0.3.1+2
   url_launcher: 5.2.5
   connectivity: 0.4.5+3
+  provider: 3.1.0+1
 
 dev_dependencies:
   flutter_test:

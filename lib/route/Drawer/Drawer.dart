@@ -8,7 +8,7 @@ class MaxgaDrawer extends StatelessWidget {
       child: Column(
         children: <Widget>[
           UserAccountsDrawerHeader(
-            accountName: const Text('yande'),
+            accountName: const Text('maxga'),
           ),
           MediaQuery.removePadding(
               context: context,

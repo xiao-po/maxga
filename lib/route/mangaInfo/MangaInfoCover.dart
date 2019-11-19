@@ -20,7 +20,7 @@ class MangaInfoCover extends StatelessWidget {
           Container(
             height: double.infinity,
             width: double.infinity,
-            child: buildCoverImage(),
+            child: buildCoverImage(manga),
           ),
           buildCoverMessage(),
         ],
@@ -28,18 +28,12 @@ class MangaInfoCover extends StatelessWidget {
     );
   }
 
-  CachedNetworkImage buildCoverImage() {
-    return CachedNetworkImage(
-      placeholder: (context, url) => Center(
-        child: SizedBox(
-          height: 20,
-          width: 20,
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
-      ),
-      imageUrl: manga.coverImgUrl,
-      alignment: Alignment.topCenter,
-      fit: BoxFit.cover,
+  Widget buildCoverImage(Manga item) {
+    return Hero(
+      tag: '${item.coverImgUrl}',
+      child:  CachedNetworkImage(
+          fit: BoxFit.cover,
+          imageUrl: item.coverImgUrl),
     );
   }
 

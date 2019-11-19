@@ -8,11 +8,13 @@ import 'package:maxga/components/Card.dart';
 import 'package:maxga/components/UpdateDialog.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Manga.dart';
+import 'package:maxga/provider/SettingProvider.dart';
 import 'package:maxga/route/Drawer/Drawer.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:maxga/route/search/search-page.dart';
 import 'package:maxga/service/UpdateService.dart';
+import 'package:provider/provider.dart';
 
 import '../../Application.dart';
 
@@ -69,11 +71,12 @@ class _IndexPageState extends State<IndexPage> {
     } else if (loadStatus == 1) {
       return ListView(
           children: mangaList
-              .map((item) => MangaCard(
-                    manga: item,
-                    cover: _buildCachedNetworkImage(item),
-                    onTap: () => this.goMangaInfoPage(item),
-                  ))
+              .map((item) =>
+              MangaCard(
+                manga: item,
+                cover: _buildCachedNetworkImage(item),
+                onTap: () => this.goMangaInfoPage(item),
+              ))
               .toList());
     } else if (loadStatus == -1) {
       return ErrorPage(
@@ -83,11 +86,14 @@ class _IndexPageState extends State<IndexPage> {
     }
   }
 
-  CachedNetworkImage _buildCachedNetworkImage(Manga item) {
-    return CachedNetworkImage(
-        imageUrl: item.coverImgUrl,
-        placeholder: (context, url) =>
-            CircularProgressIndicator(strokeWidth: 2));
+  Widget _buildCachedNetworkImage(Manga item) {
+    return Hero(
+      tag: '${item.coverImgUrl}',
+      child: CachedNetworkImage(
+          imageUrl: item.coverImgUrl,
+          placeholder: (context, url) =>
+              CircularProgressIndicator(strokeWidth: 2)),
+    );
   }
 
   Center buildProcessIndicator() {
@@ -102,7 +108,9 @@ class _IndexPageState extends State<IndexPage> {
 
   void getMangaList() async {
     try {
-      MaxgaDataHttpRepo repo = Application.getInstance().currentDataRepo;
+      MaxgaDataHttpRepo repo = Application
+          .getInstance()
+          .currentDataRepo;
       mangaList = await repo.getLatestUpdate(page);
       page++;
       this.loadStatus = 1;
@@ -131,8 +139,7 @@ class _IndexPageState extends State<IndexPage> {
   goMangaInfoPage(Manga item) {
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return MangaInfoPage(
-        url: item.infoUrl,
-        id: item.id,
+          manga: item
       );
     }));
   }
@@ -203,7 +210,8 @@ class _IndexPageState extends State<IndexPage> {
   openUpdateDialog(MaxgaReleaseInfo nextVersion) {
     showDialog(
         context: context,
-        builder: (context) => UpdateDialog(
+        builder: (context) =>
+            UpdateDialog(
               text: nextVersion.description,
               url: nextVersion.url,
               onIgnore: () => UpdateService.ignoreUpdate(nextVersion),

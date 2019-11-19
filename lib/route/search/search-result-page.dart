@@ -73,8 +73,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
   goMangaInfoPage(Manga item) {
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return MangaInfoPage(
-        url: item.infoUrl,
-        id: item.id,
+        manga: item,
       );
     }));
   }

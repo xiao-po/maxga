@@ -26,17 +26,13 @@ enum _MangaInfoPageStatus {
 }
 
 class MangaInfoPage extends StatefulWidget {
-  final int id;
+  final Manga manga;
 
-
-  const MangaInfoPage({Key key, @required this.url,@required  this.id}) : super(key: key);
-
-  final String url;
+  const MangaInfoPage({Key key, this.manga}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MangaInfoPageState();
 }
-
 
 class _MangaInfoPageState extends State<MangaInfoPage> {
   _MangaInfoPageStatus loading = _MangaInfoPageStatus.loading;
@@ -48,54 +44,72 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   @override
   void initState() {
     super.initState();
+    manga = widget.manga;
+    latestChapter = manga.getLatestChapter();
     initMangaInfo();
-
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: buildBody()
-    );
+    return Scaffold(body: buildBody());
   }
 
   Widget buildBody() {
+    String lastUpdate = latestChapter.updateTime != null
+        ? DateUtils.formatTime(
+            timestamp: latestChapter.updateTime, template: 'YYYY-MM-DD')
+        : '';
+    MangaInfoIntro mangaInfoIntro;
+    MangaInfoChapter mangaInfoChapter;
+    MangaInfoBottomBar mangaInfoBottomBar;
     switch (loading) {
       case _MangaInfoPageStatus.over:
         {
-          final String lastUpdate = latestChapter.updateTime != null
-              ? DateUtils.formatTime(
-                  timestamp: latestChapter.updateTime, template: 'YYYY-MM-DD')
-              : '';
-          return MangaInfoWrapper(
-            title: manga != null ? manga.title : '',
-            children: [
-              MangaInfoCover(
-                manga: manga,
-                updateTime: '最后更新：$lastUpdate',
-              ),
-              MangaInfoIntro(manga: manga),
-              MangaInfoChapter(
-                  manga: manga,
-                  readStatus: mangaReadProcess,
-                  onClickChapter: (chapter) => enjoyMangaContent(chapter),
-              ),
-            ],
-            bottomBar: MangaInfoBottomBar(
-              onResume: () => onResumeProcess(),
-                readed: mangaReadProcess != null
-            ),
+          mangaInfoIntro = MangaInfoIntro(manga: manga);
+          mangaInfoChapter = MangaInfoChapter(
+            manga: manga,
+            readStatus: mangaReadProcess,
+            onClickChapter: (chapter) => enjoyMangaContent(chapter),
           );
+          mangaInfoBottomBar = MangaInfoBottomBar(
+              onResume: () => onResumeProcess(), readed: mangaReadProcess != null);
+          break;
         }
-      case _MangaInfoPageStatus.loading:
-        {
-          return buildLoadPage();
-        }
-      default:
+      case _MangaInfoPageStatus.error:
         {
           return ErrorPage("读取漫画信息发生了错误呢~~~");
         }
+      default:
+        {}
     }
+    return MangaInfoWrapper(
+      title: manga != null ? manga.title : '',
+      children: [
+        MangaInfoCover(
+          manga: manga,
+          updateTime: '最后更新：$lastUpdate',
+        ),
+        mangaInfoIntro ?? Container(),
+        mangaInfoChapter ??  buildChapterLoading(),
+      ],
+      bottomBar: mangaInfoBottomBar ?? Container(),
+    );
+  }
+
+  Row buildChapterLoading() {
+    return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(top: 60),
+              child: SizedBox(
+                height: 40,
+                width: 40,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            )
+          ]
+      );
   }
 
   Widget buildLoadPage() {
@@ -117,8 +131,8 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     MaxgaDataHttpRepo repo = Application.getInstance().currentDataRepo;
     try {
       manga = await repo.getMangaInfo(
-        id: widget.id,
-        url: widget.url,
+        id: widget.manga.id,
+        url: widget.manga.infoUrl,
       );
 
       await initMangaReadProcess();
@@ -129,27 +143,28 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
       loading = _MangaInfoPageStatus.error;
     }
 
-    latestChapter = manga.getLatestChapter();
     print(mangaReadProcess?.chapterId);
     setState(() {});
   }
 
   void enjoyMangaContent(Chapter chapter, {int imagePage = 0}) async {
     await MaxgaUtils.hiddenStatusBar();
-    await Navigator.push(context, MaterialPageRoute(
-        builder: (context) => MangaViewer(
-          manga: manga,
-          currentChapter: chapter,
-          initIndex: imagePage,
-        )
-    ));
+    await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => MangaViewer(
+                  manga: manga,
+                  currentChapter: chapter,
+                  initIndex: imagePage,
+                )));
     await MaxgaUtils.showStatusBar();
     initMangaReadProcess();
   }
 
   onResumeProcess() {
-    if (mangaReadProcess != null ) {
-      var chapter = manga.chapterList.firstWhere((item) => item.id == mangaReadProcess.chapterId);
+    if (mangaReadProcess != null) {
+      var chapter = manga.chapterList
+          .firstWhere((item) => item.id == mangaReadProcess.chapterId);
       this.enjoyMangaContent(chapter, imagePage: mangaReadProcess.imageIndex);
     } else {
       var chapter = manga.getFirstChapter();
@@ -160,7 +175,4 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   Future<void> initMangaReadProcess() async {
     mangaReadProcess = await MangaReadStorageService.getMangaStatus(manga);
   }
-
-
-
 }
