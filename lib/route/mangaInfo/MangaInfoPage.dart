@@ -62,6 +62,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     MangaInfoIntro mangaInfoIntro;
     MangaInfoChapter mangaInfoChapter;
     MangaInfoBottomBar mangaInfoBottomBar;
+    bool loadOver = false;
     switch (loading) {
       case _MangaInfoPageStatus.over:
         {
@@ -71,6 +72,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
             readStatus: mangaReadProcess,
             onClickChapter: (chapter) => enjoyMangaContent(chapter),
           );
+          loadOver = true;
           mangaInfoBottomBar = MangaInfoBottomBar(
               onResume: () => onResumeProcess(), readed: mangaReadProcess != null);
           break;
@@ -87,6 +89,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
       children: [
         MangaInfoCover(
           manga: manga,
+          loadEnd: loadOver,
           updateTime: '最后更新：$lastUpdate',
         ),
         mangaInfoIntro ?? Container(),

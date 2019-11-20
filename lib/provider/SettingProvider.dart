@@ -18,6 +18,11 @@ class SettingProvider {
     this.init();
   }
 
+  MaxgaSettingItem getItem(MaxgaSettingItemType type) {
+    return this._items.firstWhere((el) => el.name == type);
+
+  }
+
   Future<bool> init() async {
     final value = await SettingService.getInitValue();
     _items = value;

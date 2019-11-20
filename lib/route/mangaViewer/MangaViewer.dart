@@ -6,10 +6,12 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/Application.dart';
+import 'package:maxga/base/setting/SettingValue.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Chapter.dart';
 import 'package:maxga/model/Manga.dart';
 import 'package:maxga/model/MangaReadProcess.dart';
+import 'package:maxga/provider/SettingProvider.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaViewer/MangaTab.dart';
 import 'package:maxga/route/mangaViewer/baseComponent/MangaViewerFutureView.dart';
@@ -71,10 +73,11 @@ class _MangaViewerState extends State<MangaViewer> {
     super.initState();
 
     Connectivity().checkConnectivity().then((connectivityResult) {
-      if (connectivityResult == ConnectivityResult.mobile) {
-        loadStatus = MangaViewerLoadState.checkNetState;
-      } else if (connectivityResult == ConnectivityResult.wifi) {
+      final readOnWiFi = SettingProvider.getInstance().getItem(MaxgaSettingItemType.readOnlyOnWiFi);
+      if (connectivityResult == ConnectivityResult.wifi  || readOnWiFi.value == '0') {
         initMangaViewer();
+      } else {
+        loadStatus = MangaViewerLoadState.checkNetState;
       }
     });
   }
@@ -366,13 +369,16 @@ class _MangaViewerState extends State<MangaViewer> {
   @override
   void dispose() {
     super.dispose();
-    tabController.dispose();
+    tabController?.dispose();
   }
 
   onBack() {
-    var manga = widget.manga;
-    MangaReadStorageService.setMangaStatus(MangaReadProcess(
-        manga.source.key, manga.id, currentChapter.id, _currentPageIndex - (preChapter != null ? 1 : 0)));
+    if (loadStatus == MangaViewerLoadState.over){
+      var manga = widget.manga;
+      MangaReadStorageService.setMangaStatus(MangaReadProcess(
+          manga.source.key, manga.id, currentChapter.id, _currentPageIndex - (preChapter != null ? 1 : 0)));
+
+    }
     Navigator.pop(context);
   }
 

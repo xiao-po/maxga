@@ -6,8 +6,9 @@ import 'package:maxga/model/Manga.dart';
 class MangaInfoCover extends StatelessWidget {
   final Manga manga;
   final String updateTime;
+  final bool loadEnd;
 
-  const MangaInfoCover({Key key, this.manga, this.updateTime}) : super(key: key);
+  const MangaInfoCover({Key key, this.manga, this.updateTime, this.loadEnd}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,7 @@ class MangaInfoCover extends StatelessWidget {
             width: double.infinity,
             child: buildCoverImage(manga),
           ),
-          buildCoverMessage(),
+          loadEnd ? buildCoverMessage() : Container(),
         ],
       ),
     );
