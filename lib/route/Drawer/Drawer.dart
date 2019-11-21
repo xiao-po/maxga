@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maxga/route/Drawer/about/about-page.dart';
 import 'package:maxga/route/Drawer/setting/Setting-page.dart';
 
 class MaxgaDrawer extends StatelessWidget {
@@ -30,6 +31,9 @@ class MaxgaDrawer extends StatelessWidget {
                       title: const Text('关于'),
                       onTap: (){
                         Navigator.pop(context);
+                        Navigator.push(context, MaterialPageRoute(
+                          builder: (context) => AboutPage(),
+                        ));
                       },
                     )
                   ],

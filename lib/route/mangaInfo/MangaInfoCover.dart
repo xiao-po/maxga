@@ -1,12 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:maxga/Utils/DateUtils.dart';
 import 'package:maxga/model/Manga.dart';
 
 class MangaInfoCover extends StatelessWidget {
-  final Manga manga;
-  final String updateTime;
+  final SimpleMangaInfo manga;
   final bool loadEnd;
+
+  final int  updateTime;
 
   const MangaInfoCover({Key key, this.manga, this.updateTime, this.loadEnd}) : super(key: key);
 
@@ -29,7 +31,7 @@ class MangaInfoCover extends StatelessWidget {
     );
   }
 
-  Widget buildCoverImage(Manga item) {
+  Widget buildCoverImage(SimpleMangaInfo item) {
     return Hero(
       tag: '${item.coverImgUrl}',
       child:  CachedNetworkImage(
@@ -74,7 +76,7 @@ class MangaInfoCover extends StatelessWidget {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                updateTime,
+                '${DateUtils.formatTime(timestamp: manga.lastUpdateChapter.updateTime, template: "yyyy-MM-dd")}',
                 style: TextStyle(color: subTitleTextColor, fontSize: subtitleTextSize),
                 textAlign: TextAlign.left,
 

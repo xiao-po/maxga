@@ -26,7 +26,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
 
 
   @override
-  Future<List<Manga>> getLatestUpdate(int page) async {
+  Future<List<SimpleMangaInfo>> getLatestUpdate(int page) async {
     final response = await http.get('http://v3api.dmzj.com/latest/100/$page.json');
     final responseData = (json.decode(response.body) as List<dynamic>);
     return responseData.map((item) => _convertDataFromListItem(item)).toList();
@@ -56,7 +56,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
 
 
   @override
-  Future<List<Manga>> getSearchManga(String keywords) async {
+  Future<List<SimpleMangaInfo>> getSearchManga(String keywords) async {
     final response = await http.get('http://v3api.dmzj.com/search/show/0/$keywords/0.json');
     final responseData = (json.decode(response.body) as List<dynamic>);
     return responseData.map((item) => _convertDataFromSearch(item)).toList();
@@ -65,14 +65,14 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
 
 
   /// 用于 动漫之家 列表拿到的接口返回的数据
-  Manga _convertDataFromListItem(Map<String, dynamic> json) {
-    final Manga manga = Manga();
+  SimpleMangaInfo _convertDataFromListItem(Map<String, dynamic> json) {
+    final SimpleMangaInfo manga = SimpleMangaInfo();
 
     final Chapter latestChapter = Chapter();
     latestChapter.id  = json['last_update_chapter_id'];
     latestChapter.title  = json['last_update_chapter_name'];
     latestChapter.updateTime  = json['last_updatetime'] * 1000;
-    manga.chapterList = [latestChapter];
+    manga.lastUpdateChapter = latestChapter;
     manga.infoUrl = 'http://v3api.dmzj.com/comic/comic_${json['id']}.json';
     manga.author = json['authors'];
     manga.coverImgUrl = json['cover'];
@@ -84,12 +84,12 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
   }
 
   /// 用于 动漫之家 列表拿到的接口返回的数据
-  Manga _convertDataFromSearch(Map<String, dynamic> json) {
-    final Manga manga = Manga();
+  SimpleMangaInfo _convertDataFromSearch(Map<String, dynamic> json) {
+    final SimpleMangaInfo manga = SimpleMangaInfo();
 
     final Chapter latestChapter = Chapter();
     latestChapter.title  = json['last_name'];
-    manga.chapterList = [latestChapter];
+    manga.lastUpdateChapter = latestChapter;
     manga.infoUrl = 'http://v3api.dmzj.com/comic/comic_${json['id']}.json';
     manga.author = json['authors'];
     manga.coverImgUrl = json['cover'];

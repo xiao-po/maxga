@@ -13,7 +13,7 @@ class SettingService {
 
     for (var item in SettingItemList) {
       final settingItem = MaxgaSettingItem.copy(item);
-      final value = await LocalStorage.getString('$_key${item.name}');
+      final value = await LocalStorage.getString('$_key${SettingTypeNameList[item.name]}');
       settingItem.setValue(value);
       settingList.add(settingItem);
     }

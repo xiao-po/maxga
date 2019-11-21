@@ -34,7 +34,7 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
   }
 
   @override
-  Future<List<Manga>> getLatestUpdate(int page) async {
+  Future<List<SimpleMangaInfo>> getLatestUpdate(int page) async {
     final response = await http.get('https://www.manhuadui.com/list/riben/update/$page/');
 
     final mangaList = parser.getMangaListFromLatestUpdate(response.body);
@@ -55,10 +55,10 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
   }
 
   @override
-  Future<List<Manga>> getSearchManga(String keywords) async {
+  Future<List<SimpleMangaInfo>> getSearchManga(String keywords) async {
 
     final response = await http.get('https://www.manhuadui.com/search/?keywords=$keywords');
-    final List<Manga> mangaList = parser.getMangaListFromSearch(response.body);
+    final List<SimpleMangaInfo> mangaList = parser.getMangaListFromSearch(response.body);
     mangaList.forEach((item) => item.source = _source);
     return mangaList;
   }

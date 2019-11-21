@@ -2,21 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/model/Manga.dart';
 
-class MangaInfoIntro extends StatefulWidget {
-  final Manga manga;
+class MangaInfoIntro extends StatelessWidget {
+  final String intro;
 
-  const MangaInfoIntro({Key key, this.manga}) : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() => _MangaInfoIntroState();
-
-
-
-}
-
-class _MangaInfoIntroState extends State<MangaInfoIntro> {
-
-  int maxLines = 4;
+  const MangaInfoIntro({Key key, this.intro}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,9 +13,9 @@ class _MangaInfoIntroState extends State<MangaInfoIntro> {
     final EdgeInsetsGeometry containerMargin = const EdgeInsets.only(left: 20, right: 20);
     return Container(
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: Color(0xffefefef))
-        )
+          border: Border(
+              bottom: BorderSide(color: Color(0xffefefef))
+          )
       ),
       padding: containerPadding,
       margin: containerMargin,
@@ -34,10 +23,10 @@ class _MangaInfoIntroState extends State<MangaInfoIntro> {
         children: <Widget>[
           Expanded(
             child: Text(
-              widget.manga.introduce,
+              intro,
               overflow: TextOverflow.fade,
               style: TextStyle(
-                color: Color(0xff7b7b7b)
+                  color: Color(0xff7b7b7b)
               ),
             ),
           )
@@ -45,4 +34,6 @@ class _MangaInfoIntroState extends State<MangaInfoIntro> {
       ),
     );
   }
+
+
 }

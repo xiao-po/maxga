@@ -26,7 +26,7 @@ enum _MangaInfoPageStatus {
 }
 
 class MangaInfoPage extends StatefulWidget {
-  final Manga manga;
+  final SimpleMangaInfo manga;
 
   const MangaInfoPage({Key key, this.manga}) : super(key: key);
 
@@ -37,15 +37,14 @@ class MangaInfoPage extends StatefulWidget {
 class _MangaInfoPageState extends State<MangaInfoPage> {
   _MangaInfoPageStatus loading = _MangaInfoPageStatus.loading;
   MangaReadProcess mangaReadProcess;
-  Manga manga;
+  List<Chapter> chapterList = [];
 
-  Chapter latestChapter;
+  String introduce;
+
 
   @override
   void initState() {
     super.initState();
-    manga = widget.manga;
-    latestChapter = manga.getLatestChapter();
     initMangaInfo();
   }
 
@@ -55,10 +54,6 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   }
 
   Widget buildBody() {
-    String lastUpdate = latestChapter.updateTime != null
-        ? DateUtils.formatTime(
-            timestamp: latestChapter.updateTime, template: 'YYYY-MM-DD')
-        : '';
     MangaInfoIntro mangaInfoIntro;
     MangaInfoChapter mangaInfoChapter;
     MangaInfoBottomBar mangaInfoBottomBar;
@@ -66,9 +61,10 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     switch (loading) {
       case _MangaInfoPageStatus.over:
         {
-          mangaInfoIntro = MangaInfoIntro(manga: manga);
+          mangaInfoIntro = MangaInfoIntro(intro: introduce);
           mangaInfoChapter = MangaInfoChapter(
-            manga: manga,
+            manga: widget.manga,
+            chapterList: chapterList,
             readStatus: mangaReadProcess,
             onClickChapter: (chapter) => enjoyMangaContent(chapter),
           );
@@ -85,12 +81,12 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
         {}
     }
     return MangaInfoWrapper(
-      title: manga != null ? manga.title : '',
+      title: widget.manga?.title ?? '',
       children: [
         MangaInfoCover(
-          manga: manga,
+          manga: widget.manga,
           loadEnd: loadOver,
-          updateTime: '最后更新：$lastUpdate',
+//          updateTime: '最后更新：$lastUpdate',
         ),
         mangaInfoIntro ?? Container(),
         mangaInfoChapter ??  buildChapterLoading(),
@@ -133,12 +129,15 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   void initMangaInfo() async {
     MaxgaDataHttpRepo repo = Application.getInstance().currentDataRepo;
     try {
-      manga = await repo.getMangaInfo(
+      final manga = await repo.getMangaInfo(
         id: widget.manga.id,
         url: widget.manga.infoUrl,
       );
 
-      await initMangaReadProcess();
+      chapterList = manga.chapterList;
+      introduce = manga.introduce;
+
+      mangaReadProcess = await MangaReadStorageService.getMangaStatus(manga);
       await Future.delayed(Duration(milliseconds: 500));
       loading = _MangaInfoPageStatus.over;
     } catch (e) {
@@ -151,31 +150,47 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   }
 
   void enjoyMangaContent(Chapter chapter, {int imagePage = 0}) async {
-    await MaxgaUtils.hiddenStatusBar();
     await Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => MangaViewer(
-                  manga: manga,
+                  manga: widget.manga,
                   currentChapter: chapter,
+                  chapterList: chapterList,
                   initIndex: imagePage,
                 )));
-    await MaxgaUtils.showStatusBar();
-    initMangaReadProcess();
+    mangaReadProcess = await MangaReadStorageService.getMangaStatus(widget.manga);
   }
 
   onResumeProcess() {
     if (mangaReadProcess != null) {
-      var chapter = manga.chapterList
+      var chapter = chapterList
           .firstWhere((item) => item.id == mangaReadProcess.chapterId);
       this.enjoyMangaContent(chapter, imagePage: mangaReadProcess.imageIndex);
     } else {
-      var chapter = manga.getFirstChapter();
+      var chapter = getFirstChapter();
       this.enjoyMangaContent(chapter, imagePage: 0);
     }
   }
 
-  Future<void> initMangaReadProcess() async {
-    mangaReadProcess = await MangaReadStorageService.getMangaStatus(manga);
+  Chapter getLatestChapter() {
+    Chapter latestChapter;
+    for(var chapter in chapterList) {
+      if (latestChapter == null || latestChapter.order < chapter.order) {
+        latestChapter = chapter;
+      }
+    }
+    return latestChapter;
   }
+  Chapter getFirstChapter() {
+    Chapter firstChapter;
+    for(var chapter in chapterList) {
+      if (firstChapter == null || firstChapter.order > chapter.order) {
+        firstChapter = chapter;
+      }
+    }
+    return firstChapter;
+  }
+
+
 }

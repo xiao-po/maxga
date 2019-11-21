@@ -8,13 +8,11 @@ import 'package:maxga/components/Card.dart';
 import 'package:maxga/components/UpdateDialog.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Manga.dart';
-import 'package:maxga/provider/SettingProvider.dart';
 import 'package:maxga/route/Drawer/Drawer.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:maxga/route/search/search-page.dart';
 import 'package:maxga/service/UpdateService.dart';
-import 'package:provider/provider.dart';
 
 import '../../Application.dart';
 
@@ -29,7 +27,7 @@ class _IndexPageState extends State<IndexPage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   int loadStatus = 0;
-  List<Manga> mangaList;
+  List<SimpleMangaInfo> mangaList;
 
   int page = 0;
 
@@ -86,7 +84,7 @@ class _IndexPageState extends State<IndexPage> {
     }
   }
 
-  Widget _buildCachedNetworkImage(Manga item) {
+  Widget _buildCachedNetworkImage(SimpleMangaInfo item) {
     return Hero(
       tag: '${item.coverImgUrl}',
       child: CachedNetworkImage(
@@ -136,7 +134,7 @@ class _IndexPageState extends State<IndexPage> {
     }));
   }
 
-  goMangaInfoPage(Manga item) {
+  goMangaInfoPage(SimpleMangaInfo item) {
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return MangaInfoPage(
           manga: item

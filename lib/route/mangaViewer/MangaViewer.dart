@@ -17,19 +17,20 @@ import 'package:maxga/route/mangaViewer/MangaTab.dart';
 import 'package:maxga/route/mangaViewer/baseComponent/MangaViewerFutureView.dart';
 import 'package:maxga/service/MangaReadStorage.service.dart';
 
-enum MangaViewerLoadState {
+enum _MangaViewerLoadState {
   checkNetState,
   loadingMangaData,
   over
 }
 
 class MangaViewer extends StatefulWidget {
-  final Manga manga;
+  final SimpleMangaInfo manga;
   final Chapter currentChapter;
+  final List<Chapter> chapterList;
   final int initIndex;
 
   const MangaViewer(
-      {Key key, this.manga, this.currentChapter, this.initIndex = 0})
+      {Key key, this.manga, this.currentChapter, this.initIndex = 0, this.chapterList})
       : super(key: key);
 
   @override
@@ -47,7 +48,7 @@ class _MangaViewerState extends State<MangaViewer> {
   bool NEXT_PAGE_CHANGE_TRUST = true;
 
   Map<int, Chapter> cachedChapterData = {};
-  MangaViewerLoadState loadStatus = MangaViewerLoadState.loadingMangaData;
+  _MangaViewerLoadState loadStatus = _MangaViewerLoadState.loadingMangaData;
   bool mangaFutureViewVisitable = false;
   double mangaFutureViewOpacity = 0;
   List<Chapter> chapterList;
@@ -66,25 +67,28 @@ class _MangaViewerState extends State<MangaViewer> {
   get chapterImageCount =>
       imagePageUrlList.length -
       (preChapter != null ? 1 : 0) -
-      (nextChapter != null ? 1 : 0);
+      (nextChapter != null ? 1 : 0) ;
 
   @override
   void initState() {
     super.initState();
 
-    Connectivity().checkConnectivity().then((connectivityResult) {
+    Connectivity().checkConnectivity().then((connectivityResult) async {
       final readOnWiFi = SettingProvider.getInstance().getItem(MaxgaSettingItemType.readOnlyOnWiFi);
       if (connectivityResult == ConnectivityResult.wifi  || readOnWiFi.value == '0') {
         initMangaViewer();
       } else {
-        loadStatus = MangaViewerLoadState.checkNetState;
+        loadStatus = _MangaViewerLoadState.checkNetState;
+        setState(() {
+
+        });
       }
     });
   }
 
   void initMangaViewer() async {
     currentChapter = widget.currentChapter;
-    chapterList = widget.manga.chapterList.toList();
+    chapterList = widget.chapterList.toList();
     chapterList.sort((a, b) => a.order.compareTo(b.order));
     final simplePreChapterData = getPreChapter(currentChapter);
     final simpleNextChapterData = getNextChapter(currentChapter);
@@ -104,7 +108,7 @@ class _MangaViewerState extends State<MangaViewer> {
     _currentPageIndex = widget.initIndex + (preChapter != null ? 1 : 0);
 
     tabController = PageController(initialPage: _currentPageIndex);
-    this.loadStatus = MangaViewerLoadState.over;
+    this.loadStatus = _MangaViewerLoadState.over;
 
     setState(() {});
   }
@@ -125,15 +129,15 @@ class _MangaViewerState extends State<MangaViewer> {
   Widget build(BuildContext context) {
     var body;
     switch (loadStatus) {
-      case MangaViewerLoadState.checkNetState: {
+      case _MangaViewerLoadState.checkNetState: {
         return buildCheckNetStatePage();
       }
-      case MangaViewerLoadState.loadingMangaData:
+      case _MangaViewerLoadState.loadingMangaData:
         {
           body = buildLoadingPage();
           break;
         }
-      case MangaViewerLoadState.over:
+      case _MangaViewerLoadState.over:
         {
           body = Stack(
             children: <Widget>[
@@ -158,12 +162,8 @@ class _MangaViewerState extends State<MangaViewer> {
                         onPageChange: (index) => changePage(
                             index.floor() + (preChapter != null ? 1 : 0),
                             shouldJump: true),
-                        imageCount: chapterImageCount + 1,
-                        pageIndex: chapterImageIndex < 1
-                            ? 0
-                            : (chapterImageIndex >= chapterImageCount
-                                ? chapterImageCount
-                                : chapterImageIndex),
+                        imageCount: chapterImageCount,
+                        pageIndex: radioPageIndex,
                         title: currentChapter.title,
                       )
                     : null,
@@ -185,6 +185,14 @@ class _MangaViewerState extends State<MangaViewer> {
       ),
       onWillPop: () => onBack(),
     );
+  }
+
+  int get radioPageIndex {
+    return chapterImageIndex < 1
+                          ? 0
+                          : (chapterImageIndex >= (chapterImageCount - 1)
+                              ?  (chapterImageCount - 1)
+                              : chapterImageIndex);
   }
 
   buildLoadingPage() {
@@ -373,7 +381,7 @@ class _MangaViewerState extends State<MangaViewer> {
   }
 
   onBack() {
-    if (loadStatus == MangaViewerLoadState.over){
+    if (loadStatus == _MangaViewerLoadState.over){
       var manga = widget.manga;
       MangaReadStorageService.setMangaStatus(MangaReadProcess(
           manga.source.key, manga.id, currentChapter.id, _currentPageIndex - (preChapter != null ? 1 : 0)));
@@ -400,7 +408,7 @@ class _MangaViewerState extends State<MangaViewer> {
             highlightedBorderColor: Colors.white,
 
             child: const Text('继续阅读',style: TextStyle(color: Colors.white,fontSize: 16),textAlign: TextAlign.center),
-            onPressed: () {loadStatus = MangaViewerLoadState.loadingMangaData;initMangaViewer();}
+            onPressed: () {loadStatus = _MangaViewerLoadState.loadingMangaData;initMangaViewer();}
             ),
         ],
       )

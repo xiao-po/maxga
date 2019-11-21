@@ -9,13 +9,14 @@ import 'package:maxga/model/MangaReadProcess.dart';
 typedef EnjoyMangaCallback = void Function(Chapter chapter);
 
 class MangaInfoChapter extends StatefulWidget {
-  final Manga manga;
+  final SimpleMangaInfo manga;
+  final List<Chapter> chapterList;
 
   final EnjoyMangaCallback onClickChapter;
   final MangaReadProcess readStatus;
 
 
-  const MangaInfoChapter({Key key, this.manga, this.onClickChapter, this.readStatus}) : super(key: key);
+  const MangaInfoChapter({Key key, this.manga, this.onClickChapter, this.readStatus, this.chapterList}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MangaInfoChapterState();
@@ -28,8 +29,7 @@ class _MangaInfoChapterState extends State<MangaInfoChapter> {
   @override
   void initState() {
     super.initState();
-    chapterList = widget.manga.chapterList.toList();
-
+    chapterList = widget.chapterList.toList(growable: false);
     setState(() {});
   }
 
@@ -65,7 +65,7 @@ class _MangaInfoChapterState extends State<MangaInfoChapter> {
     return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Text(status, style: textStyle,),
+          Text(status ?? '漫画状态未知', style: textStyle,),
           Row(
             children: <Widget>[
               FlatButton(

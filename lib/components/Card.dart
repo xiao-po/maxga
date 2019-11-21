@@ -2,11 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/model/Manga.dart';
 
-typedef CoverBuilder = Widget Function(BuildContext context, Manga manga);
+typedef CoverBuilder = Widget Function(BuildContext context, SimpleMangaInfo manga);
 
 
 class MangaCard extends StatelessWidget {
-  final Manga manga;
+  final SimpleMangaInfo manga;
 
   final GestureTapCallback onTap;
   final Widget cover;
@@ -118,10 +118,10 @@ class MangaCard extends StatelessWidget {
           Align(
             alignment: Alignment.centerRight,
             child: Text(
-              '${manga.chapterList[0].title} \n' +
-                  (manga.chapterList[0].updateTime != null ? this.convertTimeToYYYYMMDD(
+              '${manga.lastUpdateChapter.title} \n' +
+                  (manga.lastUpdateChapter.updateTime != null ? this.convertTimeToYYYYMMDD(
                   DateTime.fromMillisecondsSinceEpoch(
-                      manga.chapterList[0].updateTime)) : ''),
+                      manga.lastUpdateChapter.updateTime)) : ''),
               textAlign: TextAlign.right,
               style: TextStyle(
                 color: grayFontColor

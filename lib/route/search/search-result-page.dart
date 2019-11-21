@@ -17,7 +17,7 @@ class SearchResultPage extends StatefulWidget {
 }
 
 class _SearchResultPageState extends State<SearchResultPage> {
-  List<Manga> mangaResultList = [];
+  List<SimpleMangaInfo> mangaResultList = [];
 
   @override
   void initState() {
@@ -63,14 +63,14 @@ class _SearchResultPageState extends State<SearchResultPage> {
             .toList());
   }
 
-  CachedNetworkImage _buildCachedNetworkImage(Manga item) {
+  CachedNetworkImage _buildCachedNetworkImage(SimpleMangaInfo item) {
     return CachedNetworkImage(
         imageUrl: item.coverImgUrl,
         placeholder: (context, url) =>
             CircularProgressIndicator(strokeWidth: 2));
   }
 
-  goMangaInfoPage(Manga item) {
+  goMangaInfoPage(SimpleMangaInfo item) {
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return MangaInfoPage(
         manga: item,

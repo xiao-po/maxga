@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class MangaReadStorageService {
   static final String _key = 'manga_process_';
-  static Future<MangaReadProcess> getMangaStatus(Manga manga) async {
+  static Future<MangaReadProcess> getMangaStatus(MangaBase manga) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     print('manga_process_${manga.source.key}_${manga.id}');
     var value = prefs.getString('$_key${manga.source.key}_${manga.id}');
