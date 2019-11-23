@@ -3,7 +3,7 @@ name: Dart CI
 on:
   push:
     branches:
-      - master
+      - ci
 
 jobs:
   build:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image:  google/dart:latest
+      image:  cirrusci/flutter
 
     steps:
     - uses: actions/checkout@v1
