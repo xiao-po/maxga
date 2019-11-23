@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/Utils/MaxgaUtils.dart';
 import 'package:maxga/components/Card.dart';
+import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/components/UpdateDialog.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Manga.dart';
@@ -72,7 +73,10 @@ class _IndexPageState extends State<IndexPage> {
               .map((item) =>
               MangaCard(
                 manga: item,
-                cover: _buildCachedNetworkImage(item),
+                cover: MangaCoverImage(
+                  url: item.coverImgUrl,
+                  tagPrefix: widget.name,
+                ),
                 onTap: () => this.goMangaInfoPage(item),
               ))
               .toList());
@@ -84,15 +88,6 @@ class _IndexPageState extends State<IndexPage> {
     }
   }
 
-  Widget _buildCachedNetworkImage(SimpleMangaInfo item) {
-    return Hero(
-      tag: '${item.coverImgUrl}',
-      child: CachedNetworkImage(
-          imageUrl: item.coverImgUrl,
-          placeholder: (context, url) =>
-              CircularProgressIndicator(strokeWidth: 2)),
-    );
-  }
 
   Center buildProcessIndicator() {
     return Center(
@@ -137,6 +132,11 @@ class _IndexPageState extends State<IndexPage> {
   goMangaInfoPage(SimpleMangaInfo item) {
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return MangaInfoPage(
+          coverImageBuilder: (context) => MangaCoverImage(
+            url: item.coverImgUrl,
+            tagPrefix: widget.name,
+            fit: BoxFit.cover,
+          ),
           manga: item
       );
     }));

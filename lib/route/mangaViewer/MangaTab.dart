@@ -1,3 +1,4 @@
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -11,8 +12,11 @@ class MangaTabView extends StatelessWidget {
   final List<String> imgUrlList;
 
   final ValueChanged<int> onPageChanged;
+  final bool hasPrechapter;
 
-  MangaTabView({Key key, this.controller, this.imgUrlList, this.onPageChanged})
+  final CanMovePage canMovePage;
+
+  MangaTabView({Key key, this.controller, this.imgUrlList, this.onPageChanged, this.hasPrechapter, this.canMovePage})
       : super(key: key);
 
   @override
@@ -24,7 +28,7 @@ class MangaTabView extends StatelessWidget {
           Tab(
             child: MangaImage(
               url: url,
-              index: i + 1,
+              index: i + (hasPrechapter ? 0 : 1),
             ),
           )
       );
@@ -33,6 +37,7 @@ class MangaTabView extends StatelessWidget {
     return MangaExtendedPageView.custom(
       controller: controller,
       onPageChanged: onPageChanged,
+        canMovePage: canMovePage,
       childrenDelegate: SliverChildListDelegate(imageTab),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maxga/route/Drawer/about/about-page.dart';
+import 'package:maxga/route/Drawer/history/history-page.dart';
 import 'package:maxga/route/Drawer/setting/Setting-page.dart';
 
 class MaxgaDrawer extends StatelessWidget {
@@ -16,6 +17,16 @@ class MaxgaDrawer extends StatelessWidget {
               child: Expanded(
                 child: ListView(
                   children: <Widget>[
+                    ListTile(
+                      leading: Icon(Icons.settings),
+                      title: const Text('历史记录'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(context, MaterialPageRoute(
+                          builder: (context) => HistoryPage(),
+                        ));
+                      },
+                    ),
                     ListTile(
                       leading: Icon(Icons.settings),
                       title: const Text('设置'),

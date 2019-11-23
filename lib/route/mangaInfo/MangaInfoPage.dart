@@ -9,6 +9,7 @@ import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Chapter.dart';
 import 'package:maxga/model/Manga.dart';
 import 'package:maxga/model/MangaReadProcess.dart';
+import 'package:maxga/provider/HistoryProvider.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaInfo/MaganInfoWrapper.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoCover.dart';
@@ -27,8 +28,9 @@ enum _MangaInfoPageStatus {
 
 class MangaInfoPage extends StatefulWidget {
   final SimpleMangaInfo manga;
+  final CoverImageBuilder coverImageBuilder;
+  const MangaInfoPage({Key key,@required this.manga,@required this.coverImageBuilder}) : super(key: key);
 
-  const MangaInfoPage({Key key, this.manga}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MangaInfoPageState();
@@ -86,6 +88,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
         MangaInfoCover(
           manga: widget.manga,
           loadEnd: loadOver,
+          coverImageBuilder: widget.coverImageBuilder,
 //          updateTime: '最后更新：$lastUpdate',
         ),
         mangaInfoIntro ?? Container(),
@@ -146,7 +149,9 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     }
 
     print(mangaReadProcess?.chapterId);
-    setState(() {});
+    if (mounted) {
+      setState(() { });
+    }
   }
 
   void enjoyMangaContent(Chapter chapter, {int imagePage = 0}) async {
@@ -160,6 +165,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
                   initIndex: imagePage,
                 )));
     mangaReadProcess = await MangaReadStorageService.getMangaStatus(widget.manga);
+    HistoryProvider.getInstance().addToHistory(widget.manga);
   }
 
   onResumeProcess() {

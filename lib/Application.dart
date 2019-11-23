@@ -16,7 +16,7 @@ class Application {
 
   Application() {
     print('application init');
-    currentDataRepo = DmzjDataRepo();
+    currentDataRepo = ManhuaduiDataRepo();
     UpdateService.testClearData();
   }
 

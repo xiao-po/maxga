@@ -115,7 +115,7 @@ class MangaCard extends StatelessWidget {
               child: Text(manga.source.name,textAlign: TextAlign.right, style: TextStyle(color: grayFontColor)),
             ),
           ),
-          Align(
+          manga.lastUpdateChapter != null ? Align(
             alignment: Alignment.centerRight,
             child: Text(
               '${manga.lastUpdateChapter.title} \n' +
@@ -127,7 +127,7 @@ class MangaCard extends StatelessWidget {
                 color: grayFontColor
               ),
             ),
-          )
+          ) : Container()
         ],
       ),
     );

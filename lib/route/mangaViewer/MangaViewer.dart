@@ -6,6 +6,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/Application.dart';
+import 'package:maxga/Utils/MaxgaUtils.dart';
 import 'package:maxga/base/setting/SettingValue.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Chapter.dart';
@@ -62,6 +63,8 @@ class _MangaViewerState extends State<MangaViewer> {
 
   int _currentPageIndex = 0;
 
+  bool loadingChapter = false;
+
   get chapterImageIndex => _currentPageIndex - (preChapter != null ? 1 : 0);
 
   get chapterImageCount =>
@@ -72,7 +75,7 @@ class _MangaViewerState extends State<MangaViewer> {
   @override
   void initState() {
     super.initState();
-
+    MaxgaUtils.hiddenStatusBar();
     Connectivity().checkConnectivity().then((connectivityResult) async {
       final readOnWiFi = SettingProvider.getInstance().getItem(MaxgaSettingItemType.readOnlyOnWiFi);
       if (connectivityResult == ConnectivityResult.wifi  || readOnWiFi.value == '0') {
@@ -110,7 +113,9 @@ class _MangaViewerState extends State<MangaViewer> {
     tabController = PageController(initialPage: _currentPageIndex);
     this.loadStatus = _MangaViewerLoadState.over;
 
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   List<String> getImagePageUrlListFormChapter() {
@@ -149,6 +154,7 @@ class _MangaViewerState extends State<MangaViewer> {
                   child: MangaTabView(
                     controller: tabController,
                     onPageChanged: (index) => changePage(index),
+                    hasPrechapter: preChapter != null,
                     imgUrlList: imagePageUrlList,
                   ),
                 ),
@@ -213,6 +219,7 @@ class _MangaViewerState extends State<MangaViewer> {
       return cachedChapterData[chapter.id];
     } else {
       MaxgaDataHttpRepo repo = Application.getInstance().currentDataRepo;
+      print(chapter.url);
       final result = await repo.getChapterImageList(chapter.url);
       chapter.imgUrlList = result;
       cachedChapterData.addAll({chapter.id: chapter});
@@ -221,7 +228,6 @@ class _MangaViewerState extends State<MangaViewer> {
   }
 
   dispatchTapUpEvent(TapUpDetails details, BuildContext context) {
-    print('tap up');
     final width = MediaQuery.of(context).size.width;
 
     if (details.localPosition.dx / width > 0.33 &&
@@ -292,6 +298,9 @@ class _MangaViewerState extends State<MangaViewer> {
   }
 
   changePage(int index, {bool shouldJump = false}) async {
+    if (loadingChapter) {
+      return null;
+    }
     if (!NEXT_PAGE_CHANGE_TRUST) {
       NEXT_PAGE_CHANGE_TRUST = true;
       return null;
@@ -327,36 +336,58 @@ class _MangaViewerState extends State<MangaViewer> {
 
   void changeChapter() async {
     if (_currentPageIndex == 0 && preChapter != null) {
-      toastMessage('进入上一章节');
+      toastMessage('正在加载上一章节');
+      loadingChapter = true;
       nextChapter = currentChapter;
       currentChapter = preChapter;
       preChapter = null;
-      setState(() {});
+      if (mounted) {
+        setState(() { });
+      } else {
+        return null;
+      }
 
       final simplePreChapterData = getPreChapter(currentChapter);
       var preChapterData = await getChapterData(simplePreChapterData);
       preChapter = preChapterData;
       this.imagePageUrlList = getImagePageUrlListFormChapter();
       _currentPageIndex = imagePageUrlList.length - 2;
-      setState(() {});
+      if (mounted) {
+        toastMessage('进入上一章节');
+        loadingChapter = false;
+        setState(() { });
+      } else {
+        return null;
+      }
 
       NEXT_PAGE_CHANGE_TRUST = false;
       tabController.jumpToPage(_currentPageIndex);
       chapterChangeTimer = null;
     } else if (_currentPageIndex == (imagePageUrlList.length - 1) &&
         nextChapter != null) {
+      toastMessage('正在加载下一章节');
+      loadingChapter = true;
       preChapter = currentChapter;
       currentChapter = nextChapter;
       nextChapter = null;
-      toastMessage('进入下一章节', TextAlign.right);
-      setState(() {});
+      if (mounted) {
+        setState(() { });
+      } else {
+        return null;
+      }
 
       final simpleNextChapterData = getNextChapter(currentChapter);
       var nextChapterData = await getChapterData(simpleNextChapterData);
       nextChapter = nextChapterData;
       this.imagePageUrlList = getImagePageUrlListFormChapter();
       _currentPageIndex = preChapter != null ? 1 : 0;
-      setState(() {});
+      if (mounted) {
+        toastMessage('进入下一章节', TextAlign.right);
+    loadingChapter = false;
+        setState(() { });
+      } else {
+        return null;
+      }
 
       NEXT_PAGE_CHANGE_TRUST = false;
       tabController.jumpToPage(_currentPageIndex);
@@ -381,6 +412,8 @@ class _MangaViewerState extends State<MangaViewer> {
   }
 
   onBack() {
+
+    MaxgaUtils.showStatusBar();
     if (loadStatus == _MangaViewerLoadState.over){
       var manga = widget.manga;
       MangaReadStorageService.setMangaStatus(MangaReadProcess(
