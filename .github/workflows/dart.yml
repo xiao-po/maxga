@@ -16,6 +16,6 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Install dependencies
-      run: flutter pub get
+      run: sudo flutter pub get
     - name: build 
-      run: flutter build apk --target-platform android-arm64 --split-per-abi
+      run: sudo flutter build apk --target-platform android-arm64 --split-per-abi
