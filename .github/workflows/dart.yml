@@ -18,7 +18,7 @@ jobs:
     - name: setHome
       run: export HOME='/home/cirrus'
     - name: Install dependencies
-      run: sudo /home/cirrus/sdks/flutter/bin/flutter pub get
+      run: flutter pub get
     - name: build
       run: flutter build apk --target-platform android-arm64 --split-per-abi
 
