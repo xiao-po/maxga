@@ -18,4 +18,4 @@ jobs:
     - name: Install dependencies
       run: sudo /home/cirrus/sdks/flutter/bin/flutter pub get
     - name: build 
-      run: sudo /home/cirrus/sdks/flutter/bin/flutter build apk --target-platform android-arm64 --split-per-abi
+      run: flutter build apk --target-platform android-arm64 --split-per-abi
