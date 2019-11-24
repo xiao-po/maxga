@@ -10,7 +10,7 @@ class HistoryProvider {
 
   static final _instance = HistoryProvider();
 
-  final String _key = 'histroy_';
+  final String _key = 'mangaHistroy_';
 
   static HistoryProvider getInstance() => _instance;
 
@@ -21,23 +21,31 @@ class HistoryProvider {
   }
 
   Future<bool> init() async {
-    final List<SimpleMangaInfo>  value = (await LocalStorage.getStringList(_key)).map((el) => SimpleMangaInfo.fromJson(json.decode(el))).toList();
+    final List<SimpleMangaInfo>  value = (await LocalStorage.getStringList(_key))?.map((el) => SimpleMangaInfo.fromJson(json.decode(el)))?.toList() ?? [];
 
     _items = value;
     this._streamController.add(value);
     return true;
   }
 
-  Future<bool> addToHistory(SimpleMangaInfo manga) {
-    final list = <SimpleMangaInfo>[manga]
-      ..addAll(_items)
-      ..removeWhere((el) => el.id == manga.id);
-
+  Future<bool> addToHistory(SimpleMangaInfo manga) async {
+    final list = _items
+      ..removeWhere((el) => el.id == manga.id)
+      ..insert(0, manga);
+    this._streamController.add(_items);
+    await LocalStorage.setStringList(_key, list.map((item) => json.encode(item)).toList(growable: false));
+    return true;
   }
 
 
   dispose() {
     _streamController.close();
+  }
+
+  void clearHistory() async {
+    await LocalStorage.clearItem(_key);
+    _items = [];
+    this._streamController.add(_items);
   }
 
 }

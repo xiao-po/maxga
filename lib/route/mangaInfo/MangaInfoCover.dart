@@ -4,13 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:maxga/Utils/DateUtils.dart';
 import 'package:maxga/model/Manga.dart';
 
+typedef CoverImageBuilder = Widget Function(BuildContext context);
+
 class MangaInfoCover extends StatelessWidget {
   final SimpleMangaInfo manga;
   final bool loadEnd;
+  final CoverImageBuilder coverImageBuilder;
 
   final int  updateTime;
 
-  const MangaInfoCover({Key key, this.manga, this.updateTime, this.loadEnd}) : super(key: key);
+  const MangaInfoCover({Key key, this.manga, this.updateTime, this.loadEnd, this.coverImageBuilder}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,20 +26,11 @@ class MangaInfoCover extends StatelessWidget {
           Container(
             height: double.infinity,
             width: double.infinity,
-            child: buildCoverImage(manga),
+            child: coverImageBuilder(context),
           ),
           loadEnd ? buildCoverMessage() : Container(),
         ],
       ),
-    );
-  }
-
-  Widget buildCoverImage(SimpleMangaInfo item) {
-    return Hero(
-      tag: '${item.coverImgUrl}',
-      child:  CachedNetworkImage(
-          fit: BoxFit.cover,
-          imageUrl: item.coverImgUrl),
     );
   }
 
@@ -76,7 +70,7 @@ class MangaInfoCover extends StatelessWidget {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                '${DateUtils.formatTime(timestamp: manga.lastUpdateChapter.updateTime, template: "yyyy-MM-dd")}',
+                '${manga.lastUpdateChapter.updateTime != null ? DateUtils.formatTime(timestamp: manga.lastUpdateChapter.updateTime, template: "yyyy-MM-dd") : ''}',
                 style: TextStyle(color: subTitleTextColor, fontSize: subtitleTextSize),
                 textAlign: TextAlign.left,
 

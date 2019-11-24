@@ -22,5 +22,9 @@ class LocalStorage {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('$_prefix$key');
   }
+  static Future<bool> clearItem(String key) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.remove('$_prefix$key');
+  }
 
 }

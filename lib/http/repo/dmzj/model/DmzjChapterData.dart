@@ -11,7 +11,7 @@ class DmzjChapterData {
     title = json['title'];
     if (json['data'] != null) {
       data = new List<Chapter>();
-      json['data'].forEach((v) { data.add(new Chapter.fromJson(v)); });
+      json['data'].forEach((v) { data.add(new Chapter.fromDmzjJson(v)); });
     }
   }
 

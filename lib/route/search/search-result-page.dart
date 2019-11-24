@@ -63,16 +63,20 @@ class _SearchResultPageState extends State<SearchResultPage> {
             .toList());
   }
 
-  CachedNetworkImage _buildCachedNetworkImage(SimpleMangaInfo item) {
-    return CachedNetworkImage(
-        imageUrl: item.coverImgUrl,
-        placeholder: (context, url) =>
-            CircularProgressIndicator(strokeWidth: 2));
+  Widget _buildCachedNetworkImage(SimpleMangaInfo item) {
+    return Hero(
+      tag: 'search_page_${item.coverImgUrl}',
+      child: CachedNetworkImage(
+          imageUrl: item.coverImgUrl,
+          placeholder: (context, url) =>
+              CircularProgressIndicator(strokeWidth: 2)),
+    );
   }
 
   goMangaInfoPage(SimpleMangaInfo item) {
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return MangaInfoPage(
+        coverImageBuilder: (context) => _buildCachedNetworkImage(item),
         manga: item,
       );
     }));

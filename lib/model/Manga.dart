@@ -24,7 +24,8 @@ class SimpleMangaInfo extends MangaBase {
     coverImgUrl = json['coverImgUrl'];
     title = json['title'];
     introduce = json['introduce'];
-    typeList = json['typeList'];
+    typeList = json['typeList'].cast<String>();
+    lastUpdateChapter = Chapter.fromJson(json['lastUpdateChapter']);
   }
 
   Map<String, dynamic> toJson()=>
@@ -38,6 +39,7 @@ class SimpleMangaInfo extends MangaBase {
         'title': title,
         'introduce': introduce,
         'typeList': typeList,
+        'lastUpdateChapter': lastUpdateChapter
       };
 }
 

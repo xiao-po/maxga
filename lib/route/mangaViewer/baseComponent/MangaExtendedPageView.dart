@@ -67,14 +67,13 @@ const ScrollPhysics _defaultScrollPhysics = NeverScrollableScrollPhysics();
     this.scrollDirection = Axis.horizontal,
     this.reverse = false,
     PageController controller,
-    //this.physics,
+    this.physics = _defaultScrollPhysics,
     this.pageSnapping = true,
     this.onPageChanged,
     CanMovePage canMovePage,
     @required this.childrenDelegate,
   })  : assert(childrenDelegate != null),
         controller = controller ?? _defaultPageController,
-        physics = _defaultScrollPhysics,
         canMovePage = canMovePage ?? _defaultCanMovePage,
         super(key: key); final CanMovePage canMovePage;
 
