@@ -130,7 +130,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   }
 
   void initMangaInfo() async {
-    MaxgaDataHttpRepo repo = Application.getInstance().currentDataRepo;
+    MaxgaDataHttpRepo repo = Application.getInstance().getMangaSource(key: widget.manga.source.key);
     try {
       final manga = await repo.getMangaInfo(
         id: widget.manga.id,

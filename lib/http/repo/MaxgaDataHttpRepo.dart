@@ -1,4 +1,5 @@
 import 'package:maxga/model/Manga.dart';
+import 'package:maxga/model/MangaSource.dart';
 
 abstract class MaxgaDataHttpRepo {
 
@@ -12,4 +13,6 @@ abstract class MaxgaDataHttpRepo {
   Future<List<String>> getSuggestion(String words);
 
   Future<List<SimpleMangaInfo>> getSearchManga(String keywords);
+
+  MangaSource get mangaSource;
 }

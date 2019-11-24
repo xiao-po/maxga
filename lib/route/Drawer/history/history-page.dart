@@ -9,6 +9,7 @@ import 'package:maxga/route/error-page/EmptyPage.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:provider/provider.dart';
 
+
 class HistoryPage extends StatefulWidget {
   final name = 'history_page';
 
@@ -29,7 +30,7 @@ class _HistToryPageState extends State<HistoryPage> {
         title: Text('历史记录'),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.delete_outline),
+            icon: Icon(Icons.history),
             onPressed: () => deleteHistoryList(),
           )
         ],

@@ -9,6 +9,7 @@ import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/components/UpdateDialog.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Manga.dart';
+import 'package:maxga/model/MangaSource.dart';
 import 'package:maxga/route/Drawer/Drawer.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
@@ -26,15 +27,16 @@ class IndexPage extends StatefulWidget {
 
 class _IndexPageState extends State<IndexPage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-
   int loadStatus = 0;
   List<SimpleMangaInfo> mangaList;
+  List<MangaSource> allMangaSource;
 
   int page = 0;
 
   @override
   void initState() {
     super.initState();
+    allMangaSource = Application.getInstance()?.allDataSource;
     this.getMangaList();
     this.checkUpdate();
   }
@@ -55,6 +57,13 @@ class _IndexPageState extends State<IndexPage> {
               ),
               onPressed: this.toSearch,
             ),
+            PopupMenuButton<MangaSource>(
+              itemBuilder: (context) => allMangaSource.map((el) => PopupMenuItem(
+                value: el,
+                child: Text(el.name),
+              )).toList(),
+              onSelected: (value) => changeMangaSource(value),
+            )
           ],
         ),
         drawer: MaxgaDrawer(),
@@ -103,7 +112,7 @@ class _IndexPageState extends State<IndexPage> {
     try {
       MaxgaDataHttpRepo repo = Application
           .getInstance()
-          .currentDataRepo;
+          .getMangaSource();
       mangaList = await repo.getLatestUpdate(page);
       page++;
       this.loadStatus = 1;
@@ -215,5 +224,11 @@ class _IndexPageState extends State<IndexPage> {
               onIgnore: () => UpdateService.ignoreUpdate(nextVersion),
             )
     );
+  }
+
+  changeMangaSource(MangaSource value) {
+
+    Application.getInstance().changeMangaSource(value);
+    this.getMangaList();
   }
 }

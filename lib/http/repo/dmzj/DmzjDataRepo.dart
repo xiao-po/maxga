@@ -131,5 +131,8 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     return chapter;
   }
 
+  @override
+  get mangaSource => _source;
+
 
 }

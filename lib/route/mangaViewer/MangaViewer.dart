@@ -218,7 +218,7 @@ class _MangaViewerState extends State<MangaViewer> {
     if (cachedChapterData.containsKey(chapter.id)) {
       return cachedChapterData[chapter.id];
     } else {
-      MaxgaDataHttpRepo repo = Application.getInstance().currentDataRepo;
+      MaxgaDataHttpRepo repo = Application.getInstance().getMangaSource(key: widget.manga.source.key);
       print(chapter.url);
       final result = await repo.getChapterImageList(chapter.url);
       chapter.imgUrlList = result;

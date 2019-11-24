@@ -37,7 +37,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
 
   void getResult() async {
     Application application = Application.getInstance();
-    mangaResultList = await application.currentDataRepo.getSearchManga(widget.keyword);
+    mangaResultList = await application.getMangaSource().getSearchManga(widget.keyword);
     print(mangaResultList.length);
     setState(() {});
   }

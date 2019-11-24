@@ -63,6 +63,9 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
     return mangaList;
   }
 
+  @override
+  MangaSource get mangaSource => _source;
+
 
 
 
