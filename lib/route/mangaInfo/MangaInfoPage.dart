@@ -72,7 +72,10 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
           );
           loadOver = true;
           mangaInfoBottomBar = MangaInfoBottomBar(
-              onResume: () => onResumeProcess(), readed: mangaReadProcess != null);
+              onResume: () => onResumeProcess(),
+              readed: mangaReadProcess.collected,
+              onCollect: () => collectManga(),
+          );
           break;
         }
       case _MangaInfoPageStatus.error:
@@ -147,15 +150,13 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
       print(e);
       loading = _MangaInfoPageStatus.error;
     }
-
-    print(mangaReadProcess?.chapterId);
     if (mounted) {
       setState(() { });
     }
   }
 
   void enjoyMangaContent(Chapter chapter, {int imagePage = 0}) async {
-    await Navigator.push(
+    MangaViewerPopResult result = await Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => MangaViewer(
@@ -163,9 +164,18 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
                   currentChapter: chapter,
                   chapterList: chapterList,
                   initIndex: imagePage,
-                )));
-    mangaReadProcess = await MangaReadStorageService.getMangaStatus(widget.manga);
-    HistoryProvider.getInstance().addToHistory(widget.manga);
+                )
+        )
+    );
+    if (result.loadOver) {
+      var manga = widget.manga;
+      mangaReadProcess = MangaReadProcess(manga.source.key, manga.id, result.chapterId, result.mangaImageIndex, mangaReadProcess?.collected ?? false);
+      await Future.wait([
+        MangaReadStorageService.setMangaStatus(mangaReadProcess),
+        HistoryProvider.getInstance().addToHistory(widget.manga),
+      ]);
+      if(mounted) setState(() { });
+    }
   }
 
   onResumeProcess() {
@@ -196,6 +206,12 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
       }
     }
     return firstChapter;
+  }
+
+  collectManga() async {
+    mangaReadProcess.collected = !mangaReadProcess.collected;
+    await MangaReadStorageService.setMangaStatus(mangaReadProcess);
+    if(mounted) setState(() { });
   }
 
 

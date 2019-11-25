@@ -24,6 +24,16 @@ enum _MangaViewerLoadState {
   over
 }
 
+
+
+class MangaViewerPopResult {
+  bool loadOver;
+  int mangaImageIndex;
+  int chapterId;
+
+  MangaViewerPopResult({this.loadOver, this.mangaImageIndex, this.chapterId});
+}
+
 class MangaViewer extends StatefulWidget {
   final SimpleMangaInfo manga;
   final Chapter currentChapter;
@@ -90,6 +100,8 @@ class _MangaViewerState extends State<MangaViewer> {
   }
 
   void initMangaViewer() async {
+    loadStatus = _MangaViewerLoadState.loadingMangaData;
+    setState(() {});
     currentChapter = widget.currentChapter;
     chapterList = widget.chapterList.toList();
     chapterList.sort((a, b) => a.order.compareTo(b.order));
@@ -412,15 +424,17 @@ class _MangaViewerState extends State<MangaViewer> {
   }
 
   onBack() {
-
-    MaxgaUtils.showStatusBar();
-    if (loadStatus == _MangaViewerLoadState.over){
-      var manga = widget.manga;
-      MangaReadStorageService.setMangaStatus(MangaReadProcess(
-          manga.source.key, manga.id, currentChapter.id, _currentPageIndex - (preChapter != null ? 1 : 0)));
-
+    if (loadStatus == _MangaViewerLoadState.over) {
+      Navigator.pop<MangaViewerPopResult>(context, MangaViewerPopResult(
+          loadOver: loadStatus == _MangaViewerLoadState.over,
+          mangaImageIndex: _currentPageIndex - (preChapter != null ? 1 : 0),
+          chapterId: currentChapter.id
+      ));
+    } else {
+      Navigator.pop<MangaViewerPopResult>(context, MangaViewerPopResult(
+          loadOver: loadStatus == _MangaViewerLoadState.over,
+      ));
     }
-    Navigator.pop(context);
   }
 
   Widget buildCheckNetStatePage() {
@@ -441,7 +455,7 @@ class _MangaViewerState extends State<MangaViewer> {
             highlightedBorderColor: Colors.white,
 
             child: const Text('继续阅读',style: TextStyle(color: Colors.white,fontSize: 16),textAlign: TextAlign.center),
-            onPressed: () {loadStatus = _MangaViewerLoadState.loadingMangaData;initMangaViewer();}
+            onPressed: () {initMangaViewer();}
             ),
         ],
       )

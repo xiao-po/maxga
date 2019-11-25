@@ -51,6 +51,8 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
     final Manga mangaInfo = parser.getMangaFromMangaInfoPage(response.body);
     mangaInfo.chapterList.forEach((item) => item.comicId = id);
     mangaInfo.source = _source;
+    mangaInfo.id = id;
+    mangaInfo.infoUrl = url;
     return mangaInfo;
   }
 
