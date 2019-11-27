@@ -11,12 +11,10 @@ import 'package:maxga/base/setting/SettingValue.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Chapter.dart';
 import 'package:maxga/model/Manga.dart';
-import 'package:maxga/model/MangaReadProcess.dart';
 import 'package:maxga/provider/SettingProvider.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaViewer/MangaTab.dart';
 import 'package:maxga/route/mangaViewer/baseComponent/MangaViewerFutureView.dart';
-import 'package:maxga/service/MangaReadStorage.service.dart';
 
 enum _MangaViewerLoadState {
   checkNetState,
@@ -164,6 +162,7 @@ class _MangaViewerState extends State<MangaViewer> {
                 child: GestureDetector(
                   onTapUp: (details) => dispatchTapUpEvent(details, context),
                   child: MangaTabView(
+                    source: widget.manga.source,
                     controller: tabController,
                     onPageChanged: (index) => changePage(index),
                     hasPrechapter: preChapter != null,

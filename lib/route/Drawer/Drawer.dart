@@ -18,7 +18,7 @@ class MaxgaDrawer extends StatelessWidget {
                 child: ListView(
                   children: <Widget>[
                     ListTile(
-                      leading: Icon(Icons.settings),
+                      leading: Icon(Icons.history),
                       title: const Text('历史记录'),
                       onTap: () {
                         Navigator.pop(context);

@@ -1,13 +1,14 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/components/Card.dart';
+import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/model/Manga.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 
 import '../../Application.dart';
 
 class SearchResultPage extends StatefulWidget {
+  final String name = 'search_result';
   final String keyword;
 
   const SearchResultPage({Key key, this.keyword}) : super(key: key);
@@ -38,7 +39,6 @@ class _SearchResultPageState extends State<SearchResultPage> {
   void getResult() async {
     Application application = Application.getInstance();
     mangaResultList = await application.getMangaSource().getSearchManga(widget.keyword);
-    print(mangaResultList.length);
     setState(() {});
   }
 
@@ -57,26 +57,25 @@ class _SearchResultPageState extends State<SearchResultPage> {
         children: mangaResultList
             .map((item) => MangaCard(
                   manga: item,
-                  cover: _buildCachedNetworkImage(item),
+                  cover: MangaCoverImage(
+                    source: item.source,
+                    url: item.coverImgUrl,
+                    tagPrefix: widget.name,
+                  ),
                   onTap: () => this.goMangaInfoPage(item),
                 ))
             .toList());
   }
 
-  Widget _buildCachedNetworkImage(SimpleMangaInfo item) {
-    return Hero(
-      tag: 'search_page_${item.coverImgUrl}',
-      child: CachedNetworkImage(
-          imageUrl: item.coverImgUrl,
-          placeholder: (context, url) =>
-              CircularProgressIndicator(strokeWidth: 2)),
-    );
-  }
-
   goMangaInfoPage(SimpleMangaInfo item) {
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return MangaInfoPage(
-        coverImageBuilder: (context) => _buildCachedNetworkImage(item),
+        coverImageBuilder: (context) => MangaCoverImage(
+          source: item.source,
+          url: item.coverImgUrl,
+          tagPrefix: widget.name,
+          fit: BoxFit.cover,
+        ),
         manga: item,
       );
     }));

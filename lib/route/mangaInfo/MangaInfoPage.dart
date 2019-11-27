@@ -38,7 +38,7 @@ class MangaInfoPage extends StatefulWidget {
 
 class _MangaInfoPageState extends State<MangaInfoPage> {
   _MangaInfoPageStatus loading = _MangaInfoPageStatus.loading;
-  MangaReadProcess mangaReadProcess;
+  ReadMangaStatus readMangaStatus;
   List<Chapter> chapterList = [];
 
   String introduce;
@@ -65,15 +65,15 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
         {
           mangaInfoIntro = MangaInfoIntro(intro: introduce);
           mangaInfoChapter = MangaInfoChapter(
-            manga: widget.manga,
             chapterList: chapterList,
-            readStatus: mangaReadProcess,
+            readStatus: readMangaStatus,
             onClickChapter: (chapter) => enjoyMangaContent(chapter),
           );
           loadOver = true;
           mangaInfoBottomBar = MangaInfoBottomBar(
               onResume: () => onResumeProcess(),
-              readed: mangaReadProcess.collected,
+              readed: readMangaStatus.readChapterId != null,
+              collected: readMangaStatus.collected,
               onCollect: () => collectManga(),
           );
           break;
@@ -143,7 +143,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
       chapterList = manga.chapterList;
       introduce = manga.introduce;
 
-      mangaReadProcess = await MangaReadStorageService.getMangaStatus(manga);
+      readMangaStatus = await MangaReadStorageService.getMangaStatus(widget.manga);
       await Future.delayed(Duration(milliseconds: 500));
       loading = _MangaInfoPageStatus.over;
     } catch (e) {
@@ -168,21 +168,22 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
         )
     );
     if (result.loadOver) {
-      var manga = widget.manga;
-      mangaReadProcess = MangaReadProcess(manga.source.key, manga.id, result.chapterId, result.mangaImageIndex, mangaReadProcess?.collected ?? false);
+      readMangaStatus.readChapterId = result.chapterId;
+      readMangaStatus.readImageIndex = result.mangaImageIndex;
       await Future.wait([
-        MangaReadStorageService.setMangaStatus(mangaReadProcess),
+        MangaReadStorageService.setMangaStatus(readMangaStatus),
         HistoryProvider.getInstance().addToHistory(widget.manga),
       ]);
       if(mounted) setState(() { });
     }
+    MaxgaUtils.showStatusBar();
   }
 
   onResumeProcess() {
-    if (mangaReadProcess != null) {
+    if (readMangaStatus != null) {
       var chapter = chapterList
-          .firstWhere((item) => item.id == mangaReadProcess.chapterId);
-      this.enjoyMangaContent(chapter, imagePage: mangaReadProcess.imageIndex);
+          .firstWhere((item) => item.id == readMangaStatus.readChapterId);
+      this.enjoyMangaContent(chapter, imagePage: readMangaStatus.readImageIndex);
     } else {
       var chapter = getFirstChapter();
       this.enjoyMangaContent(chapter, imagePage: 0);
@@ -209,8 +210,8 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   }
 
   collectManga() async {
-    mangaReadProcess.collected = !mangaReadProcess.collected;
-    await MangaReadStorageService.setMangaStatus(mangaReadProcess);
+    readMangaStatus.collected = !readMangaStatus.collected;
+    await MangaReadStorageService.setMangaStatus(readMangaStatus);
     if(mounted) setState(() { });
   }
 

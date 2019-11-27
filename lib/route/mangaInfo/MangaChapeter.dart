@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/components/MangaOutlineButton.dart';
+import 'package:maxga/components/skeleton.dart';
 import 'package:maxga/constant/SortValue.dart';
 import 'package:maxga/model/Chapter.dart';
 import 'package:maxga/model/Manga.dart';
@@ -9,14 +10,13 @@ import 'package:maxga/model/MangaReadProcess.dart';
 typedef EnjoyMangaCallback = void Function(Chapter chapter);
 
 class MangaInfoChapter extends StatefulWidget {
-  final SimpleMangaInfo manga;
   final List<Chapter> chapterList;
 
   final EnjoyMangaCallback onClickChapter;
-  final MangaReadProcess readStatus;
+  final ReadMangaStatus readStatus;
 
 
-  const MangaInfoChapter({Key key, this.manga, this.onClickChapter, this.readStatus, this.chapterList}) : super(key: key);
+  const MangaInfoChapter({Key key,this.onClickChapter, this.readStatus, this.chapterList}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MangaInfoChapterState();
@@ -45,7 +45,7 @@ class _MangaInfoChapterState extends State<MangaInfoChapter> {
           Padding(
             padding: EdgeInsets.only(left: 20, right: 10),
             child: buildChapterStatus(
-              status: widget.manga.status,
+              status: widget.readStatus.status,
             ),
           ),
           _MangaChapterGrid(
@@ -113,7 +113,7 @@ class _MangaChapterGrid extends StatelessWidget {
   final List<Chapter> chapterList;
   final EnjoyMangaCallback onOpenChapter;
 
-  final MangaReadProcess readStatus;
+  final ReadMangaStatus readStatus;
 
   const _MangaChapterGrid({Key key, this.chapterList, this.onOpenChapter, this.readStatus}) : super(key: key);
 
@@ -121,17 +121,19 @@ class _MangaChapterGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final EdgeInsetsGeometry gridPadding =
       const EdgeInsets.only(top: 0, bottom: 0, left: 5, right: 5);
-    print(readStatus);
+
+    double deviceWidth = MediaQuery.of(context).size.width;
+    int crossAxisCount = (deviceWidth / 120).floor();
     return GridView.count(
         padding: gridPadding,
-        crossAxisCount: 3,
+        crossAxisCount: crossAxisCount,
         childAspectRatio: 2.0,
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         children: chapterList
             .map((item) => Align(
                   child: MangaOutlineButton(
-                      active: readStatus?.chapterId == item.id ?? null,
+                      active: readStatus?.readChapterId == item.id ?? null,
                       text: Text(item.title, textAlign: TextAlign.center, overflow: TextOverflow.ellipsis,),
                       onPressed: () => onOpenChapter(item),
                   ),

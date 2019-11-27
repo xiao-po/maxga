@@ -17,10 +17,9 @@ class MangaInfoCover extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double topCoverImageHeight = 300;
-
+    double deviceHeight = MediaQuery.of(context).size.height;
     return Container(
-      height: topCoverImageHeight,
+      height: deviceHeight / 2,
       child: Stack(
         children: <Widget>[
           Container(

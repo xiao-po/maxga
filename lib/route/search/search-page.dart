@@ -68,7 +68,6 @@ class _SearchPageState extends State<SearchPage> {
       decoration: InputDecoration(
         hintText: '漫画名称、作者名字',
         hintStyle: TextStyle(color: Colors.black54),
-//        contentPadding: EdgeInsets.only(top: 17),
         enabledBorder:
             UnderlineInputBorder(borderSide: BorderSide(color: Colors.black12)),
         focusedBorder:

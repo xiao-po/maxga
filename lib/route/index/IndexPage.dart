@@ -1,6 +1,6 @@
 import 'dart:async';
+import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/Utils/MaxgaUtils.dart';
@@ -9,11 +9,13 @@ import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/components/UpdateDialog.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Manga.dart';
+import 'package:maxga/model/MangaReadProcess.dart';
 import 'package:maxga/model/MangaSource.dart';
 import 'package:maxga/route/Drawer/Drawer.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:maxga/route/search/search-page.dart';
+import 'package:maxga/service/MangaReadStorage.service.dart';
 import 'package:maxga/service/UpdateService.dart';
 
 import '../../Application.dart';
@@ -38,7 +40,9 @@ class _IndexPageState extends State<IndexPage> {
     super.initState();
     allMangaSource = Application.getInstance()?.allDataSource;
     this.getMangaList();
-    this.checkUpdate();
+    if (Platform.isAndroid) {
+      this.checkUpdate();
+    }
   }
 
   @override
@@ -48,7 +52,7 @@ class _IndexPageState extends State<IndexPage> {
         key: scaffoldKey,
         backgroundColor: Color(0xfff5f5f5),
         appBar: AppBar(
-          title: const Text('maxga'),
+          title: const Text('MaxGa'),
           actions: <Widget>[
             IconButton(
               icon: Icon(
@@ -56,6 +60,10 @@ class _IndexPageState extends State<IndexPage> {
                 color: Colors.white,
               ),
               onPressed: this.toSearch,
+            ),
+            IconButton(
+              icon: Icon(Icons.info),
+              onPressed: () => this.outputCollection(),
             ),
             PopupMenuButton<MangaSource>(
               itemBuilder: (context) => allMangaSource.map((el) => PopupMenuItem(
@@ -83,6 +91,7 @@ class _IndexPageState extends State<IndexPage> {
               MangaCard(
                 manga: item,
                 cover: MangaCoverImage(
+                  source: item.source,
                   url: item.coverImgUrl,
                   tagPrefix: widget.name,
                 ),
@@ -142,6 +151,7 @@ class _IndexPageState extends State<IndexPage> {
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return MangaInfoPage(
           coverImageBuilder: (context) => MangaCoverImage(
+            source: item.source,
             url: item.coverImgUrl,
             tagPrefix: widget.name,
             fit: BoxFit.cover,
@@ -230,5 +240,12 @@ class _IndexPageState extends State<IndexPage> {
 
     Application.getInstance().changeMangaSource(value);
     this.getMangaList();
+  }
+
+  outputCollection() async {
+    List<ReadMangaStatus> collectedMangaList = await MangaReadStorageService.getAllCollectedManga();
+    print(''
+        '${collectedMangaList.map((el) => el.title).join('\n')}'
+        '');
   }
 }

@@ -1,6 +1,7 @@
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:maxga/model/MangaSource.dart';
 
 import 'MangaTab.dart';
 
@@ -8,7 +9,9 @@ class MangaImage extends StatefulWidget {
   final String url;
   final int index;
 
-  const MangaImage({Key key, this.url, this.index}) : super(key: key);
+  final MangaSource source;
+
+  const MangaImage({Key key, this.url, this.index,  this.source}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MangaImageState();
@@ -16,9 +19,6 @@ class MangaImage extends StatefulWidget {
 }
 
 class _MangaImageState extends State<MangaImage> with SingleTickerProviderStateMixin  {
-  Map _httpHeaders = <String, String>{
-    "Referer": "http://images.dmzj.com/",
-  };
   MangaImageAnimationListener _animationListener;
   AnimationController _animationController;
   Animation _animation;
@@ -35,8 +35,9 @@ class _MangaImageState extends State<MangaImage> with SingleTickerProviderStateM
     return  ExtendedImage.network(
       widget.url,
       height: double.infinity,
+      width: double.infinity,
       mode: ExtendedImageMode.gesture,
-      headers: _httpHeaders,
+      headers: widget.source.headers,
       alignment: Alignment.center,
       fit: BoxFit.contain,
       onDoubleTap: (state) => zoomImage(state),

@@ -2,20 +2,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class MangaInfoWrapper extends StatefulWidget {
-
   final String title;
 
   final List<Widget> children;
 
   final Widget bottomBar;
 
-  const MangaInfoWrapper({Key key, this.title, this.children, this.bottomBar}) : super(key: key);
-
+  const MangaInfoWrapper({Key key, this.title, this.children, this.bottomBar})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MangaInfoWrapperState();
 }
-
 
 class _MangaInfoWrapperState extends State<MangaInfoWrapper> {
   final scrollController = ScrollController();
@@ -27,12 +25,14 @@ class _MangaInfoWrapperState extends State<MangaInfoWrapper> {
 
     scrollController.addListener(listenScrollTopForModifyBackgroundColor);
   }
+
   @override
   Widget build(BuildContext context) {
-
     Color originColor = Theme.of(context).accentColor;
-    Color appbarColor = Color.fromARGB((opacity * 0xff).floor(), originColor.red , originColor.green, originColor.blue);
-    Color appbarTitleColor = Color.fromARGB((opacity * 0xff).floor(), 0x000000ff, 0x000000ff, 0x000000ff);
+    Color appbarColor = Color.fromARGB((opacity * 0xff).floor(),
+        originColor.red, originColor.green, originColor.blue);
+    Color appbarTitleColor = Color.fromARGB(
+        (opacity * 0xff).floor(), 0x000000ff, 0x000000ff, 0x000000ff);
 
     return Stack(
       children: <Widget>[
@@ -48,42 +48,48 @@ class _MangaInfoWrapperState extends State<MangaInfoWrapper> {
                 ],
               ),
             ),
-            widget.bottomBar != null ? Align(
-              alignment: Alignment.bottomCenter,
-              child: widget.bottomBar,
-            ) : Container()
+            widget.bottomBar != null
+                ? Align(
+                    alignment: Alignment.bottomCenter,
+                    child: widget.bottomBar,
+                  )
+                : Container()
           ],
         ),
         Container(
-          height: 80,
-          child: AppBar(
-            backgroundColor: appbarColor,
-            title:  Text(widget.title, style: TextStyle(color: appbarTitleColor)),
-            elevation: 0,
-            actions: <Widget>[
-              IconButton(icon: Icon(Icons.share, color: Colors.white), onPressed: () {},)
-            ],
-          ),
+          height: 100,
+          child: MediaQuery.removePadding(
+              context: context,
+              removeBottom: true,
+              child: AppBar(
+                backgroundColor: appbarColor,
+                leading: BackButton(),
+                title: Text(widget.title,
+                    style: TextStyle(color: appbarTitleColor)),
+                elevation: 0,
+                actions: <Widget>[
+                  IconButton(
+                    icon: Icon(Icons.share, color: Colors.white),
+                    onPressed: () {},
+                  )
+                ],
+              )),
         ),
-
       ],
     );
   }
 
-
   void listenScrollTopForModifyBackgroundColor() {
     if (scrollController.position.extentBefore < 200) {
-      var opacity = scrollController.position.extentBefore / 100 ;
+      var opacity = scrollController.position.extentBefore / 100;
       this.opacity = opacity > 0.9 ? 1 : opacity;
       setState(() {});
     }
   }
-
 
   @override
   void dispose() {
     super.dispose();
     scrollController.dispose();
   }
-
 }

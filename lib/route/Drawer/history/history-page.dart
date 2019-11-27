@@ -30,7 +30,7 @@ class _HistToryPageState extends State<HistoryPage> {
         title: Text('历史记录'),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.history),
+            icon: Icon(Icons.delete_forever),
             onPressed: () => deleteHistoryList(),
           )
         ],
@@ -40,6 +40,7 @@ class _HistToryPageState extends State<HistoryPage> {
           mangaHistoryList.map((item) => MangaCard(
             manga: item,
             cover: MangaCoverImage(
+              source: item.source,
               url: item.coverImgUrl,
               tagPrefix: widget.name,
             ),
@@ -54,6 +55,7 @@ class _HistToryPageState extends State<HistoryPage> {
       return MangaInfoPage(
           coverImageBuilder: (c) => MangaCoverImage(
                 url: item.coverImgUrl,
+                source: item.source,
                 tagPrefix: widget.name,
                 fit: BoxFit.cover,
               ),

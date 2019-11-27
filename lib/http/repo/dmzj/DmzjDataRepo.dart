@@ -13,7 +13,10 @@ import 'model/DmzjSearchSuggestion.dart';
 class DmzjDataRepo extends MaxgaDataHttpRepo {
   MangaSource _source = MangaSource(
     name: '动漫之家',
-    key: 'dmzj'
+    key: 'dmzj',
+    headers: {
+      'referer': 'http://m.dmzj.com/latest.html',
+    }
   );
 
   @override

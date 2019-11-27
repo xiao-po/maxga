@@ -8,8 +8,9 @@ class MangaInfoBottomBar extends StatelessWidget {
   final OnCollectCallBack onCollect;
   final OnResumeCallBack onResume;
   final bool readed;
+  final bool collected;
 
-  const MangaInfoBottomBar({Key key, this.onCollect, this.onResume, this.readed = false})
+  const MangaInfoBottomBar({Key key, this.onCollect, this.onResume, this.readed = false, this.collected = false})
       : super(key: key);
 
   @override
@@ -24,7 +25,7 @@ class MangaInfoBottomBar extends StatelessWidget {
         children: <Widget>[
           FlatButton.icon(
               onPressed: onCollect,
-              icon: Icon(Icons.star_border, color: readed ? Colors.black : Colors.orangeAccent,),
+              icon: Icon(Icons.star_border, color: collected ? Colors.orangeAccent : Colors.black,),
               label: const Text('收藏')),
           buildResumeButton()
         ],

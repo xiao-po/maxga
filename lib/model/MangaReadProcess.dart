@@ -1,35 +1,58 @@
+import 'Chapter.dart';
 import 'Manga.dart';
+import 'MangaSource.dart';
 
-class MangaReadProcess {
-  String sourceKey;
-  int id;
-  int chapterId;
-  int imageIndex;
-  bool collected;
+class ReadMangaStatus extends SimpleMangaInfo {
+  int readChapterId;
+  int readImageIndex;
+  bool collected = false;
 
 
-  MangaReadProcess(this.sourceKey, this.id, this.chapterId, this.imageIndex, this.collected);
-
-  MangaReadProcess.empty(Manga manga){
-    sourceKey = manga.source.key;
+  ReadMangaStatus.fromSimpleMangaInfo(SimpleMangaInfo manga) {
+    source = manga.source;
+    author = manga.author;
     id = manga.id;
-    collected = false;
+    infoUrl = manga.infoUrl;
+    status = manga.status;
+    coverImgUrl = manga.coverImgUrl;
+    title = manga.title;
+    introduce = manga.introduce;
+    typeList = manga.typeList.cast<String>();
+    lastUpdateChapter = manga.lastUpdateChapter;
+
   }
-  MangaReadProcess.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    chapterId = json['chapterId'];
-    imageIndex = json['imageIndex'];
-    sourceKey = json['sourceKey'];
-    collected = json['collected'];
+
+  ReadMangaStatus.fromJson(Map<String, dynamic> json) {
+      source = MangaSource.fromJson(json['source']);
+      author = json['author'];
+      id = json['id'];
+      infoUrl = json['infoUrl'];
+      status = json['status'];
+      coverImgUrl = json['coverImgUrl'];
+      title = json['title'];
+      introduce = json['introduce'];
+      typeList = json['typeList'].cast<String>();
+      collected = json['collected'];
+      readImageIndex = json['readImageIndex'];
+      readChapterId = json['readChapterId'];
+      lastUpdateChapter = Chapter.fromJson(json['lastUpdateChapter']);
   }
 
   Map<String, dynamic> toJson() =>
       {
-        'sourceKey': sourceKey,
+        'source': source,
+        'author': author,
         'id': id,
-        'chapterId': chapterId,
-        'imageIndex': imageIndex,
+        'infoUrl': infoUrl,
+        'status': status,
+        'coverImgUrl': coverImgUrl,
+        'title': title,
+        'introduce': introduce,
+        'readImageIndex': readImageIndex,
+        'readChapterId': readChapterId,
         'collected': collected,
+        'typeList': typeList,
+        'lastUpdateChapter': lastUpdateChapter
       };
 
 

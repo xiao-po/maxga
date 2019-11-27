@@ -7,12 +7,12 @@ typedef CoverBuilder = Widget Function(BuildContext context, SimpleMangaInfo man
 
 class MangaCard extends StatelessWidget {
   final SimpleMangaInfo manga;
-
   final GestureTapCallback onTap;
   final Widget cover;
+  final Widget title;
   final CoverBuilder coverBuilder;
 
-  MangaCard({this.manga, this.onTap, this.cover, this.coverBuilder});
+  MangaCard({this.manga, this.onTap, this.cover, this.coverBuilder,@required this.title});
 
   final Color grayFontColor = Color(0xff9e9e9e);
 
@@ -25,41 +25,43 @@ class MangaCard extends StatelessWidget {
       bottom: 10,
     );
     final double cardHeight = 120;
-
+    final double coverWidth = 100;
+    final double coverHorizonPadding =( cardHeight - coverWidth ) / 2;
+    var edgeInsets = EdgeInsets.only(top: 0, left: 10);
     return  Card(
       child: Material(
         child: InkWell(
           onTap: this.onTap,
           child: Container(
-
             height: cardHeight,
             padding: cardPadding,
             child:  Row(
               children: <Widget>[
-                buildCover(context),
-                buildMangaInfo(),
+                Center(
+                  child: Container(
+                    height: cardHeight,
+                    width: coverWidth,
+                    padding: EdgeInsets.only(left: coverHorizonPadding, right: coverHorizonPadding,top: 0,bottom: 0),
+                    child: cover ?? coverBuilder(context, manga),
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    padding: edgeInsets,
+                    child: Column(
+                      children: <Widget>[
+                        buildMangaTitle(manga.title),
+                        buildLabelInfo(Icons.edit, manga.author),
+                        buildLabelInfo(Icons.label_outline, manga.typeList.join(' / ')),
+                      ],
+                    ),
+                  ),
+                ),
                 buildMangaMoreInfo()
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildMangaInfo() {
-    var edgeInsets = EdgeInsets.only(top: 0, left: 10);
-
-    return Expanded(
-      flex: 1,
-      child: Container(
-        padding: edgeInsets,
-        child: Column(
-          children: <Widget>[
-            buildMangaTitle(manga.title),
-            buildLabelInfo(Icons.edit, manga.author),
-            buildLabelInfo(Icons.label_outline, manga.typeList.join(' / ')),
-          ],
         ),
       ),
     );
@@ -129,20 +131,6 @@ class MangaCard extends StatelessWidget {
             ),
           ) : Container()
         ],
-      ),
-    );
-  }
-
-  Widget buildCover(BuildContext context) {
-    final double coverHeight = 140;
-    final double coverWidth = 100;
-
-
-    return Center(
-      child: SizedBox(
-        height: coverHeight,
-        width: coverWidth,
-        child: cover ?? coverBuilder(context, manga),
       ),
     );
   }

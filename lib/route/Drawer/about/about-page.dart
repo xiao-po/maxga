@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/service/UpdateService.dart';
@@ -10,98 +12,123 @@ enum CheckUpdateStatus {
   loading,
   shouldUpdate,
   notUpdate,
+  error,
 }
-
 
 class AboutPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _AboutPageState();
-
 }
 
 class _AboutPageState extends State<AboutPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  MaxgaReleaseInfo nextVersion;
 
   CheckUpdateStatus checkUpdateLoading = CheckUpdateStatus.none;
 
   @override
+  void initState() {
+    super.initState();
+    if (Platform.isAndroid) {
+      checkUpdateStatus();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    List<ListTile> list = [
-      ListTile(
+    List<ListTile> list = [];
+    if (Platform.isAndroid) {
+      list.add(ListTile(
         title: const Text('检查新版本'),
-        trailing:  buildListTileTrailing(checkUpdateLoading),
-        onTap: () => checkUpdateStatus(),
-      ),
-      ListTile(
-        title: const Text('源代码仓库'),
-        subtitle: const Text(RepoUrl),
-        onTap: () => openRepoUrl(RepoUrl),
-      )
-    ];
+        trailing: buildListTileTrailing(checkUpdateLoading),
+        onTap: () => handleUpdateListTileTapEvent(),
+      ));
+    }
+    list.add(ListTile(
+      title: const Text('源代码仓库'),
+      subtitle: const Text(RepoUrl),
+      onTap: () => openRepoUrl(RepoUrl),
+    ));
     return Scaffold(
-      key: scaffoldKey,
-      appBar: AppBar(
-        leading: BackButton(),
-        title: const Text('关于'),
-      ),
-      body: Column(
-        children: <Widget>[
-          buildApplicationAndVersionIntro(),
-          Expanded(
-            child: ListView.separated(
-              itemCount: list.length,
-              itemBuilder: (context, index) => list[index],
-              separatorBuilder: (context, index) {
-                return Divider();
-              },
-            ),
-          )
-        ],
-      )
-    );
+        key: scaffoldKey,
+        appBar: AppBar(
+          leading: BackButton(),
+          title: const Text('关于'),
+        ),
+        body: Column(
+          children: <Widget>[
+            buildApplicationAndVersionIntro(),
+            Expanded(
+              child: ListView.separated(
+                itemCount: list.length,
+                itemBuilder: (context, index) => list[index],
+                separatorBuilder: (context, index) {
+                  return Divider();
+                },
+              ),
+            )
+          ],
+        ));
+  }
+
+  handleUpdateListTileTapEvent() {
+    switch(checkUpdateLoading) {
+      case CheckUpdateStatus.notUpdate:
+      case CheckUpdateStatus.none:
+      case CheckUpdateStatus.loading:
+        break;
+      case CheckUpdateStatus.shouldUpdate:
+        openRepoUrl(nextVersion.url);
+        break;
+      case CheckUpdateStatus.error:
+        checkUpdateStatus();
+        break;
+    }
   }
 
   Widget buildListTileTrailing(CheckUpdateStatus checkUpdateLoading) {
     const trailingTextStyle = TextStyle(color: Colors.black26);
-    switch(checkUpdateLoading) {
-      case CheckUpdateStatus.loading: return buildListTileIndicator();
-      case CheckUpdateStatus.shouldUpdate: return Text('有更新', style: trailingTextStyle);
-      case CheckUpdateStatus.notUpdate: return Text('已经是最新版本', style: trailingTextStyle);
+    switch (checkUpdateLoading) {
+      case CheckUpdateStatus.loading:
+        return buildListTileIndicator();
+      case CheckUpdateStatus.shouldUpdate:
+        return Text('有更新', style: trailingTextStyle);
+      case CheckUpdateStatus.notUpdate:
+        return Text('已经是最新版本', style: trailingTextStyle);
       case CheckUpdateStatus.none:
-      default:
         return null;
+      case CheckUpdateStatus.error:
+        return Text('网络出错', style: trailingTextStyle);
+        break;
     }
   }
 
   Widget buildListTileIndicator() => SizedBox(
-    width: 20,
-    height: 20,
-    child: CircularProgressIndicator(strokeWidth: 2,valueColor: AlwaysStoppedAnimation<Color>(Colors.black26)),
-  );
+        width: 20,
+        height: 20,
+        child: CircularProgressIndicator(
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.black26)),
+      );
 
   Widget buildApplicationAndVersionIntro() {
-
-
     return Container(
       height: 200,
       margin: EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        border:  Border(
-            bottom: BorderSide(color: Color(0xffefefef))
-        )
-      ),
+          border: Border(bottom: BorderSide(color: Color(0xffefefef)))),
       width: double.infinity,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          const Text('MaxGa', style: TextStyle(fontSize: 40, color: Colors.cyan)),
+          const Text('MaxGa',
+              style: TextStyle(fontSize: 40, color: Colors.cyan)),
           const Text('version: 0.0.1', style: TextStyle(color: Colors.black38))
         ],
       ),
     );
   }
-
 
   openRepoUrl(url) async {
     if (await canLaunch(url)) {
@@ -110,17 +137,18 @@ class _AboutPageState extends State<AboutPage> {
   }
 
   checkUpdateStatus() async {
-    scaffoldKey.currentState.hideCurrentSnackBar();
     this.checkUpdateLoading = CheckUpdateStatus.loading;
-    setState(() { });
+    setState(() {});
     final nextVersion = await UpdateService.checkUpdateStatus();
     if (nextVersion != null) {
       this.checkUpdateLoading = CheckUpdateStatus.shouldUpdate;
-      openUpdateSnackBar(nextVersion);
     } else {
       this.checkUpdateLoading = CheckUpdateStatus.notUpdate;
     }
-    setState(() { });
+    this.nextVersion = nextVersion;
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void openUpdateSnackBar(MaxgaReleaseInfo nextVersion) {
@@ -158,9 +186,8 @@ class _AboutPageState extends State<AboutPage> {
               )
             ],
           ),
-      ],
-    ),
+        ],
+      ),
     ));
   }
-
 }
