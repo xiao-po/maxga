@@ -1,7 +1,6 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:maxga/base/setting/Setting.model.dart';
-import 'package:maxga/provider/SettingProvider.dart';
 import 'package:provider/provider.dart';
 
 import 'SettingListTile.dart';

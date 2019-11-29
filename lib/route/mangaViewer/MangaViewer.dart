@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:battery/battery.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:maxga/Application.dart';
 import 'package:maxga/Utils/MaxgaUtils.dart';
@@ -438,7 +438,6 @@ class _MangaViewerState extends State<MangaViewer> {
 
   Widget buildCheckNetStatePage() {
 
-    var text = '1';
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(

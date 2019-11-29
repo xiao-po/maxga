@@ -1,8 +1,9 @@
 import 'package:extended_image/extended_image.dart';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/gestures.dart';
 
 import 'MangaPageView.dart';
+import 'package:flutter/widgets.dart';
 final PageController _defaultPageController = PageController();
 const ScrollPhysics _defaultScrollPhysics = NeverScrollableScrollPhysics();
 

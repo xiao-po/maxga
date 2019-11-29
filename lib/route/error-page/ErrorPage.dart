@@ -1,4 +1,6 @@
-import 'package:flutter/cupertino.dart';
+
+
+import 'package:flutter/material.dart';
 
 class ErrorPage extends StatelessWidget {
   final GestureTapCallback onTap;

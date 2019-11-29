@@ -1,7 +1,6 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:maxga/components/skeleton.dart';
-import 'package:maxga/model/Manga.dart';
 import 'package:shimmer/shimmer.dart';
 
 class MangaInfoIntro extends StatelessWidget {

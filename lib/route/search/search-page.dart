@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:maxga/http/repo/dmzj/DmzjDataRepo.dart';
 import 'package:maxga/route/search/search-result-page.dart';

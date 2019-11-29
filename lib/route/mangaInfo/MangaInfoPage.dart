@@ -1,10 +1,6 @@
-import 'package:connectivity/connectivity.dart';
-import 'package:extended_image/extended_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/Application.dart';
 import 'package:maxga/Utils/MaxgaUtils.dart';
-import 'package:maxga/Utils/DateUtils.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Chapter.dart';
 import 'package:maxga/model/Manga.dart';

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:maxga/model/Manga.dart';
 import 'package:maxga/provider/HistoryProvider.dart';
 import 'package:maxga/provider/SettingProvider.dart';
-import 'package:maxga/route/Drawer/history/history-page.dart';
 import 'package:maxga/route/index/IndexPage.dart';
 import 'package:provider/provider.dart';
 

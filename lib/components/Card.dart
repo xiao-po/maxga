@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:maxga/components/skeleton.dart';
 import 'package:maxga/model/Manga.dart';
@@ -204,7 +204,6 @@ class MangaInfoCardExtra extends StatelessWidget {
 class SkeletonCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final Color grayFontColor = Colors.grey[350] ;
     final EdgeInsetsGeometry cardPadding = EdgeInsets.only(
       left: 0,
       right: 0,

@@ -1,10 +1,8 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:maxga/components/MangaOutlineButton.dart';
-import 'package:maxga/components/skeleton.dart';
 import 'package:maxga/constant/SortValue.dart';
 import 'package:maxga/model/Chapter.dart';
-import 'package:maxga/model/Manga.dart';
 import 'package:maxga/model/MangaReadProcess.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -156,8 +154,6 @@ class SkeletonMangaChapterGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final EdgeInsetsGeometry gridPadding =
-        const EdgeInsets.only(top: 0, bottom: 0, left: 5, right: 5);
 
     double deviceWidth = MediaQuery.of(context).size.width;
     int crossAxisCount = (deviceWidth / 120).floor();

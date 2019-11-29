@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:maxga/service/UpdateService.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -99,7 +99,9 @@ class _AboutPageState extends State<AboutPage> {
         return null;
       case CheckUpdateStatus.error:
         return Text('网络出错', style: trailingTextStyle);
-        break;
+      default: {
+        throw Error();
+      }
     }
   }
 
