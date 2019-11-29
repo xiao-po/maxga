@@ -141,7 +141,6 @@ class MangaExtra extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final widgetWidget = MediaQuery.of(context).size.width;
     return Container(
       width: 100,
       child: Column(
