@@ -80,7 +80,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
         }
       case _MangaInfoPageStatus.loading: {
         mangaInfoIntro = MangaInfoIntroSkeleton();
-        mangaInfoChapter = SkeletonMangaChapterGrid(colCount: 5);
+        mangaInfoChapter = SkeletonMangaChapterGrid(colCount: 6);
         break;
       }
       default:

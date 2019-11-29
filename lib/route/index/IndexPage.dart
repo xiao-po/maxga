@@ -10,13 +10,11 @@ import 'package:maxga/components/UpdateDialog.dart';
 import 'package:maxga/components/skeleton.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Manga.dart';
-import 'package:maxga/model/MangaReadProcess.dart';
 import 'package:maxga/model/MangaSource.dart';
 import 'package:maxga/route/Drawer/Drawer.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:maxga/route/search/search-page.dart';
-import 'package:maxga/service/MangaReadStorage.service.dart';
 import 'package:maxga/service/UpdateService.dart';
 
 import '../../Application.dart';
@@ -61,10 +59,6 @@ class _IndexPageState extends State<IndexPage> {
                 color: Colors.white,
               ),
               onPressed: this.toSearch,
-            ),
-            IconButton(
-              icon: Icon(Icons.info),
-              onPressed: () => this.outputCollection(),
             ),
             PopupMenuButton<MangaSource>(
               itemBuilder: (context) => allMangaSource
@@ -247,13 +241,4 @@ class _IndexPageState extends State<IndexPage> {
     setState(() {});
   }
 
-  outputCollection() async {
-    loadStatus = loadStatus == 1 ? 0 : 1;
-    List<ReadMangaStatus> collectedMangaList =
-        await MangaReadStorageService.getAllCollectedManga();
-    print(''
-        '${collectedMangaList.map((el) => el.title).join('\n')}'
-        '');
-    setState(() {});
-  }
 }

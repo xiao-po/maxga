@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:maxga/components/MangaOutlineButton.dart';
 import 'package:maxga/constant/SortValue.dart';
@@ -154,38 +153,65 @@ class SkeletonMangaChapterGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     double deviceWidth = MediaQuery.of(context).size.width;
     int crossAxisCount = (deviceWidth / 120).floor();
     final skeletonButtonRow = List(crossAxisCount)
       ..fillRange(0, crossAxisCount, 0);
-    final skeletonButtonCol = List(colCount)
-      ..fillRange(0, colCount, 0);
-    var body = Column(
-            children: skeletonButtonCol
-                .map(
-                  (item) => Row(
-                      children: skeletonButtonRow
-                          .map((item) => Expanded(
-                        flex: 1,
-                        child: Align(
-                          child: Container(
-                            width: 100,
-                            height: 35,
-                            margin: EdgeInsets.only(top: 10,bottom: 10),
-                            decoration: BoxDecoration(
-                                color: Colors.grey[350],
-                                borderRadius: BorderRadius.circular(5.0)),
-                          ),
-                        ),
-                      ))
-                          .toList()),
-                )
-                .toList());
+    final skeletonButtonCol = List(colCount)..fillRange(0, colCount, 0);
+    var skeletonGridView = skeletonButtonCol
+        .map((item) => buildGridViewRow(skeletonButtonRow))
+        .toList();
+    var body = Column(children: [
+      Padding(
+        padding: EdgeInsets.only(left: 20,right: 20),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            buildSkeletonRect(width: 100, height: 20),
+            buildSkeletonRect(width: 100, height: 20),
+          ],
+        ),
+      ),
+      ...skeletonGridView
+    ]);
     return Shimmer.fromColors(
         period: Duration(milliseconds: 1200),
         baseColor: Colors.grey[350],
         highlightColor: Colors.grey[200],
         child: body);
+  }
+
+  Widget buildGridViewRow(List skeletonButtonRow) {
+    return Row(
+        children: skeletonButtonRow
+            .map((item) => Expanded(
+                  flex: 1,
+                  child: buildButtonSkeleton(),
+                ))
+            .toList());
+  }
+
+  Widget buildButtonSkeleton() {
+    return buildSkeletonRect(
+        width: 100,
+        height: 35,
+        borderRadius: BorderRadius.circular(5.0)
+    );
+  }
+
+  Widget buildSkeletonRect({
+    double width,
+    double height,
+    BorderRadius borderRadius}) {
+    return Align(
+      child: Container(
+        width: width,
+        height: height,
+        margin: EdgeInsets.only(top: 10, bottom: 10),
+        decoration: BoxDecoration(
+            color: Colors.grey[350], borderRadius: borderRadius),
+      ),
+    );
   }
 }

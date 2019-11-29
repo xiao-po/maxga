@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:maxga/model/Manga.dart';
 import 'package:maxga/service/LocalStorage.service.dart';
 
+// TODO： Provider 改造
 class HistoryProvider {
   List<SimpleMangaInfo> _items;
   StreamController<List<SimpleMangaInfo>> _streamController = StreamController();

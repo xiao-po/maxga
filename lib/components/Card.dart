@@ -143,7 +143,7 @@ class MangaExtra extends StatelessWidget {
   Widget build(BuildContext context) {
     final widgetWidget = MediaQuery.of(context).size.width;
     return Container(
-      width: widgetWidget * 0.18,
+      width: 100,
       child: Column(
         children: <Widget>[
           Expanded(
@@ -153,7 +153,7 @@ class MangaExtra extends StatelessWidget {
             ),
           ),
           bottom,
-        ],
+        ]..removeWhere((el) => el == null),
       ),
     );
   }
@@ -172,27 +172,33 @@ class MangaInfoCardExtra extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textStyle = TextStyle(color: textColor);
+    final updateTime = manga.lastUpdateChapter.updateTime != null
+        ? this.convertTimeToYYYYMMDD(
+        DateTime.fromMillisecondsSinceEpoch(
+            manga.lastUpdateChapter.updateTime
+        )
+    ) : '';
+    var bottomText;
+    if (manga.lastUpdateChapter != null) {
+      bottomText = Align(
+          alignment: Alignment.centerRight,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [manga.lastUpdateChapter.title, updateTime].map((el) => Text(
+                el,
+                textAlign: TextAlign.right,
+                overflow: TextOverflow.ellipsis,
+                style: textStyle)).toList(growable: false),
+          )
+      );
+    }
     return MangaExtra(
       body: Text(
         manga.source.name,
         textAlign: TextAlign.right,
         style: textStyle,
       ),
-      bottom: manga.lastUpdateChapter != null
-          ? Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                '${manga.lastUpdateChapter.title} \n' +
-                    (manga.lastUpdateChapter.updateTime != null
-                        ? this.convertTimeToYYYYMMDD(
-                            DateTime.fromMillisecondsSinceEpoch(
-                                manga.lastUpdateChapter.updateTime))
-                        : ''),
-                textAlign: TextAlign.right,
-                style: textStyle,
-              ),
-            )
-          : Container(),
+      bottom: bottomText,
     );
   }
 
