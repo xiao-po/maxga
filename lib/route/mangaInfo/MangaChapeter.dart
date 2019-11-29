@@ -6,6 +6,7 @@ import 'package:maxga/constant/SortValue.dart';
 import 'package:maxga/model/Chapter.dart';
 import 'package:maxga/model/Manga.dart';
 import 'package:maxga/model/MangaReadProcess.dart';
+import 'package:shimmer/shimmer.dart';
 
 typedef EnjoyMangaCallback = void Function(Chapter chapter);
 
@@ -15,8 +16,9 @@ class MangaInfoChapter extends StatefulWidget {
   final EnjoyMangaCallback onClickChapter;
   final ReadMangaStatus readStatus;
 
-
-  const MangaInfoChapter({Key key,this.onClickChapter, this.readStatus, this.chapterList}) : super(key: key);
+  const MangaInfoChapter(
+      {Key key, this.onClickChapter, this.readStatus, this.chapterList})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MangaInfoChapterState();
@@ -49,9 +51,9 @@ class _MangaInfoChapterState extends State<MangaInfoChapter> {
             ),
           ),
           _MangaChapterGrid(
-              readStatus: widget.readStatus,
-              chapterList: chapterList,
-              onOpenChapter: (item) => widget.onClickChapter(item),
+            readStatus: widget.readStatus,
+            chapterList: chapterList,
+            onOpenChapter: (item) => widget.onClickChapter(item),
           ),
         ],
       ),
@@ -65,7 +67,10 @@ class _MangaInfoChapterState extends State<MangaInfoChapter> {
     return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Text(status ?? '漫画状态未知', style: textStyle,),
+          Text(
+            status ?? '漫画状态未知',
+            style: textStyle,
+          ),
           Row(
             children: <Widget>[
               FlatButton(
@@ -91,9 +96,6 @@ class _MangaInfoChapterState extends State<MangaInfoChapter> {
         ]);
   }
 
-
-
-
   changeSortType() {
     if (sortType == SortType.asc) {
       sortType = SortType.desc;
@@ -102,8 +104,6 @@ class _MangaInfoChapterState extends State<MangaInfoChapter> {
       sortType = SortType.asc;
       chapterList.sort((a, b) => b.order - a.order);
     }
-
-
 
     setState(() {});
   }
@@ -115,12 +115,14 @@ class _MangaChapterGrid extends StatelessWidget {
 
   final ReadMangaStatus readStatus;
 
-  const _MangaChapterGrid({Key key, this.chapterList, this.onOpenChapter, this.readStatus}) : super(key: key);
+  const _MangaChapterGrid(
+      {Key key, this.chapterList, this.onOpenChapter, this.readStatus})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final EdgeInsetsGeometry gridPadding =
-      const EdgeInsets.only(top: 0, bottom: 0, left: 5, right: 5);
+        const EdgeInsets.only(top: 0, bottom: 0, left: 5, right: 5);
 
     double deviceWidth = MediaQuery.of(context).size.width;
     int crossAxisCount = (deviceWidth / 120).floor();
@@ -133,13 +135,61 @@ class _MangaChapterGrid extends StatelessWidget {
         children: chapterList
             .map((item) => Align(
                   child: MangaOutlineButton(
-                      active: readStatus?.readChapterId == item.id ?? null,
-                      text: Text(item.title, textAlign: TextAlign.center, overflow: TextOverflow.ellipsis,),
-                      onPressed: () => onOpenChapter(item),
+                    active: readStatus?.readChapterId == item.id ?? null,
+                    text: Text(
+                      item.title,
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    onPressed: () => onOpenChapter(item),
                   ),
                 ))
             .toList(growable: false));
   }
+}
 
+class SkeletonMangaChapterGrid extends StatelessWidget {
+  final int colCount;
 
+  const SkeletonMangaChapterGrid({Key key, this.colCount = 3})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final EdgeInsetsGeometry gridPadding =
+        const EdgeInsets.only(top: 0, bottom: 0, left: 5, right: 5);
+
+    double deviceWidth = MediaQuery.of(context).size.width;
+    int crossAxisCount = (deviceWidth / 120).floor();
+    final skeletonButtonRow = List(crossAxisCount)
+      ..fillRange(0, crossAxisCount, 0);
+    final skeletonButtonCol = List(colCount)
+      ..fillRange(0, colCount, 0);
+    var body = Column(
+            children: skeletonButtonCol
+                .map(
+                  (item) => Row(
+                      children: skeletonButtonRow
+                          .map((item) => Expanded(
+                        flex: 1,
+                        child: Align(
+                          child: Container(
+                            width: 100,
+                            height: 35,
+                            margin: EdgeInsets.only(top: 10,bottom: 10),
+                            decoration: BoxDecoration(
+                                color: Colors.grey[350],
+                                borderRadius: BorderRadius.circular(5.0)),
+                          ),
+                        ),
+                      ))
+                          .toList()),
+                )
+                .toList());
+    return Shimmer.fromColors(
+        period: Duration(milliseconds: 1200),
+        baseColor: Colors.grey[350],
+        highlightColor: Colors.grey[200],
+        child: body);
+  }
 }

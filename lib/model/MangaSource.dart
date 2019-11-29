@@ -10,7 +10,7 @@ class MangaSource {
   MangaSource.fromJson(Map<String, dynamic> json)  {
     name = json['name'];
     key = json['key'];
-    headers = new Map<String, String>.from(json['headers']);
+    headers = json['headers'] != null ? new Map<String, String>.from(json['headers']) : null;
   }
 
   Map<String, dynamic> toJson()=>

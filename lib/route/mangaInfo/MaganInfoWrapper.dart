@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -57,7 +59,7 @@ class _MangaInfoWrapperState extends State<MangaInfoWrapper> {
           ],
         ),
         Container(
-          height: 100,
+          height: 80.0,
           child: MediaQuery.removePadding(
               context: context,
               removeBottom: true,

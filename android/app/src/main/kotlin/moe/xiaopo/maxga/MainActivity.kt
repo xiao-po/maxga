@@ -1,4 +1,4 @@
-package moe.xiaopo.maxga.maxga
+package moe.xiaopo.maxga
 
 import android.os.Bundle
 

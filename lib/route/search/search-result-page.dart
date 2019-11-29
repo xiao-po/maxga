@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/components/Card.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
+import 'package:maxga/components/skeleton.dart';
 import 'package:maxga/model/Manga.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 
@@ -43,12 +44,10 @@ class _SearchResultPageState extends State<SearchResultPage> {
   }
 
   Widget _loadingPage() {
-    return Center(
-      child: SizedBox(
-        width: 40,
-        height: 40,
-        child: CircularProgressIndicator(),
-      ),
+    final itemCount = (MediaQuery.of(context).size.height - 100) / 120;
+    return SkeletonList(
+      length: itemCount.floor(),
+      builder: (context, index) => SkeletonCard() ,
     );
   }
 
@@ -56,14 +55,15 @@ class _SearchResultPageState extends State<SearchResultPage> {
     return ListView(
         children: mangaResultList
             .map((item) => MangaCard(
-                  manga: item,
-                  cover: MangaCoverImage(
-                    source: item.source,
-                    url: item.coverImgUrl,
-                    tagPrefix: widget.name,
-                  ),
-                  onTap: () => this.goMangaInfoPage(item),
-                ))
+              title: Text(item.title),
+              extra: MangaInfoCardExtra(manga: item),
+              cover: MangaCoverImage(
+                source: item.source,
+                url: item.coverImgUrl,
+                tagPrefix: widget.name,
+              ),
+              onTap: () => this.goMangaInfoPage(item),
+            ))
             .toList());
   }
 

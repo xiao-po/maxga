@@ -56,8 +56,8 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   }
 
   Widget buildBody() {
-    MangaInfoIntro mangaInfoIntro;
-    MangaInfoChapter mangaInfoChapter;
+    Widget mangaInfoIntro;
+    Widget mangaInfoChapter;
     MangaInfoBottomBar mangaInfoBottomBar;
     bool loadOver = false;
     switch (loading) {
@@ -82,6 +82,11 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
         {
           return ErrorPage("读取漫画信息发生了错误呢~~~");
         }
+      case _MangaInfoPageStatus.loading: {
+        mangaInfoIntro = MangaInfoIntroSkeleton();
+        mangaInfoChapter = SkeletonMangaChapterGrid(colCount: 5);
+        break;
+      }
       default:
         {}
     }
@@ -94,8 +99,8 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
           coverImageBuilder: widget.coverImageBuilder,
 //          updateTime: '最后更新：$lastUpdate',
         ),
-        mangaInfoIntro ?? Container(),
-        mangaInfoChapter ??  buildChapterLoading(),
+        mangaInfoIntro,
+        mangaInfoChapter ?? Container(),
       ],
       bottomBar: mangaInfoBottomBar ?? Container(),
     );
@@ -180,7 +185,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   }
 
   onResumeProcess() {
-    if (readMangaStatus != null) {
+    if (readMangaStatus.readChapterId != null) {
       var chapter = chapterList
           .firstWhere((item) => item.id == readMangaStatus.readChapterId);
       this.enjoyMangaContent(chapter, imagePage: readMangaStatus.readImageIndex);

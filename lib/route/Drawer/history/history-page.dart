@@ -38,7 +38,8 @@ class _HistToryPageState extends State<HistoryPage> {
       body: mangaHistoryList?.length != 0 ? ListView(
           children:
           mangaHistoryList.map((item) => MangaCard(
-            manga: item,
+            title: Text(item.title),
+            extra: MangaInfoCardExtra(manga: item),
             cover: MangaCoverImage(
               source: item.source,
               url: item.coverImgUrl,

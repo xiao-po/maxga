@@ -7,6 +7,7 @@ import 'package:maxga/Utils/MaxgaUtils.dart';
 import 'package:maxga/components/Card.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/components/UpdateDialog.dart';
+import 'package:maxga/components/skeleton.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Manga.dart';
 import 'package:maxga/model/MangaReadProcess.dart';
@@ -66,10 +67,12 @@ class _IndexPageState extends State<IndexPage> {
               onPressed: () => this.outputCollection(),
             ),
             PopupMenuButton<MangaSource>(
-              itemBuilder: (context) => allMangaSource.map((el) => PopupMenuItem(
-                value: el,
-                child: Text(el.name),
-              )).toList(),
+              itemBuilder: (context) => allMangaSource
+                  .map((el) => PopupMenuItem(
+                        value: el,
+                        child: Text(el.name),
+                      ))
+                  .toList(),
               onSelected: (value) => changeMangaSource(value),
             )
           ],
@@ -83,21 +86,27 @@ class _IndexPageState extends State<IndexPage> {
 
   buildIndexBody() {
     if (loadStatus == 0) {
-      return buildProcessIndicator();
+      final itemCount = (MediaQuery.of(context).size.height - 100) / 120;
+      return SkeletonList(
+        length: itemCount.floor(),
+        builder: (context, index) => SkeletonCard(),
+      );
     } else if (loadStatus == 1) {
-      return ListView(
-          children: mangaList
-              .map((item) =>
-              MangaCard(
-                manga: item,
+      final Color grayFontColor = Color(0xff9e9e9e);
+
+      return ListView.builder(
+          itemCount: mangaList.length,
+          itemBuilder: (context, index) => MangaCard(
+                title: Text(mangaList[index].title),
+                extra: MangaInfoCardExtra(
+                    manga: mangaList[index], textColor: grayFontColor),
                 cover: MangaCoverImage(
-                  source: item.source,
-                  url: item.coverImgUrl,
+                  source: mangaList[index].source,
+                  url: mangaList[index].coverImgUrl,
                   tagPrefix: widget.name,
                 ),
-                onTap: () => this.goMangaInfoPage(item),
-              ))
-              .toList());
+                onTap: () => this.goMangaInfoPage(mangaList[index]),
+              ));
     } else if (loadStatus == -1) {
       return ErrorPage(
         '加载失败了呢~~~，\n我们点击之后继续吧',
@@ -105,7 +114,6 @@ class _IndexPageState extends State<IndexPage> {
       );
     }
   }
-
 
   Center buildProcessIndicator() {
     return Center(
@@ -119,11 +127,10 @@ class _IndexPageState extends State<IndexPage> {
 
   void getMangaList() async {
     try {
-      MaxgaDataHttpRepo repo = Application
-          .getInstance()
-          .getMangaSource();
+      MaxgaDataHttpRepo repo = Application.getInstance().getMangaSource();
       mangaList = await repo.getLatestUpdate(page);
       page++;
+      await Future.delayed(Duration(seconds: 2));
       this.loadStatus = 1;
     } catch (e) {
       this.loadStatus = -1;
@@ -151,13 +158,12 @@ class _IndexPageState extends State<IndexPage> {
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return MangaInfoPage(
           coverImageBuilder: (context) => MangaCoverImage(
-            source: item.source,
-            url: item.coverImgUrl,
-            tagPrefix: widget.name,
-            fit: BoxFit.cover,
-          ),
-          manga: item
-      );
+                source: item.source,
+                url: item.coverImgUrl,
+                tagPrefix: widget.name,
+                fit: BoxFit.cover,
+              ),
+          manga: item);
     }));
   }
 
@@ -227,25 +233,27 @@ class _IndexPageState extends State<IndexPage> {
   openUpdateDialog(MaxgaReleaseInfo nextVersion) {
     showDialog(
         context: context,
-        builder: (context) =>
-            UpdateDialog(
+        builder: (context) => UpdateDialog(
               text: nextVersion.description,
               url: nextVersion.url,
               onIgnore: () => UpdateService.ignoreUpdate(nextVersion),
-            )
-    );
+            ));
   }
 
   changeMangaSource(MangaSource value) {
-
     Application.getInstance().changeMangaSource(value);
     this.getMangaList();
+    loadStatus = 0;
+    setState(() {});
   }
 
   outputCollection() async {
-    List<ReadMangaStatus> collectedMangaList = await MangaReadStorageService.getAllCollectedManga();
+    loadStatus = loadStatus == 1 ? 0 : 1;
+    List<ReadMangaStatus> collectedMangaList =
+        await MangaReadStorageService.getAllCollectedManga();
     print(''
         '${collectedMangaList.map((el) => el.title).join('\n')}'
         '');
+    setState(() {});
   }
 }

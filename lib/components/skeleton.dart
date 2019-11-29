@@ -1,15 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
-
-class SkeletonMangaCard extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return null;
-  }
-
-}
-
 /// 骨架屏
 class SkeletonList extends StatelessWidget {
   final EdgeInsetsGeometry padding;
@@ -40,4 +31,15 @@ class SkeletonList extends StatelessWidget {
               ))),
     );
   }
+}
+
+/// 骨架屏 元素背景 ->形状及颜色
+class SkeletonDecoration extends BoxDecoration {
+  SkeletonDecoration({
+    isCircle: false,
+    isDark: false,
+  }) : super(
+    color: !isDark ? Colors.grey[350] : Colors.grey[700],
+    shape: isCircle ? BoxShape.circle : BoxShape.rectangle,
+  );
 }
