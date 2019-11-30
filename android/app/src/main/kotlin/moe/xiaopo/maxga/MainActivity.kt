@@ -4,17 +4,10 @@ import android.os.Bundle
 
 import io.flutter.app.FlutterActivity
 import io.flutter.plugins.GeneratedPluginRegistrant
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import android.R.attr.key
-import android.util.Log
-import java.nio.charset.Charset
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.MethodCall
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.view.WindowManager
+import android.content.Intent
+import android.net.Uri
 
 
 class MainActivity : FlutterActivity() {
@@ -35,6 +28,16 @@ class MainActivity : FlutterActivity() {
             if (methodCall.method == "showStatusBar") {
 
                 window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                result.success(true)
+            }
+            if (methodCall.method == "shareUrl") {
+                if (methodCall.arguments is String) {
+                    val url = methodCall.arguments as String;
+                    val intent = Intent(Intent.ACTION_SEND)
+                    intent.setType("text/plain")
+                    intent.putExtra(Intent.EXTRA_TEXT, url)
+                    this.sendBroadcast(intent)
+                }
                 result.success(true)
             }
         }

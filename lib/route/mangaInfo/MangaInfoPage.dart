@@ -88,6 +88,12 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     }
     return MangaInfoWrapper(
       title: widget.manga?.title ?? '',
+      appbarActions:  <Widget>[
+        IconButton(
+          icon: Icon(Icons.share, color: Colors.white),
+          onPressed: () {MaxgaUtils.shareUrl(readMangaStatus.infoUrl);},
+        )
+      ],
       children: [
         MangaInfoCover(
           manga: widget.manga,

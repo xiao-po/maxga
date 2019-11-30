@@ -7,7 +7,9 @@ class MangaInfoWrapper extends StatefulWidget {
 
   final Widget bottomBar;
 
-  const MangaInfoWrapper({Key key, this.title, this.children, this.bottomBar})
+  final List<Widget> appbarActions;
+
+  const MangaInfoWrapper({Key key, this.title, this.children, this.bottomBar, this.appbarActions})
       : super(key: key);
 
   @override
@@ -66,12 +68,7 @@ class _MangaInfoWrapperState extends State<MangaInfoWrapper> {
                 title: Text(widget.title,
                     style: TextStyle(color: appbarTitleColor)),
                 elevation: 0,
-                actions: <Widget>[
-                  IconButton(
-                    icon: Icon(Icons.share, color: Colors.white),
-                    onPressed: () {},
-                  )
-                ],
+                actions: widget.appbarActions,
               )),
         ),
       ],
