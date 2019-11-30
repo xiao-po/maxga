@@ -32,12 +32,8 @@ class Application {
       return _mangaRepoPool.getRepo(source: _currentSource);
     }
   }
-
   get allDataRepo => _mangaRepoPool.getAllRepo();
   get allDataSource => _mangaRepoPool.getAllSource();
-
-
-
 }
 
 
