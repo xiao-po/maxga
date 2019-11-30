@@ -7,6 +7,7 @@ typedef CoverBuilder = Widget Function(BuildContext context);
 
 class MangaCard extends StatelessWidget {
   final GestureTapCallback onTap;
+  final GestureLongPressCallback onLongPress;
   final Widget cover;
   final Widget title;
   final List<MangaLabel> labels;
@@ -19,7 +20,7 @@ class MangaCard extends StatelessWidget {
       this.coverBuilder,
       @required this.title,
       this.labels,
-      this.extra});
+      this.extra, this.onLongPress});
 
   final Color grayFontColor = Color(0xff9e9e9e);
 
@@ -74,6 +75,7 @@ class MangaCard extends StatelessWidget {
       body = Material(
         child: InkWell(
           onTap: this.onTap,
+          onLongPress: this.onLongPress,
           child: body,
         ),
       );
@@ -98,6 +100,7 @@ class MangaCard extends StatelessWidget {
       ),
     );
   }
+
 }
 
 class MangaLabel extends StatelessWidget {

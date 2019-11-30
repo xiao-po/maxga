@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:maxga/Utils/MaxgaUtils.dart';
 import 'package:maxga/components/Card.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
-import 'package:maxga/components/UpdateDialog.dart';
+import 'package:maxga/components/dialog.dart';
 import 'package:maxga/components/skeleton.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/Manga.dart';
@@ -240,5 +240,6 @@ class _IndexPageState extends State<IndexPage> {
     loadStatus = 0;
     setState(() {});
   }
+
 
 }

@@ -87,6 +87,7 @@ class CollectionPageState extends State<CollectionPage> {
           manga: item);
     }));
   }
+
 }
 
 class SmallMangaCard extends StatelessWidget {
