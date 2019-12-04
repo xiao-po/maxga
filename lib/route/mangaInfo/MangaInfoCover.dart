@@ -99,17 +99,24 @@ class MangaInfoCover extends StatelessWidget {
                           children: <Widget>[
                             const Text('作者: ',
                                 style: TextStyle(color: coverStringColor)),
-                            CoverMessageTag(
-                              onTap: () => searchTag(manga.author, context),
-                              child: Text(
-                                manga.author,
-                                style: TextStyle(
-                                    color: coverStringColor,
-                                    fontSize: subtitleTextSize),
-                                textAlign: TextAlign.left,
-                                overflow: TextOverflow.ellipsis,
+                            Expanded(
+                              child: Wrap(
+                                direction: Axis.horizontal,
+                                children:
+                                manga.author.map((text) => CoverMessageTag(
+                                  onTap: () => searchTag(text, context),
+                                  child: Text(
+                                    text,
+                                    style: TextStyle(
+                                        color: coverStringColor,
+                                        fontSize: subtitleTextSize),
+                                    textAlign: TextAlign.left,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                )).toList(growable: false),
                               ),
                             )
+
                           ],
                         ),
                       ),

@@ -17,7 +17,7 @@ class SimpleMangaInfo extends MangaBase {
 
   SimpleMangaInfo.fromJson(Map<String, dynamic> json) {
     source = MangaSource.fromJson(json['source']);
-    author = json['author'];
+    author = json['author'].cast<String>();
     id = json['id'];
     infoUrl = json['infoUrl'];
     status = json['status'];
@@ -45,7 +45,7 @@ class SimpleMangaInfo extends MangaBase {
 
 class MangaBase {
   MangaSource source;
-  String author;
+  List<String> author;
   int id;
   String infoUrl;
   String status; // "连载中" "已完结"

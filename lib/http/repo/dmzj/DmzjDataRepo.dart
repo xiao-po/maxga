@@ -14,6 +14,8 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
   MangaSource _source = MangaSource(
     name: '动漫之家',
     key: 'dmzj',
+    domain: 'https://v3api.dmzj.com',
+    iconUrl:  'https://www.dmzj.com/favicon.ico',
     headers: {
       'referer': 'http://m.dmzj.com/latest.html',
     }
@@ -23,14 +25,14 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
   Future<Manga> getMangaInfo({id, url}) async {
     if (url != null) {
     }
-    final response = await http.get('http://v3api.dmzj.com/comic/comic_$id.json');
+    final response = await http.get('${_source.domain}/comic/comic_$id.json');
     return _convertDataFromMangaInfo(json.decode(response.body), id);
   }
 
 
   @override
   Future<List<SimpleMangaInfo>> getLatestUpdate(int page) async {
-    final response = await http.get('http://v3api.dmzj.com/latest/100/$page.json');
+    final response = await http.get('${_source.domain}/latest/100/$page.json');
     final responseData = (json.decode(response.body) as List<dynamic>);
     return responseData.map((item) => _convertDataFromListItem(item)).toList();
   }
@@ -46,7 +48,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<List<String>> getSuggestion(String words) async {
-    final response = await http.get('http://v3api.dmzj.com/search/fuzzy/0/$words.json');
+    final response = await http.get('${_source.domain}/search/fuzzy/0/$words.json');
     try{
       final responseData = (json.decode(response.body) as List<dynamic>);
       return responseData.map((item) => DmzjSearchSuggestion.fromJson(item)).map((item) => item.title.replaceFirst('+', '')).toList();
@@ -60,7 +62,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<List<SimpleMangaInfo>> getSearchManga(String keywords) async {
-    final response = await http.get('http://v3api.dmzj.com/search/show/0/$keywords/0.json');
+    final response = await http.get('${_source.domain}/search/show/0/$keywords/0.json');
     final responseData = (json.decode(response.body) as List<dynamic>);
     return responseData.map((item) => _convertDataFromSearch(item)).toList();
   }
@@ -77,7 +79,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     latestChapter.updateTime  = json['last_updatetime'] * 1000;
     manga.lastUpdateChapter = latestChapter;
     manga.infoUrl = 'http://v3api.dmzj.com/comic/comic_${json['id']}.json';
-    manga.author = json['authors'];
+    manga.author = json['authors'].split('/');
     manga.coverImgUrl = json['cover'];
     manga.title = json['title'];
     manga.id = json['id'];
@@ -93,8 +95,8 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     final Chapter latestChapter = Chapter();
     latestChapter.title  = json['last_name'];
     manga.lastUpdateChapter = latestChapter;
-    manga.infoUrl = 'http://v3api.dmzj.com/comic/comic_${json['id']}.json';
-    manga.author = json['authors'];
+    manga.infoUrl = '${_source.domain}/comic/comic_${json['id']}.json';
+    manga.author = json['authors'].split('/');
     manga.coverImgUrl = json['cover'];
     manga.title = json['title'];
     manga.id = json['id'];
@@ -107,7 +109,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
   Manga _convertDataFromMangaInfo(Map<String, dynamic> json, int comicId) {
     final DmzjMangaInfo dmzjMangaInfo = DmzjMangaInfo.fromJson(json);
     final Manga manga = Manga();
-    manga.author = dmzjMangaInfo.authors.map((tag) => tag.tagName).join('/');
+    manga.author = dmzjMangaInfo.authors.map((tag) => tag.tagName).toList(growable: false);
     manga.introduce = dmzjMangaInfo.description;
     manga.typeList = dmzjMangaInfo.types.map((type) => type.tagName).toList();
     manga.title = dmzjMangaInfo.title;
@@ -116,7 +118,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     manga.status = dmzjMangaInfo.status[0].tagName;
     manga.chapterList = dmzjMangaInfo.chapters.singleWhere((item) => item.title == '连载').data;
     manga.chapterList.forEach((chapter) {
-      chapter.url = 'http://v3api.dmzj.com/chapter/$comicId/${chapter.id}.json';
+      chapter.url = '${_source.domain}/chapter/$comicId/${chapter.id}.json';
     });
     manga.source = _source;
     return manga;

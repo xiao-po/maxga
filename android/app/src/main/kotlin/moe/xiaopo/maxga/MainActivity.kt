@@ -36,7 +36,7 @@ class MainActivity : FlutterActivity() {
                     val intent = Intent(Intent.ACTION_SEND)
                     intent.setType("text/plain")
                     intent.putExtra(Intent.EXTRA_TEXT, url)
-                    this.sendBroadcast(intent)
+                    this.startActivity(intent)
                 }
                 result.success(true)
             }

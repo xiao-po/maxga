@@ -15,6 +15,7 @@ import 'package:maxga/route/Drawer/Drawer.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:maxga/route/search/search-page.dart';
+import 'package:maxga/service/MangaReadStorage.service.dart';
 import 'package:maxga/service/UpdateService.dart';
 
 import '../../Application.dart';
@@ -59,6 +60,13 @@ class _IndexPageState extends State<IndexPage> {
                 color: Colors.white,
               ),
               onPressed: this.toSearch,
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.delete,
+                color: Colors.white,
+              ),
+              onPressed: () => this.deleteUserData(),
             ),
             PopupMenuButton<MangaSource>(
               itemBuilder: (context) => allMangaSource
@@ -121,6 +129,7 @@ class _IndexPageState extends State<IndexPage> {
 
   void getMangaList() async {
     try {
+
       MaxgaDataHttpRepo repo = Application.getInstance().getMangaSource();
       mangaList = await repo.getLatestUpdate(page);
       page++;
@@ -239,6 +248,10 @@ class _IndexPageState extends State<IndexPage> {
     this.getMangaList();
     loadStatus = 0;
     setState(() {});
+  }
+
+  deleteUserData() {
+    MangaReadStorageService.clearStatus();
   }
 
 

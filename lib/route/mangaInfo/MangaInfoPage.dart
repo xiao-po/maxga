@@ -11,6 +11,7 @@ import 'package:maxga/route/mangaInfo/MaganInfoWrapper.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoCover.dart';
 import 'package:maxga/route/mangaViewer/MangaViewer.dart';
 import 'package:maxga/service/MangaReadStorage.service.dart';
+import 'package:provider/provider.dart';
 
 import 'MangaChapeter.dart';
 import 'MangaInfoBottomBar.dart';
@@ -179,7 +180,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
       readMangaStatus.readImageIndex = result.mangaImageIndex;
       await Future.wait([
         MangaReadStorageService.setMangaStatus(readMangaStatus),
-        HistoryProvider.getInstance().addToHistory(widget.manga),
+        Provider.of<HistoryProvider>(context).addToHistory(widget.manga),
       ]);
       if(mounted) setState(() { });
     }

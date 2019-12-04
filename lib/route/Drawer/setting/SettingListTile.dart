@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:maxga/base/setting/Setting.model.dart';
 import 'package:maxga/base/setting/SettingValue.dart';
 import 'package:maxga/provider/SettingProvider.dart';
+import 'package:provider/provider.dart';
 
 class SettingListTile extends StatelessWidget {
   final MaxgaSettingItem setting;
@@ -39,7 +40,7 @@ class _ReadOnWiFiSettingItem extends StatelessWidget {
       value: setting.value == '1',
       title: Text(setting.title),
       onChanged: (checked) {
-        SettingProvider.getInstance().modifySetting(setting, checked ? '1':'0');
+        Provider.of<SettingProvider>(context).modifySetting(setting, checked ? '1':'0');
       },
     );
   }

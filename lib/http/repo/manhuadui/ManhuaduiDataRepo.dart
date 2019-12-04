@@ -7,9 +7,11 @@ import 'package:maxga/model/MangaSource.dart';
 import '../MaxgaDataHttpRepo.dart';
 
 class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
-  MangaSource _source = MangaSource(
+  MangaSource  _source = MangaSource(
       name: '漫画堆',
-      key: 'manhuadui'
+      key: 'manhuadui',
+      domain: 'https://www.manhuadui.com',
+      iconUrl:  'https://www.manhuadui.com/favicon.ico',
   );
   ManhuaduiHtmlParser parser = ManhuaduiHtmlParser.getInstance();
 
@@ -22,7 +24,7 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<List<String>> getChapterImageList(String url) async {
-    final response = await http.get('https://www.manhuadui.com$url');
+    final response = await http.get('${_source.domain}$url');
     var chapterImageList = parser.getMangaImageListFromMangaPage(response.body);
     var chapterImagePath = parser.getMangaImagePathFromMangaPage(response.body);
     if (chapterImagePath == "") {
@@ -35,7 +37,7 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<List<SimpleMangaInfo>> getLatestUpdate(int page) async {
-    final response = await http.get('https://www.manhuadui.com/list/riben/update/$page/');
+    final response = await http.get('${_source.domain}/list/riben/update/$page/');
 
     final mangaList = parser.getMangaListFromLatestUpdate(response.body);
     mangaList.forEach((manga) => manga.source = _source);
@@ -59,7 +61,7 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
   @override
   Future<List<SimpleMangaInfo>> getSearchManga(String keywords) async {
 
-    final response = await http.get('https://www.manhuadui.com/search/?keywords=$keywords');
+    final response = await http.get('${_source.domain}/search/?keywords=$keywords');
     final List<SimpleMangaInfo> mangaList = parser.getMangaListFromSearch(response.body);
     mangaList.forEach((item) => item.source = _source);
     return mangaList;
@@ -67,6 +69,8 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
 
   @override
   MangaSource get mangaSource => _source;
+
+
 
 
 

@@ -3,6 +3,7 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:icon="@mipmap/ic_launcher"
+        android:label="MaxGa"
         android:fullBackupContent="@xml/backup_descriptor">
         <activity
             android:name=".MainActivity"

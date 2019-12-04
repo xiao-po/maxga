@@ -21,7 +21,7 @@ class _HistToryPageState extends State<HistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    List<SimpleMangaInfo> mangaHistoryList = Provider.of<List<SimpleMangaInfo>>(context);
+    List<SimpleMangaInfo> mangaHistoryList = Provider.of<HistoryProvider>(context).historyMangaList;
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
@@ -76,7 +76,7 @@ class _HistToryPageState extends State<HistoryPage> {
                     child: const Text('清除'),
                     onPressed: () {
                       Navigator.pop(context);
-                      HistoryProvider.getInstance().clearHistory();
+                      Provider.of<HistoryProvider>(context).clearHistory();
                     }),
               ],
             ));

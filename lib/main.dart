@@ -15,13 +15,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        StreamProvider<List<MaxgaSettingItem>>(
-          initialData: [],
-          builder: (context) => SettingProvider.getInstance().stream,
+        ChangeNotifierProvider(
+          builder: (context) => HistoryProvider(),
         ),
-        StreamProvider<List<SimpleMangaInfo>>(
-          initialData: [],
-          builder: (context) => HistoryProvider.getInstance().stream,
+        ChangeNotifierProvider(
+          builder: (context) => SettingProvider(),
         ),
       ],
       child: MaterialApp(

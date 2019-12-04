@@ -87,7 +87,7 @@ class ManhuaduiHtmlParser {
     manga.title = mangaTitle;
     manga.id = int.parse(comicId);
     manga.status = mangaExistStatus;
-    manga.author = mangaAuthor;
+    manga.author = mangaAuthor.split(',');
     manga.typeList = mangaTag.split('/');
     manga.infoUrl = mangaInfoUrl;
 
@@ -114,7 +114,7 @@ class ManhuaduiHtmlParser {
     manga.title = mangaTitle;
     manga.id = int.parse(comicId);
     manga.status = '';
-    manga.author = mangaAuthor;
+    manga.author = mangaAuthor.split(',');
     manga.typeList = [];
     manga.infoUrl = mangaInfoUrl;
 
@@ -169,7 +169,7 @@ class ManhuaduiHtmlParser {
     manga.coverImgUrl = mangaCoverUrl;
     manga.title = mangaTitle;
     manga.status = mangaExistStatus;
-    manga.author = mangaAuthor;
+    manga.author = mangaAuthor.split(',');
     manga.typeList = mangaTag.split(' | ');
     manga.introduce = mangaIntroString;
     manga.chapterList = chapterList;

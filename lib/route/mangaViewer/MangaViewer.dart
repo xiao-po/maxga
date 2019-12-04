@@ -15,6 +15,7 @@ import 'package:maxga/provider/SettingProvider.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaViewer/MangaTab.dart';
 import 'package:maxga/route/mangaViewer/baseComponent/MangaViewerFutureView.dart';
+import 'package:provider/provider.dart';
 
 enum _MangaViewerLoadState {
   checkNetState,
@@ -85,7 +86,7 @@ class _MangaViewerState extends State<MangaViewer> {
     super.initState();
     MaxgaUtils.hiddenStatusBar();
     Connectivity().checkConnectivity().then((connectivityResult) async {
-      final readOnWiFi = SettingProvider.getInstance().getItem(MaxgaSettingItemType.readOnlyOnWiFi);
+      final readOnWiFi = Provider.of<SettingProvider>(context).getItem(MaxgaSettingItemType.readOnlyOnWiFi);
       if (connectivityResult == ConnectivityResult.wifi  || readOnWiFi.value == '0') {
         initMangaViewer();
       } else {

@@ -79,18 +79,8 @@ class _MangaImageState extends State<MangaImage> with SingleTickerProviderStateM
           child: Stack(
             fit: StackFit.expand,
             children: <Widget>[
-              Image.asset(
-                "assets/failed.jpg",
-                fit: BoxFit.fill,
-              ),
-              Positioned(
-                bottom: 0.0,
-                left: 0.0,
-                right: 0.0,
-                child: Text(
-                  "load image failed, click to reload",
-                  textAlign: TextAlign.center,
-                ),
+              Align(
+                child: Text('加载图片失败，点击重试', style: TextStyle(color: Colors.white),),
               )
             ],
           ),
