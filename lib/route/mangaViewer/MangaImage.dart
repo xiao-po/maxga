@@ -32,6 +32,7 @@ class _MangaImageState extends State<MangaImage> with SingleTickerProviderStateM
   }
   @override
   Widget build(BuildContext context) {
+    print(widget.source?.headers);
     return  ExtendedImage.network(
       widget.url,
       height: double.infinity,

@@ -5,6 +5,7 @@ import 'package:maxga/model/MangaSource.dart';
 
 import 'http/repo/dmzj/DmzjDataRepo.dart';
 import 'http/repo/hanhan/HanhanDataRepo.dart';
+import 'http/repo/manhuagui/ManhuaguiDataRepo.dart';
 
 class Application {
   static Application _application = Application();
@@ -18,7 +19,9 @@ class Application {
     final manhuaduiDataRepo = ManhuaduiDataRepo();
     final dmzjDataRepo = DmzjDataRepo();
     final hanhanDateRepo = HanhanDateRepo();
+    final manhuaguiDateRepo = ManhuaguiDataRepo();
     _mangaRepoPool.registryRepo(manhuaduiDataRepo);
+    _mangaRepoPool.registryRepo(manhuaguiDateRepo);
     _mangaRepoPool.registryRepo(dmzjDataRepo);
     _mangaRepoPool.registryRepo(hanhanDateRepo);
     _currentSource = dmzjDataRepo.mangaSource;

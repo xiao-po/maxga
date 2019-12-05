@@ -60,7 +60,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
       } finally {
 
         print('${repo.mangaSource.name} loadover');
-        setState(() {});
+        if (mounted) {setState(() {});}
       }
     });
   }

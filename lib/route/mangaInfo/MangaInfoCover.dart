@@ -96,9 +96,13 @@ class MangaInfoCover extends StatelessWidget {
                       Padding(
                         padding: EdgeInsets.only(bottom: 10),
                         child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            const Text('作者: ',
-                                style: TextStyle(color: coverStringColor)),
+                            const Padding(
+                              padding: const EdgeInsets.only(top: 5),
+                              child: const Text('作者: ',
+                                  style: TextStyle(color: coverStringColor)),
+                            ),
                             Expanded(
                               child: Wrap(
                                 direction: Axis.horizontal,

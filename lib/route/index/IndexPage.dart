@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-
 import 'package:flutter/material.dart';
 import 'package:maxga/Utils/MaxgaUtils.dart';
 import 'package:maxga/components/Card.dart';
@@ -129,7 +128,6 @@ class _IndexPageState extends State<IndexPage> {
 
   void getMangaList() async {
     try {
-
       MaxgaDataHttpRepo repo = Application.getInstance().getMangaSource();
       mangaList = await repo.getLatestUpdate(page);
       page++;
@@ -252,7 +250,6 @@ class _IndexPageState extends State<IndexPage> {
 
   deleteUserData() {
     MangaReadStorageService.clearStatus();
+//    ManhuaguiCrypto.test();
   }
-
-
 }

@@ -114,6 +114,7 @@ class _MangaViewerState extends State<MangaViewer> {
     Chapter preChapterData = resultChapterList[0];
     Chapter currentChapterData = resultChapterList[1];
     Chapter nextChapterData = resultChapterList[2];
+    print(currentChapterData.imgUrlList[0]);
 
     nextChapter = nextChapterData;
     preChapter = preChapterData;
