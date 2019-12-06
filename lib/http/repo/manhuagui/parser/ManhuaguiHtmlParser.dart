@@ -1,8 +1,8 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:maxga/Utils/DateUtils.dart';
-import 'package:maxga/model/Chapter.dart';
-import 'package:maxga/model/Manga.dart';
+import 'package:maxga/model/manga/Chapter.dart';
+import 'package:maxga/model/manga/Manga.dart';
 
 class ManhuaguiHtmlParser {
   static ManhuaguiHtmlParser _instance;

@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
-import 'package:maxga/model/MangaReadProcess.dart';
+import 'package:maxga/model/manga/MangaSource.dart';
+import 'package:maxga/model/maxga/MangaReadProcess.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:maxga/service/MangaReadStorage.service.dart';
 
@@ -63,7 +65,11 @@ class CollectionPageState extends State<CollectionPage> {
           children: collectedMangaList.map((el) => Material(
             child: InkWell(
               onTap: () => this.startRead(el),
-              child: SmallMangaCard(manga: el,tagPrefix: widget.name,))
+              child: SmallMangaCard(
+                manga: el,
+                tagPrefix: widget.name,
+                source: MangaRepoPool.getInstance().getMangaSourceByKey(el.sourceKey),
+              ))
             ),
           ).toList(growable: false),
         );
@@ -77,9 +83,10 @@ class CollectionPageState extends State<CollectionPage> {
 
   startRead(ReadMangaStatus item) {
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
+
       return MangaInfoPage(
           coverImageBuilder: (context) => MangaCoverImage(
-            source: item.source,
+            source:  MangaRepoPool.getInstance().getMangaSourceByKey(item.sourceKey),
             url: item.coverImgUrl,
             tagPrefix: widget.name,
             fit: BoxFit.cover,
@@ -94,8 +101,10 @@ class SmallMangaCard extends StatelessWidget {
   final ReadMangaStatus manga;
   final String tagPrefix;
 
+  final MangaSource source;
+
   const SmallMangaCard(
-      {Key key, @required this.manga, @required this.tagPrefix})
+      {Key key, @required this.manga, @required this.tagPrefix,@required this.source})
       : super(key: key);
 
   @override
@@ -113,7 +122,7 @@ class SmallMangaCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(5.0),
                 child: MangaCoverImage(
                   url: manga.coverImgUrl,
-                  source: manga.source,
+                  source: source,
                   fit: BoxFit.fitWidth,
                   tagPrefix: tagPrefix,
                 ),
@@ -133,7 +142,7 @@ class SmallMangaCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontSize: 12, textBaseline: TextBaseline.alphabetic, color: Colors.black45)),
                 ),
-                Text(manga.source.name,
+                Text(source.name,
                     textAlign: TextAlign.left,
                     style: TextStyle(fontSize: 12, textBaseline: TextBaseline.alphabetic, color: Colors.black45))
               ],

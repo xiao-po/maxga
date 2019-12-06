@@ -2,14 +2,16 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/Utils/MaxgaUtils.dart';
 import 'package:maxga/components/Card.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/components/dialog.dart';
 import 'package:maxga/components/skeleton.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
-import 'package:maxga/model/Manga.dart';
-import 'package:maxga/model/MangaSource.dart';
+import 'package:maxga/model/manga/Manga.dart';
+import 'package:maxga/model/manga/MangaSource.dart';
+import 'package:maxga/model/maxga/MaxgaReleaseInfo.dart';
 import 'package:maxga/route/Drawer/Drawer.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
@@ -17,7 +19,6 @@ import 'package:maxga/route/search/search-page.dart';
 import 'package:maxga/service/MangaReadStorage.service.dart';
 import 'package:maxga/service/UpdateService.dart';
 
-import '../../Application.dart';
 
 class IndexPage extends StatefulWidget {
   final String name = 'index_page';
@@ -37,7 +38,7 @@ class _IndexPageState extends State<IndexPage> {
   @override
   void initState() {
     super.initState();
-    allMangaSource = Application.getInstance()?.allDataSource;
+    allMangaSource = MangaRepoPool.getInstance()?.allDataSource;
     this.getMangaList();
     if (Platform.isAndroid) {
       this.checkUpdate();
@@ -46,10 +47,11 @@ class _IndexPageState extends State<IndexPage> {
 
   @override
   Widget build(BuildContext context) {
+    const indexPageBackGround = Color(0xfff5f5f5);
     return WillPopScope(
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: Color(0xfff5f5f5),
+        backgroundColor: indexPageBackGround,
         appBar: AppBar(
           title: const Text('MaxGa'),
           actions: <Widget>[
@@ -94,20 +96,25 @@ class _IndexPageState extends State<IndexPage> {
       );
     } else if (loadStatus == 1) {
       final Color grayFontColor = Color(0xff9e9e9e);
-
       return ListView.builder(
           itemCount: mangaList.length,
-          itemBuilder: (context, index) => MangaCard(
-                title: Text(mangaList[index].title),
-                extra: MangaInfoCardExtra(
-                    manga: mangaList[index], textColor: grayFontColor),
-                cover: MangaCoverImage(
-                  source: mangaList[index].source,
-                  url: mangaList[index].coverImgUrl,
-                  tagPrefix: widget.name,
-                ),
-                onTap: () => this.goMangaInfoPage(mangaList[index]),
-              ));
+          itemBuilder: (context, index) {
+            MangaSource source = MangaRepoPool.getInstance().getMangaSourceByKey(mangaList[index].sourceKey);
+            return MangaCard(
+              title: Text(mangaList[index].title),
+              extra: MangaInfoCardExtra(
+                  manga: mangaList[index],
+                  textColor: grayFontColor,
+                  source: source
+              ),
+              cover: MangaCoverImage(
+                source: source,
+                url: mangaList[index].coverImgUrl,
+                tagPrefix: widget.name,
+              ),
+              onTap: () => this.goMangaInfoPage(mangaList[index]),
+            );
+          });
     } else if (loadStatus == -1) {
       return ErrorPage(
         '加载失败了呢~~~，\n我们点击之后继续吧',
@@ -127,8 +134,9 @@ class _IndexPageState extends State<IndexPage> {
   }
 
   void getMangaList() async {
+    this.loadStatus = 0;
     try {
-      MaxgaDataHttpRepo repo = Application.getInstance().getMangaSource();
+      MaxgaDataHttpRepo repo = MangaRepoPool.getInstance().currentDataRepo;
       mangaList = await repo.getLatestUpdate(page);
       page++;
       await Future.delayed(Duration(seconds: 2));
@@ -156,10 +164,11 @@ class _IndexPageState extends State<IndexPage> {
   }
 
   goMangaInfoPage(SimpleMangaInfo item) {
+    MangaSource source = MangaRepoPool.getInstance().getMangaSourceByKey(item.sourceKey);
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return MangaInfoPage(
           coverImageBuilder: (context) => MangaCoverImage(
-                source: item.source,
+                source: source,
                 url: item.coverImgUrl,
                 tagPrefix: widget.name,
                 fit: BoxFit.cover,
@@ -242,7 +251,7 @@ class _IndexPageState extends State<IndexPage> {
   }
 
   changeMangaSource(MangaSource value) {
-    Application.getInstance().changeMangaSource(value);
+    MangaRepoPool.getInstance().changeMangaSource(value);
     this.getMangaList();
     loadStatus = 0;
     setState(() {});
@@ -250,6 +259,8 @@ class _IndexPageState extends State<IndexPage> {
 
   deleteUserData() {
     MangaReadStorageService.clearStatus();
-//    ManhuaguiCrypto.test();
+//    Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
+//      return TestPage();
+//    }));
   }
 }

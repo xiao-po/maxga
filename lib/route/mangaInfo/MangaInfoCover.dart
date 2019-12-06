@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:maxga/Utils/DateUtils.dart';
-import 'package:maxga/model/Manga.dart';
+import 'package:maxga/model/manga/Manga.dart';
+import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/route/search/search-result-page.dart';
 
 typedef CoverImageBuilder = Widget Function(BuildContext context);
 
 class MangaInfoCover extends StatelessWidget {
   final SimpleMangaInfo manga;
+  final MangaSource source;
   final bool loadEnd;
   final CoverImageBuilder coverImageBuilder;
 
@@ -17,7 +19,7 @@ class MangaInfoCover extends StatelessWidget {
       this.manga,
       this.updateTime,
       this.loadEnd,
-      this.coverImageBuilder})
+      this.coverImageBuilder, @required this.source})
       : super(key: key);
 
   @override
@@ -154,7 +156,7 @@ class MangaInfoCover extends StatelessWidget {
                     ],
                   )),
                   Text(
-                    '来源: ${manga.source.name}',
+                    '来源: ${source.name}',
                     style: TextStyle(
                         color: coverStringColor, fontSize: subtitleTextSize),
                     textAlign: TextAlign.left,

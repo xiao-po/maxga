@@ -1,5 +1,5 @@
 
-import 'package:maxga/model/Chapter.dart';
+import 'package:maxga/model/manga/Chapter.dart';
 
 class DmzjChapterData {
   String title;

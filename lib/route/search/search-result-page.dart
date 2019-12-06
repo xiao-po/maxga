@@ -2,12 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/components/Card.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
-import 'package:maxga/components/skeleton.dart';
-import 'package:maxga/model/Manga.dart';
-import 'package:maxga/model/MangaSource.dart';
+import 'package:maxga/model/manga/Manga.dart';
+import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 
-import '../../Application.dart';
+import '../../MangaRepoPool.dart';
 
 enum _LoadingState { loading, over, error, empty }
 
@@ -32,7 +31,6 @@ class SearchResultPage extends StatefulWidget {
 }
 
 class _SearchResultPageState extends State<SearchResultPage> {
-
   List<_SearchResult> searchResultList = [];
   DateTime searchTime = DateTime.now();
   int expandCount = 0;
@@ -42,8 +40,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
   @override
   void initState() {
     super.initState();
-    Application application = Application.getInstance();
-    application.allDataRepo.forEach((repo) async {
+    MangaRepoPool.getInstance().allDataRepo.forEach((repo) async {
       final resultItem = _SearchResult(repo.mangaSource);
       searchResultList.add(resultItem);
       try {
@@ -58,9 +55,9 @@ class _SearchResultPageState extends State<SearchResultPage> {
         print(e);
         resultItem.status = _LoadingState.error;
       } finally {
-
-        print('${repo.mangaSource.name} loadover');
-        if (mounted) {setState(() {});}
+        if (mounted) {
+          setState(() {});
+        }
       }
     });
   }
@@ -73,10 +70,12 @@ class _SearchResultPageState extends State<SearchResultPage> {
         title: Text(widget.keyword),
       ),
       body: buildBodyByState(),
-      floatingActionButton: expandCount > 0 ? FloatingActionButton(
-        onPressed: () => unCollapseAll(),
-        child: Icon(Icons.unfold_less),
-      ) : null,
+      floatingActionButton: expandCount > 0
+          ? FloatingActionButton(
+              onPressed: () => unCollapseAll(),
+              child: Icon(Icons.unfold_less),
+            )
+          : null,
     );
   }
 
@@ -98,7 +97,8 @@ class _SearchResultPageState extends State<SearchResultPage> {
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return MangaInfoPage(
         coverImageBuilder: (context) => MangaCoverImage(
-          source: item.source,
+          source:
+              MangaRepoPool.getInstance().getMangaSourceByKey(item.sourceKey),
           url: item.coverImgUrl,
           tagPrefix: '${widget.name}${searchTime.toIso8601String()}',
           fit: BoxFit.cover,
@@ -120,18 +120,23 @@ class _SearchResultPageState extends State<SearchResultPage> {
             setState(() {});
           }
         },
-        children: searchResultList.map(
-          (item) => ExpansionPanel(
-            canTapOnHeader: true,
-            isExpanded: item.isExpanded,
-            headerBuilder: (context, isExpand) => buildExpansionPanelHeader(item),
-            body: item.mangaList.length > 0 ? ListView(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              children: buildMangaCardList(item.mangaList),
-            ) : Container(),
-          ),
-        ).toList(growable: false),
+        children: searchResultList
+            .map(
+              (item) => ExpansionPanel(
+                canTapOnHeader: true,
+                isExpanded: item.isExpanded,
+                headerBuilder: (context, isExpand) =>
+                    buildExpansionPanelHeader(item),
+                body: item.mangaList.length > 0
+                    ? ListView(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        children: buildMangaCardList(item.mangaList),
+                      )
+                    : Container(),
+              ),
+            )
+            .toList(growable: false),
       ),
     );
   }
@@ -141,7 +146,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
     var extra;
     const extraTextStyle = const TextStyle(color: Colors.black12);
     const errorTextStyle = const TextStyle(color: Colors.redAccent);
-    switch(item.status) {
+    switch (item.status) {
       case _LoadingState.loading:
         extra = Row(
           children: <Widget>[
@@ -162,10 +167,12 @@ class _SearchResultPageState extends State<SearchResultPage> {
         break;
       case _LoadingState.over:
       case _LoadingState.empty:
-        extra = Text('搜索结果: ${item.mangaList.length}',);
+        extra = Text(
+          '搜索结果: ${item.mangaList.length}',
+        );
         break;
     }
-    var body =  Row(
+    var body = Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
@@ -194,28 +201,29 @@ class _SearchResultPageState extends State<SearchResultPage> {
   }
 
   List<MangaCard> buildMangaCardList(List<MangaBase> mangaList) {
-    return mangaList
-        .map((item) => MangaCard(
-              title: Text(item.title),
-              extra: MangaInfoCardExtra(manga: item),
-              cover: MangaCoverImage(
-                source: item.source,
-                url: item.coverImgUrl,
-                tagPrefix: '${widget.name}${searchTime.toIso8601String()}',
-              ),
-              onTap: () => this.goMangaInfoPage(item),
-            ))
-        .toList();
+    return mangaList.map((item) {
+      MangaSource source =
+          MangaRepoPool.getInstance().getMangaSourceByKey(item.sourceKey);
+      return MangaCard(
+        title: Text(item.title),
+        extra: MangaInfoCardExtra(manga: item, source: source,),
+        cover: MangaCoverImage(
+          source: source,
+          url: item.coverImgUrl,
+          tagPrefix: '${widget.name}${searchTime.toIso8601String()}',
+        ),
+        onTap: () => this.goMangaInfoPage(item),
+      );
+    }).toList();
   }
 
   unCollapseAll() {
     setState(() {
-      for(var i = 0; i < searchResultList.length; i++) {
+      for (var i = 0; i < searchResultList.length; i++) {
         final item = searchResultList[i];
         item.isExpanded = false;
       }
       scrollController.jumpTo(0);
     });
   }
-
 }

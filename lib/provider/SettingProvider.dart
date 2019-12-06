@@ -7,10 +7,13 @@ import 'package:maxga/service/Setting.service.dart';
 
 class SettingProvider extends BaseProvider {
   List<MaxgaSettingItem> _items;
+  List<MaxgaSettingItem> get itemList => _items;
 
   SettingProvider() {
     this.init();
   }
+  
+  
 
   MaxgaSettingItem getItem(MaxgaSettingItemType type) {
     return this._items.firstWhere((el) => el.name == type);
@@ -20,12 +23,14 @@ class SettingProvider extends BaseProvider {
   Future<bool> init() async {
     final value = await SettingService.getInitValue();
     _items = value;
+    notifyListeners();
     return true;
   }
 
   Future<bool> modifySetting(MaxgaSettingItem item, value) async {
     final isSuccess = await SettingService.saveItem(SettingTypeNameList[item.name], value);
     item.value = value;
+    notifyListeners();
     return isSuccess;
   }
 }

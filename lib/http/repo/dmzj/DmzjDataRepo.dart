@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:http/http.dart';
+import 'package:maxga/base/error/MaxgaHttpError.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/http/repo/dmzj/model/DmzjMangaInfo.dart';
-import 'package:maxga/model/Chapter.dart';
-import 'package:maxga/model/Manga.dart';
+import 'package:maxga/model/manga/Chapter.dart';
+import 'package:maxga/model/manga/Manga.dart';
 import 'package:http/http.dart' as http;
-import 'package:maxga/model/MangaSource.dart';
+import 'package:maxga/model/manga/MangaSource.dart';
 
 import 'model/DmzjSearchSuggestion.dart';
 
@@ -23,25 +25,40 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<Manga> getMangaInfo({id, url}) async {
-    if (url != null) {
+    var response;
+    try {
+      if (id != null) {
+        response = await http.get('${_source.domain}/comic/comic_$id.json');
+      } else  {
+        response = await http.get(url);
+      }
+    } catch(e) {
+      throw MaxgaHttpError('动漫之家接口获取漫画详情失败', _source);
     }
-    final response = await http.get('${_source.domain}/comic/comic_$id.json');
     return _convertDataFromMangaInfo(json.decode(response.body), id);
   }
 
 
   @override
   Future<List<SimpleMangaInfo>> getLatestUpdate(int page) async {
-    final response = await http.get('${_source.domain}/latest/100/$page.json');
-    final responseData = (json.decode(response.body) as List<dynamic>);
-    return responseData.map((item) => _convertDataFromListItem(item)).toList();
+    try {
+      final response = await http.get('${_source.domain}/latest/100/$page.json');
+      final responseData = (json.decode(response.body) as List<dynamic>);
+      return responseData.map((item) => _convertDataFromListItem(item)).toList();
+    } catch(e) {
+      throw MaxgaHttpError('动漫之家接口获取最近更新失败', _source);
+    }
   }
 
 
   @override
   Future<List<String>> getChapterImageList(String url) async {
-    final response = await http.get(url);
-
+    Response response;
+    try {
+      response = await http.get(url);
+    } catch(e) {
+      throw MaxgaHttpError('动漫之家接口获取章节图片', _source);
+    }
     return json.decode(response.body)['page_url'].cast<String>();
   }
 
@@ -84,7 +101,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     manga.title = json['title'];
     manga.id = json['id'];
     manga.typeList = (json['types'] as String).split('/');
-    manga.source = _source;
+    manga.sourceKey = _source.key;
     return manga;
   }
 
@@ -101,7 +118,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     manga.title = json['title'];
     manga.id = json['id'];
     manga.typeList = (json['types'] as String).split('/');
-    manga.source = _source;
+    manga.sourceKey = _source.key;
     return manga;
   }
 
@@ -120,7 +137,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     manga.chapterList.forEach((chapter) {
       chapter.url = '${_source.domain}/chapter/$comicId/${chapter.id}.json';
     });
-    manga.source = _source;
+    manga.sourceKey = _source.key;
     return manga;
   }
 

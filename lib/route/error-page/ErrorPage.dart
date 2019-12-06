@@ -22,7 +22,7 @@ class ErrorPage extends StatelessWidget {
           ),
         ),
       ),
-      behavior: HitTestBehavior.translucent,
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
       onLongPress: onLongPress,
     );

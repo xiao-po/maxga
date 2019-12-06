@@ -1,8 +1,10 @@
 
 import 'package:flutter/material.dart';
+import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/components/Card.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
-import 'package:maxga/model/Manga.dart';
+import 'package:maxga/model/manga/Manga.dart';
+import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/provider/HistoryProvider.dart';
 import 'package:maxga/route/error-page/EmptyPage.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
@@ -36,16 +38,19 @@ class _HistToryPageState extends State<HistoryPage> {
       ),
       body: mangaHistoryList?.length != 0 ? ListView(
           children:
-          mangaHistoryList.map((item) => MangaCard(
-            title: Text(item.title),
-            extra: MangaInfoCardExtra(manga: item),
-            cover: MangaCoverImage(
-              source: item.source,
-              url: item.coverImgUrl,
-              tagPrefix: widget.name,
-            ),
-            onTap: () => this.goMangaInfoPage(item),
-          ))
+          mangaHistoryList.map((item) {
+            MangaSource source = MangaRepoPool.getInstance().getMangaSourceByKey(item.sourceKey);
+            return MangaCard(
+              title: Text(item.title),
+              extra: MangaInfoCardExtra(manga: item, source: source,),
+              cover: MangaCoverImage(
+                source: source,
+                url: item.coverImgUrl,
+                tagPrefix: widget.name,
+              ),
+              onTap: () => this.goMangaInfoPage(item),
+            );
+          })
               .toList()) : EmptyPage('暂无历史记录'),
     );
   }
@@ -55,7 +60,7 @@ class _HistToryPageState extends State<HistoryPage> {
       return MangaInfoPage(
           coverImageBuilder: (c) => MangaCoverImage(
                 url: item.coverImgUrl,
-                source: item.source,
+                source: MangaRepoPool.getInstance().getMangaSourceByKey(item.sourceKey),
                 tagPrefix: widget.name,
                 fit: BoxFit.cover,
               ),

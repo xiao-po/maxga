@@ -1,6 +1,6 @@
-import 'package:maxga/model/Manga.dart';
+import 'package:maxga/model/manga/Manga.dart';
 
-import 'package:maxga/model/MangaSource.dart';
+import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:http/http.dart' as http;
 
 import '../MaxgaDataHttpRepo.dart';
@@ -47,7 +47,7 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
     );
     final list = parser.getMangaListFromLatestUpdate(response.body)
       ..forEach((manga) {
-        manga.source = _source;
+        manga.sourceKey = _source.key;
       });
     return list;
   }
@@ -69,7 +69,7 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
       throw Error();
     }
     final manga = parser.getMangaFromInfoPate(response.body);
-    manga.source = _source;
+    manga.sourceKey = _source.key;
     return manga;
   }
 
@@ -80,7 +80,7 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
       headers: HanhanHttpHeader,
     );
     final mangaList = parser.getMangaListFromLatestUpdate(response.body);
-    mangaList.forEach((manga) => manga.source = _source);
+    mangaList.forEach((manga) => manga.sourceKey = _source.key);
     return mangaList;
   }
 

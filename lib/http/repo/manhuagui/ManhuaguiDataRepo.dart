@@ -1,9 +1,9 @@
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/http/repo/manhuagui/crypto/ManhuaguiCrypto.dart';
 import 'package:maxga/http/repo/manhuagui/parser/ManhuaguiHtmlParser.dart';
-import 'package:maxga/model/Manga.dart';
+import 'package:maxga/model/manga/Manga.dart';
 import 'package:http/http.dart' as http;
-import 'package:maxga/model/MangaSource.dart';
+import 'package:maxga/model/manga/MangaSource.dart';
 
 class ManhuaguiDataRepo extends MaxgaDataHttpRepo {
   MangaSource _source = MangaSource(
@@ -29,7 +29,7 @@ class ManhuaguiDataRepo extends MaxgaDataHttpRepo {
     final response = await http.get('${_source.domain}update/?page=$page&ajax=1&order=1');
     return parser.getSimpleMangaInfoListFromUpdatePage(response.body)..forEach((manga) {
       manga.infoUrl = '${_source.domain}${manga.infoUrl.substring(1)}';
-      manga.source = _source;
+      manga.sourceKey = _source.key;
     });
   }
 
@@ -52,7 +52,7 @@ class ManhuaguiDataRepo extends MaxgaDataHttpRepo {
 
     return parser.getSimpleMangaInfoFromSearch(response.body)..forEach((manga) {
       manga.infoUrl = '${_source.domain}${manga.infoUrl.substring(1)}';
-      manga.source = _source;
+      manga.sourceKey = _source.key;
     });
   }
 

@@ -2,6 +2,7 @@ import 'dart:io';
 
 
 import 'package:flutter/material.dart';
+import 'package:maxga/model/maxga/MaxgaReleaseInfo.dart';
 import 'package:maxga/service/UpdateService.dart';
 import 'package:url_launcher/url_launcher.dart';
 

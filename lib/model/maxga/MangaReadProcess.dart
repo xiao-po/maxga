@@ -1,15 +1,14 @@
-import 'Chapter.dart';
-import 'Manga.dart';
-import 'MangaSource.dart';
+import '../manga/Chapter.dart';
+import '../manga/Manga.dart';
+import '../manga/MangaSource.dart';
 
 class ReadMangaStatus extends SimpleMangaInfo {
   int readChapterId;
   int readImageIndex;
   bool collected = false;
 
-
   ReadMangaStatus.fromSimpleMangaInfo(SimpleMangaInfo manga) {
-    source = manga.source;
+    sourceKey = manga.sourceKey;
     author = manga.author;
     id = manga.id;
     infoUrl = manga.infoUrl;
@@ -19,28 +18,26 @@ class ReadMangaStatus extends SimpleMangaInfo {
     introduce = manga.introduce;
     typeList = manga.typeList.cast<String>();
     lastUpdateChapter = manga.lastUpdateChapter;
-
   }
 
   ReadMangaStatus.fromJson(Map<String, dynamic> json) {
-      source = MangaSource.fromJson(json['source']);
-      author = json['author'].cast<String>();
-      id = json['id'];
-      infoUrl = json['infoUrl'];
-      status = json['status'];
-      coverImgUrl = json['coverImgUrl'];
-      title = json['title'];
-      introduce = json['introduce'];
-      typeList = json['typeList'].cast<String>();
-      collected = json['collected'];
-      readImageIndex = json['readImageIndex'];
-      readChapterId = json['readChapterId'];
-      lastUpdateChapter = Chapter.fromJson(json['lastUpdateChapter']);
+    sourceKey = json['source'];
+    author = json['author'].cast<String>();
+    id = json['id'];
+    infoUrl = json['infoUrl'];
+    status = json['status'];
+    coverImgUrl = json['coverImgUrl'];
+    title = json['title'];
+    introduce = json['introduce'];
+    typeList = json['typeList'].cast<String>();
+    collected = json['collected'];
+    readImageIndex = json['readImageIndex'];
+    readChapterId = json['readChapterId'];
+    lastUpdateChapter = Chapter.fromJson(json['lastUpdateChapter']);
   }
 
-  Map<String, dynamic> toJson() =>
-      {
-        'source': source,
+  Map<String, dynamic> toJson() => {
+        'sourceKey': sourceKey,
         'author': author,
         'id': id,
         'infoUrl': infoUrl,
@@ -54,6 +51,4 @@ class ReadMangaStatus extends SimpleMangaInfo {
         'typeList': typeList,
         'lastUpdateChapter': lastUpdateChapter
       };
-
-
 }

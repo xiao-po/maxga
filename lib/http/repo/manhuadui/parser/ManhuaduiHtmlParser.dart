@@ -4,9 +4,9 @@ import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart';
 import 'package:maxga/Utils/DateUtils.dart';
 import 'package:maxga/http/repo/manhuadui/crypto/ManhuaduiCrypto.dart';
-import 'package:maxga/model/Chapter.dart';
+import 'package:maxga/model/manga/Chapter.dart';
 
-import 'package:maxga/model/Manga.dart';
+import 'package:maxga/model/manga/Manga.dart';
 
 class ManhuaduiHtmlParser {
   static ManhuaduiHtmlParser _instance;

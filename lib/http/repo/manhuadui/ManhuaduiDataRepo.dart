@@ -1,8 +1,8 @@
 import 'package:maxga/http/repo/manhuadui/parser/ManhuaduiHtmlParser.dart';
 
 import 'package:http/http.dart' as http;
-import 'package:maxga/model/Manga.dart';
-import 'package:maxga/model/MangaSource.dart';
+import 'package:maxga/model/manga/Manga.dart';
+import 'package:maxga/model/manga/MangaSource.dart';
 
 import '../MaxgaDataHttpRepo.dart';
 
@@ -40,7 +40,7 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
     final response = await http.get('${_source.domain}/list/riben/update/$page/');
 
     final mangaList = parser.getMangaListFromLatestUpdate(response.body);
-    mangaList.forEach((manga) => manga.source = _source);
+    mangaList.forEach((manga) => manga.sourceKey = _source.key);
     return mangaList;
   }
 
@@ -52,7 +52,7 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
     final response = await http.get(url);
     final Manga mangaInfo = parser.getMangaFromMangaInfoPage(response.body);
     mangaInfo.chapterList.forEach((item) => item.comicId = id);
-    mangaInfo.source = _source;
+    mangaInfo.sourceKey = _source.key;
     mangaInfo.id = id;
     mangaInfo.infoUrl = url;
     return mangaInfo;
@@ -63,7 +63,7 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
 
     final response = await http.get('${_source.domain}/search/?keywords=$keywords');
     final List<SimpleMangaInfo> mangaList = parser.getMangaListFromSearch(response.body);
-    mangaList.forEach((item) => item.source = _source);
+    mangaList.forEach((item) => item.sourceKey = _source.key);
     return mangaList;
   }
 

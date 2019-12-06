@@ -1,7 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:maxga/components/skeleton.dart';
-import 'package:maxga/model/Manga.dart';
+import 'package:maxga/model/manga/Manga.dart';
+import 'package:maxga/model/manga/MangaSource.dart';
 
 typedef CoverBuilder = Widget Function(BuildContext context);
 
@@ -163,12 +164,13 @@ class MangaExtra extends StatelessWidget {
 
 class MangaInfoCardExtra extends StatelessWidget {
   final SimpleMangaInfo manga;
+  final MangaSource source;
   final Color textColor;
 
   const MangaInfoCardExtra({
     Key key,
     this.manga,
-    this.textColor,
+    this.textColor, @required this.source,
   }) : super(key: key);
 
   @override
@@ -196,7 +198,7 @@ class MangaInfoCardExtra extends StatelessWidget {
     }
     return MangaExtra(
       body: Text(
-        manga.source.name,
+        source.name,
         textAlign: TextAlign.right,
         style: textStyle,
       ),

@@ -1,17 +1,22 @@
 class DateUtils {
   static String formatTime({DateTime time, int timestamp, String template}) {
-    var resultTime = time;
-    if (resultTime == null) {
-      resultTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    try {
+      var resultTime = time;
+      if (resultTime == null) {
+        resultTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      }
+      var result = template;
+      result = result.replaceAll('yyyy', '${resultTime.year}');
+      result = result.replaceAll('MM', '${resultTime.month}');
+      result = result.replaceAll('dd', '${resultTime.day}');
+      result = result.replaceAll('hh', '${resultTime.hour}');
+      result = result.replaceAll('mm', '${resultTime.minute}');
+      result = result.replaceAll('ss', '${resultTime.second}');
+      return result;
+    } catch(e) {
+
+      throw DateUtilError('时间戳 formatter 失败');
     }
-    var result = template;
-    result = result.replaceAll('yyyy', '${resultTime.year}');
-    result = result.replaceAll('MM', '${resultTime.month}');
-    result = result.replaceAll('dd', '${resultTime.day}');
-    result = result.replaceAll('hh', '${resultTime.hour}');
-    result = result.replaceAll('mm', '${resultTime.minute}');
-    result = result.replaceAll('ss', '${resultTime.second}');
-    return result;
   }
 
   static int convertTimeStringToTimestamp(String time, String template) {
@@ -52,14 +57,17 @@ class DateUtils {
           secondValue
       ).millisecondsSinceEpoch;
     } catch(e) {
-      print('date utils error !');
-      throw e;
+      throw DateUtilError('转换时间错误');
     }
 
 
   }
 
-  static int _getTimeValueFromTimeString(String timeString, int startIndex, int endIndex) {
+}
 
-  }
+
+class DateUtilError extends Error {
+  final String message;
+
+  DateUtilError(this.message);
 }

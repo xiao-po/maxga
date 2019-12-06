@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:maxga/model/Manga.dart';
+import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/provider/base/BaseProvider.dart';
 import 'package:maxga/service/LocalStorage.service.dart';
 

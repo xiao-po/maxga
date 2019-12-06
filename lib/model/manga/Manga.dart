@@ -1,4 +1,4 @@
-import 'package:maxga/model/MangaSource.dart';
+import 'package:maxga/model/manga/MangaSource.dart';
 
 import 'Chapter.dart';
 
@@ -16,7 +16,7 @@ class SimpleMangaInfo extends MangaBase {
   SimpleMangaInfo();
 
   SimpleMangaInfo.fromJson(Map<String, dynamic> json) {
-    source = MangaSource.fromJson(json['source']);
+    sourceKey = json['sourceKey'];
     author = json['author'].cast<String>();
     id = json['id'];
     infoUrl = json['infoUrl'];
@@ -30,7 +30,7 @@ class SimpleMangaInfo extends MangaBase {
 
   Map<String, dynamic> toJson()=>
       {
-        'source': source,
+        'sourceKey': sourceKey,
         'author': author,
         'id': id,
         'infoUrl': infoUrl,
@@ -44,7 +44,7 @@ class SimpleMangaInfo extends MangaBase {
 }
 
 class MangaBase {
-  MangaSource source;
+  String sourceKey;
   List<String> author;
   int id;
   String infoUrl;

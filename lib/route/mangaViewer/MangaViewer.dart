@@ -6,11 +6,12 @@ import 'package:connectivity/connectivity.dart';
 
 import 'package:flutter/material.dart';
 import 'package:maxga/Application.dart';
+import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/Utils/MaxgaUtils.dart';
 import 'package:maxga/base/setting/SettingValue.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
-import 'package:maxga/model/Chapter.dart';
-import 'package:maxga/model/Manga.dart';
+import 'package:maxga/model/manga/Chapter.dart';
+import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/provider/SettingProvider.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaViewer/MangaTab.dart';
@@ -164,7 +165,7 @@ class _MangaViewerState extends State<MangaViewer> {
                 child: GestureDetector(
                   onTapUp: (details) => dispatchTapUpEvent(details, context),
                   child: MangaTabView(
-                    source: widget.manga.source,
+                    source: MangaRepoPool.getInstance().getMangaSourceByKey(widget.manga.sourceKey),
                     controller: tabController,
                     onPageChanged: (index) => changePage(index),
                     hasPrechapter: preChapter != null,
@@ -231,7 +232,7 @@ class _MangaViewerState extends State<MangaViewer> {
     if (cachedChapterData.containsKey(chapter.id)) {
       return cachedChapterData[chapter.id];
     } else {
-      MaxgaDataHttpRepo repo = Application.getInstance().getMangaSource(key: widget.manga.source.key);
+      MaxgaDataHttpRepo repo = MangaRepoPool.getInstance().getRepo(key: widget.manga.sourceKey);
       print(chapter.url);
       final result = await repo.getChapterImageList(chapter.url);
       chapter.imgUrlList = result;

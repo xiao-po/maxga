@@ -1,5 +1,6 @@
 import 'package:maxga/http/github/GithubReleaseRepo.dart';
 import 'package:maxga/model/github/GithubRelease.dart';
+import 'package:maxga/model/maxga/MaxgaReleaseInfo.dart';
 import 'package:maxga/service/LocalStorage.service.dart';
 import 'package:package_info/package_info.dart';
 
@@ -11,12 +12,13 @@ class UpdateService {
     String currentVersion = await _getCurrentVersion();
     final String ignoreUpdateVersion = await LocalStorage.getString(IgnoreUpdateVersion);
 
-    if (nextVersionInfo.version != currentVersion && ignoreUpdateVersion != nextVersionInfo.version) {
+    if (nextVersionInfo.compare(currentVersion) && nextVersionInfo.compare(ignoreUpdateVersion)) {
       return nextVersionInfo;
     } else {
       return null;
     }
   }
+
 
   static Future<bool> ignoreUpdate(MaxgaReleaseInfo maxgaReleaseInfo) async {
 
@@ -38,20 +40,6 @@ class UpdateService {
 
   static void testClearData() async {
     await LocalStorage.setString(IgnoreUpdateVersion, '');
-
-  }
-}
-
-class MaxgaReleaseInfo {
-  String version;
-  String description;
-  String url;
-
-
-  MaxgaReleaseInfo.fromGithubRelease(GithubRelease githubRelease) {
-    this.version = githubRelease.tagName;
-    this.description = githubRelease.body;
-    this.url = githubRelease.htmlUrl;
 
   }
 }

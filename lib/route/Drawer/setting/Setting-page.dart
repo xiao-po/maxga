@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:maxga/base/setting/Setting.model.dart';
+import 'package:maxga/provider/SettingProvider.dart';
 import 'package:provider/provider.dart';
 
 import 'SettingListTile.dart';
@@ -17,8 +18,7 @@ class _SettingState extends State<SettingPage> {
   }
   @override
   Widget build(BuildContext context) {
-    List<MaxgaSettingItem> settings = Provider.of<List<MaxgaSettingItem>>(context);
-    print(settings);
+    List<MaxgaSettingItem> settings = Provider.of<SettingProvider>(context).itemList;
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(),

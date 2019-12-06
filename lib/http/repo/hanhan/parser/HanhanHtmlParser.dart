@@ -2,8 +2,8 @@ import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart';
 import 'package:maxga/Utils/DateUtils.dart';
 import 'package:maxga/http/repo/hanhan/crypto/HanhanCrypto.dart';
-import 'package:maxga/model/Chapter.dart';
-import 'package:maxga/model/Manga.dart';
+import 'package:maxga/model/manga/Chapter.dart';
+import 'package:maxga/model/manga/Manga.dart';
 
 class HanhanHtmlParser {
   static HanhanHtmlParser _instance;

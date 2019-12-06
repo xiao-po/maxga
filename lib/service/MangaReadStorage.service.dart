@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:maxga/model/Manga.dart';
-import 'package:maxga/model/MangaReadProcess.dart';
+import 'package:maxga/model/manga/Manga.dart';
+import 'package:maxga/model/maxga/MangaReadProcess.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MangaReadStorageService {
@@ -9,8 +9,7 @@ class MangaReadStorageService {
 
   static Future<ReadMangaStatus> getMangaStatus(MangaBase manga) async {
     final allReadManga = await _getAllReadManga();
-    final index = allReadManga.indexWhere(
-        (el) => el.id == manga.id && manga.source.key == el.source.key);
+    final index = allReadManga.indexWhere((el) => el.id == manga.id && manga.sourceKey == el.sourceKey);
     return index != -1
         ? allReadManga[index]
         : ReadMangaStatus.fromSimpleMangaInfo(manga);
