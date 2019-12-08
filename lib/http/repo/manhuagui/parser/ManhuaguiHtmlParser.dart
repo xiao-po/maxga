@@ -15,19 +15,19 @@ class ManhuaguiHtmlParser {
   }
 
   List<SimpleMangaInfo> getSimpleMangaInfoFromSearch(String body) {
-    final document = parse(body);
-    final mangaListEl = document.querySelector('#detail');
-    return this.getSimpleMangaInfoFromLiList(mangaListEl);
+    final document = parseFragment(body);
+    final mangaListEl = document.querySelector('#detail').querySelectorAll('li');
+    return getSimpleMangaInfoFromLiList(mangaListEl);
   }
 
   List<SimpleMangaInfo> getSimpleMangaInfoListFromUpdatePage(String body) {
     var document = parseFragment(body, container: 'ul');
 
-    return getSimpleMangaInfoFromLiList(document);
+    return getSimpleMangaInfoFromLiList(document.querySelectorAll('li'));
   }
 
-  List<SimpleMangaInfo> getSimpleMangaInfoFromLiList(Node document) {
-    return document.children.map((el) {
+  List<SimpleMangaInfo> getSimpleMangaInfoFromLiList(List<Element> mangaElList) {
+    return mangaElList.map((el) {
       final infoEl = el.querySelector('a');
       final url = infoEl.attributes['href'];
       final id = int.parse(url.substring(

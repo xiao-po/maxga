@@ -89,11 +89,7 @@ class _IndexPageState extends State<IndexPage> {
 
   buildIndexBody() {
     if (loadStatus == 0) {
-      final itemCount = (MediaQuery.of(context).size.height - 100) / 120;
-      return SkeletonList(
-        length: itemCount.floor(),
-        builder: (context, index) => SkeletonCard(),
-      );
+      return SkeletonCardList();
     } else if (loadStatus == 1) {
       final Color grayFontColor = Color(0xff9e9e9e);
       return ListView.builder(

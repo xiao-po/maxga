@@ -211,6 +211,18 @@ class MangaInfoCardExtra extends StatelessWidget {
   }
 }
 
+class SkeletonCardList extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final itemCount = (MediaQuery.of(context).size.height - 100) / 120;
+    return SkeletonList(
+      length: itemCount.floor(),
+      builder: (context, index) => SkeletonCard(),
+    );
+  }
+
+}
+
 class SkeletonCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

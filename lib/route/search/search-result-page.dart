@@ -8,12 +8,13 @@ import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 
 import '../../MangaRepoPool.dart';
 
-enum _LoadingState { loading, over, error, empty }
+enum _LoadingState { loading, retry, over, error, empty }
 
 class _SearchResult {
   final MangaSource source;
   List<MangaBase> mangaList = [];
   bool isExpanded = false;
+  int retryTimes = 0;
   _LoadingState status = _LoadingState.loading;
   String errorMessage;
 
@@ -40,9 +41,21 @@ class _SearchResultPageState extends State<SearchResultPage> {
   @override
   void initState() {
     super.initState();
-    MangaRepoPool.getInstance().allDataRepo.forEach((repo) async {
-      final resultItem = _SearchResult(repo.mangaSource);
-      searchResultList.add(resultItem);
+    searchResultList = MangaRepoPool.getInstance()
+        .allDataRepo
+        .map((repo) => _SearchResult(repo.mangaSource))
+        .toList(growable: false)
+          ..forEach((item) => searchAction(item));
+  }
+
+  void searchAction(resultItem) async {
+    final repo = MangaRepoPool.getInstance().getDataRepo(resultItem.source.key);
+    int retryTimes = 4;
+    setState(() {
+      resultItem.status = _LoadingState.loading;
+      resultItem.retryTimes = 0;
+    });
+    while (--retryTimes >= 0) {
       try {
         final resultList = await repo.getSearchManga(widget.keyword);
         if (resultList != null && resultList.length > 0) {
@@ -51,15 +64,22 @@ class _SearchResultPageState extends State<SearchResultPage> {
         } else {
           resultItem.status = _LoadingState.empty;
         }
+        break;
       } catch (e) {
         print(e);
-        resultItem.status = _LoadingState.error;
+        resultItem.status = _LoadingState.retry;
+        resultItem.retryTimes += 1;
       } finally {
+        print('$mounted');
         if (mounted) {
           setState(() {});
         }
       }
-    });
+    }
+
+    if (_LoadingState.retry == resultItem.status) {
+      resultItem.status = _LoadingState.error;
+    }
   }
 
   @override
@@ -112,14 +132,8 @@ class _SearchResultPageState extends State<SearchResultPage> {
     return SingleChildScrollView(
       controller: scrollController,
       child: ExpansionPanelList(
-        expansionCallback: (panelIndex, isExpanded) {
-          final resultItem = searchResultList[panelIndex];
-          if (resultItem.status == _LoadingState.over) {
-            expandCount = isExpanded ? expandCount - 1 : expandCount + 1;
-            resultItem.isExpanded = !resultItem.isExpanded;
-            setState(() {});
-          }
-        },
+        expansionCallback: (panelIndex, isExpanded) =>
+            handleExpansionPanelClick(panelIndex, isExpanded),
         children: searchResultList
             .map(
               (item) => ExpansionPanel(
@@ -141,11 +155,24 @@ class _SearchResultPageState extends State<SearchResultPage> {
     );
   }
 
+  void handleExpansionPanelClick(int panelIndex, bool isExpanded) {
+    final resultItem = searchResultList[panelIndex];
+    if (resultItem.status == _LoadingState.over) {
+      expandCount = isExpanded ? expandCount - 1 : expandCount + 1;
+      resultItem.isExpanded = !resultItem.isExpanded;
+      setState(() {});
+    } else if (resultItem.status == _LoadingState.error) {
+      searchAction(resultItem);
+    }
+  }
+
   Widget buildExpansionPanelHeader(_SearchResult item) {
     var sourceName = Text(item.source.name);
     var extra;
     const extraTextStyle = const TextStyle(color: Colors.black12);
     const errorTextStyle = const TextStyle(color: Colors.redAccent);
+    const progressColor = const AlwaysStoppedAnimation<Color>(Colors.black12);
+    double extraWidth = 100;
     switch (item.status) {
       case _LoadingState.loading:
         extra = Row(
@@ -157,18 +184,42 @@ class _SearchResultPageState extends State<SearchResultPage> {
             SizedBox(
               height: 20,
               width: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: progressColor,
+              ),
             )
           ],
         );
         break;
       case _LoadingState.error:
+        extraWidth = 140;
         extra = Text('搜索失败，点击重试', style: errorTextStyle);
         break;
       case _LoadingState.over:
       case _LoadingState.empty:
         extra = Text(
           '搜索结果: ${item.mangaList.length}',
+        );
+        break;
+      case _LoadingState.retry:
+        extraWidth = 180;
+        extra = Row(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.only(right: 10),
+              child: Text(
+                '搜索失败，重试第 ${item.retryTimes} 次',
+                style: extraTextStyle,
+              ),
+            ),
+            SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                  strokeWidth: 2, valueColor: progressColor),
+            )
+          ],
         );
         break;
     }
@@ -189,7 +240,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
           ],
         ),
         SizedBox(
-          width: 100,
+          width: extraWidth,
           child: extra,
         )
       ],
@@ -206,7 +257,10 @@ class _SearchResultPageState extends State<SearchResultPage> {
           MangaRepoPool.getInstance().getMangaSourceByKey(item.sourceKey);
       return MangaCard(
         title: Text(item.title),
-        extra: MangaInfoCardExtra(manga: item, source: source,),
+        extra: MangaInfoCardExtra(
+          manga: item,
+          source: source,
+        ),
         cover: MangaCoverImage(
           source: source,
           url: item.coverImgUrl,
