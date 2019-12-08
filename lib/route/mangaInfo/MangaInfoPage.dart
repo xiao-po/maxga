@@ -7,6 +7,7 @@ import 'package:maxga/model/manga/Chapter.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/model/maxga/MangaReadProcess.dart';
+import 'package:maxga/model/maxga/MangaViewerPopResult.dart';
 import 'package:maxga/provider/HistoryProvider.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaInfo/MaganInfoWrapper.dart';
@@ -178,7 +179,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   }
 
   void enjoyMangaContent(Chapter chapter, {int imagePage = 0}) async {
-    MangaViewerPopResult result = await Navigator.push(
+    var result = await Navigator.push<MangaViewerPopResult>(
         context,
         MaterialPageRoute(
             builder: (context) => MangaViewer(

@@ -13,6 +13,7 @@ class MaxgaReleaseInfo {
   }
 
   bool compare(String version) {
+    return true;
     final nextVersion = this.version;
     final nextVersionList = _splitVersionNumber(nextVersion);
     final versionList = _splitVersionNumber(version);

@@ -200,42 +200,26 @@ class _IndexPageState extends State<IndexPage> {
   checkUpdate() async {
     final nextVersion = await UpdateService.checkUpdateStatus();
     if (nextVersion != null) {
-      final buttonTextStyle = TextStyle(
-        color: Colors.greenAccent,
-      );
-      final buttonPadding = EdgeInsets.fromLTRB(15, 5, 15, 5);
+      final buttonPadding = const EdgeInsets.fromLTRB(15, 5, 15, 5);
       scaffoldKey.currentState.showSnackBar(SnackBar(
         duration: Duration(seconds: 3),
-        content: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Text('有新版本更新'),
-            Row(
-              children: <Widget>[
-                GestureDetector(
-                  child: Padding(
-                    padding: buttonPadding,
-                    child: Text('详情', style: buttonTextStyle),
-                  ),
-                  onTap: () {
-                    hiddenSnack();
-                    openUpdateDialog(nextVersion);
-                  },
-                ),
-                GestureDetector(
-                  child: Padding(
-                    padding: buttonPadding,
-                    child: Text('忽略', style: buttonTextStyle),
-                  ),
-                  onTap: () {
-                    hiddenSnack();
-                    UpdateService.ignoreUpdate(nextVersion);
-                  },
-                )
-              ],
-            ),
-          ],
+        content: GestureDetector(
+          child: Padding(
+            padding: buttonPadding,
+            child: Text('有新版本更新, 点击查看'),
+          ),
+          onTap: () {
+            hiddenSnack();
+            openUpdateDialog(nextVersion);
+          },
         ),
+        action: SnackBarAction(
+          label: '忽略',
+          textColor: Colors.greenAccent,
+          onPressed: () {
+            openUpdateDialog(nextVersion);
+          },
+        )
       ));
     }
   }

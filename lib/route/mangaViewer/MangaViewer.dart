@@ -7,32 +7,23 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/Utils/MaxgaUtils.dart';
+import 'package:maxga/base/error/MaxgaHttpError.dart';
 import 'package:maxga/base/setting/SettingValue.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/manga/Chapter.dart';
 import 'package:maxga/model/manga/Manga.dart';
+import 'package:maxga/model/maxga/MangaViewerPopResult.dart';
 import 'package:maxga/provider/SettingProvider.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaViewer/MangaTab.dart';
 import 'package:maxga/route/mangaViewer/baseComponent/MangaViewerFutureView.dart';
 import 'package:provider/provider.dart';
 
-enum _MangaViewerLoadState {
-  checkNetState,
-  loadingMangaData,
-  over,
-  error
-}
+import 'MangaStatusBar.dart';
 
+enum _MangaViewerLoadState { checkNetState, loadingMangaData, over, error }
 
-
-class MangaViewerPopResult {
-  bool loadOver;
-  int mangaImageIndex;
-  int chapterId;
-
-  MangaViewerPopResult({this.loadOver, this.mangaImageIndex, this.chapterId});
-}
+enum _PageChangeOrigin { onTap, scroll, none }
 
 class MangaViewer extends StatefulWidget {
   final SimpleMangaInfo manga;
@@ -41,58 +32,74 @@ class MangaViewer extends StatefulWidget {
   final int initIndex;
 
   const MangaViewer(
-      {Key key, this.manga, this.currentChapter, this.initIndex = 0, this.chapterList})
+      {Key key,
+      this.manga,
+      this.currentChapter,
+      this.initIndex = 0,
+      this.chapterList})
       : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MangaViewerState();
 }
 
-
 class _MangaViewerState extends State<MangaViewer> {
   final mangaViewerKey = GlobalKey<ScaffoldState>();
-
-  Timer chapterChangeTimer;
-  Timer scrollEventTimer;
-  Timer futureViewVisitableTimer;
-  // ignore: non_constant_identifier_names
-  bool NEXT_PAGE_CHANGE_TRUST = true;
+  final futureViewAnimationDuration = Duration(milliseconds: 200);
+  MaxgaDataHttpRepo dataHttpRepo;
+  List<Chapter> chapterList;
+  PageController tabController;
 
   Map<int, Chapter> cachedChapterData = {};
-  _MangaViewerLoadState loadStatus = _MangaViewerLoadState.loadingMangaData;
-  bool mangaFutureViewVisitable = false;
-  double mangaFutureViewOpacity = 0;
-  List<Chapter> chapterList;
-  final futureViewAnimationDuration = Duration(milliseconds: 200);
-  PageController tabController;
+  bool isOnScroll = false;
   Chapter currentChapter;
   Chapter preChapter;
   Chapter nextChapter;
 
+  _PageChangeOrigin _pageChangeOrigin = _PageChangeOrigin.none;
+  _MangaViewerLoadState loadStatus = _MangaViewerLoadState.loadingMangaData;
+
+  Timer scrollEventTimer;
+  Timer futureViewVisitableTimer;
+
+  bool loadingChapter = false;
   List<String> imagePageUrlList = <String>[];
+  bool mangaFutureViewVisitable = false;
+  double mangaFutureViewOpacity = 0;
 
   int _currentPageIndex = 0;
 
-  bool loadingChapter = false;
+  int get pageOffsetFix => preChapter != null ? 1 : 0;
 
-  get chapterImageIndex => _currentPageIndex - (preChapter != null ? 1 : 0);
+  int get chapterImageIndex => _currentPageIndex - (pageOffsetFix);
 
-  get chapterImageCount =>
-      imagePageUrlList.length -
-      (preChapter != null ? 1 : 0) -
-      (nextChapter != null ? 1 : 0) ;
+  int get chapterImageCount =>
+      imagePageUrlList.length - (pageOffsetFix) - (nextChapter != null ? 1 : 0);
+
+  int get radioPageIndex {
+    return chapterImageIndex < 1
+        ? 0
+        : (chapterImageIndex >= (chapterImageCount - 1)
+            ? (chapterImageCount - 1)
+            : chapterImageIndex);
+  }
 
   @override
   void initState() {
     super.initState();
     MaxgaUtils.hiddenStatusBar();
+    dataHttpRepo =
+        MangaRepoPool.getInstance().getRepo(key: widget.manga.sourceKey);
     Connectivity().checkConnectivity().then((connectivityResult) async {
-      final readOnWiFi = Provider.of<SettingProvider>(context).getItem(MaxgaSettingItemType.readOnlyOnWiFi);
-      if (connectivityResult == ConnectivityResult.wifi  || readOnWiFi.value == '0') {
+      final readOnWiFi = Provider.of<SettingProvider>(context)
+          .getItem(MaxgaSettingItemType.readOnlyOnWiFi);
+      if (connectivityResult == ConnectivityResult.wifi ||
+          readOnWiFi.value == '0') {
         initMangaViewer();
       } else {
-        loadStatus = _MangaViewerLoadState.checkNetState;
-        setState(() {});
+        setState(() {
+          loadStatus = _MangaViewerLoadState.checkNetState;
+        });
       }
     });
   }
@@ -121,15 +128,17 @@ class _MangaViewerState extends State<MangaViewer> {
           preChapter = preChapterData;
           currentChapter = currentChapterData;
           this.imagePageUrlList = getImagePageUrlListFormChapter();
-          _currentPageIndex = widget.initIndex + (preChapter != null ? 1 : 0);
+          _currentPageIndex = widget.initIndex + (pageOffsetFix);
           tabController = PageController(initialPage: _currentPageIndex);
           this.loadStatus = _MangaViewerLoadState.over;
         });
       }
-    } catch(e) {
+    } catch (e) {
+      if (e is MaxgaHttpError) {
+        print(e.message);
+      }
       if (mounted) {
         setState(() {
-
           this.loadStatus = _MangaViewerLoadState.error;
         });
       }
@@ -138,12 +147,12 @@ class _MangaViewerState extends State<MangaViewer> {
 
   List<String> getImagePageUrlListFormChapter() {
     List<String> imageUrlList = [];
-    if(preChapter != null) {
+    if (preChapter != null) {
       imageUrlList.add(preChapter.imgUrlList.last);
     }
     imageUrlList.addAll(currentChapter.imgUrlList);
     if (nextChapter != null) {
-       imageUrlList.add(nextChapter.imgUrlList.first);
+      imageUrlList.add(nextChapter.imgUrlList.first);
     }
     return imageUrlList;
   }
@@ -162,15 +171,14 @@ class _MangaViewerState extends State<MangaViewer> {
         {
           body = Stack(
             children: <Widget>[
-              NotificationListener<ScrollEndNotification>(
+              NotificationListener<ScrollNotification>(
                 onNotification: (scrollNotification) =>
-                    onPageViewScroll(scrollNotification),
+                    handleTabViewScroll(scrollNotification),
                 child: GestureDetector(
                   onTapUp: (details) => dispatchTapUpEvent(details, context),
                   child: MangaTabView(
-                    source: MangaRepoPool.getInstance().getMangaSourceByKey(widget.manga.sourceKey),
+                    source: dataHttpRepo.mangaSource,
                     controller: tabController,
-//                    onPageChanged: (index) => changePage(index),
                     hasPrechapter: preChapter != null,
                     imgUrlList: imagePageUrlList,
                   ),
@@ -182,9 +190,8 @@ class _MangaViewerState extends State<MangaViewer> {
                 duration: futureViewAnimationDuration,
                 child: mangaFutureViewVisitable
                     ? MangaFeatureView(
-                        onPageChange: (index) => changePage(
-                            index.floor() + (preChapter != null ? 1 : 0),
-                            shouldJump: true),
+                        onPageChange: (index) =>
+                            changePage(index.floor() + (pageOffsetFix)),
                         imageCount: chapterImageCount,
                         pageIndex: radioPageIndex,
                         title: currentChapter.title,
@@ -199,10 +206,11 @@ class _MangaViewerState extends State<MangaViewer> {
         appbar = buildAppbarOnOtherStatus();
         body = buildCheckNetStatePage();
         break;
-      case _MangaViewerLoadState.error: {
-        appbar = buildAppbarOnOtherStatus();
-        body = ErrorPage('加载失败');
-        break;
+      case _MangaViewerLoadState.error:
+        {
+          appbar = buildAppbarOnOtherStatus();
+          body = ErrorPage('加载失败');
+          break;
         }
     }
 
@@ -215,23 +223,13 @@ class _MangaViewerState extends State<MangaViewer> {
       ),
       onWillPop: () => onBack(),
     );
-
-
   }
 
   AppBar buildAppbarOnOtherStatus() {
     return AppBar(
-          backgroundColor: Colors.transparent,
-          leading: BackButton(),
-        );
-  }
-
-  int get radioPageIndex {
-    return chapterImageIndex < 1
-                          ? 0
-                          : (chapterImageIndex >= (chapterImageCount - 1)
-                              ?  (chapterImageCount - 1)
-                              : chapterImageIndex);
+      backgroundColor: Colors.transparent,
+      leading: BackButton(),
+    );
   }
 
   buildLoadingPage() {
@@ -251,9 +249,7 @@ class _MangaViewerState extends State<MangaViewer> {
     if (cachedChapterData.containsKey(chapter.id)) {
       return cachedChapterData[chapter.id];
     } else {
-      MaxgaDataHttpRepo repo = MangaRepoPool.getInstance().getRepo(key: widget.manga.sourceKey);
-      print(chapter.url);
-      final result = await repo.getChapterImageList(chapter.url);
+      final result = await dataHttpRepo.getChapterImageList(chapter.url);
       chapter.imgUrlList = result;
       cachedChapterData.addAll({chapter.id: chapter});
       return chapter;
@@ -266,13 +262,16 @@ class _MangaViewerState extends State<MangaViewer> {
     if (details.localPosition.dx / width > 0.33 &&
         details.localPosition.dx / width < 0.66) {
       updateFutureViewVisitable();
-    } else if (details.localPosition.dx / width < 0.33) {
-      goPrePage();
-    } else if (details.localPosition.dx / width > 0.66) {
-      goNextPage();
+    } else {
+      _pageChangeOrigin = _PageChangeOrigin.onTap;
+      if (details.localPosition.dx / width < 0.33) {
+        changePage(_currentPageIndex - 1);
+      } else if (details.localPosition.dx / width > 0.66) {
+        changePage(_currentPageIndex + 1);
+      }
+      Future.delayed(Duration(milliseconds: 100))
+          .then((value) => _pageChangeOrigin = _PageChangeOrigin.none);
     }
-
-    setState(() {});
   }
 
   void updateFutureViewVisitable() {
@@ -284,8 +283,9 @@ class _MangaViewerState extends State<MangaViewer> {
       this.mangaFutureViewVisitable = !this.mangaFutureViewVisitable;
     } else {
       futureViewVisitableTimer = Timer(futureViewAnimationDuration, () {
-        this.mangaFutureViewVisitable = !this.mangaFutureViewVisitable;
-        setState(() {});
+        setState(() {
+          this.mangaFutureViewVisitable = !this.mangaFutureViewVisitable;
+        });
       });
     }
 
@@ -293,57 +293,16 @@ class _MangaViewerState extends State<MangaViewer> {
   }
 
   void toastMessage(String s, [TextAlign alignment = TextAlign.left]) {
-    mangaViewerKey.currentState.removeCurrentSnackBar();
+    mangaViewerKey.currentState.hideCurrentSnackBar();
     mangaViewerKey.currentState.showSnackBar(SnackBar(
       duration: Duration(seconds: 1),
       content: Text(s, textAlign: alignment),
     ));
   }
 
-
-  goPrePage() {
-    if (_currentPageIndex != 0) {
-      changePage(_currentPageIndex - 1, shouldJump: true);
-    } else {
-      if (preChapter != null) {
-        _currentPageIndex = _currentPageIndex - 1;
-        changeChapter();
-      } else {
-        toastMessage('已经是第一页了');
-      }
-    }
-  }
-
-  goNextPage() {
-    if (_currentPageIndex != (chapterImageCount)) {
-      changePage(_currentPageIndex + 1, shouldJump: true);
-    } else {
-      if (nextChapter != null) {
-        _currentPageIndex = _currentPageIndex + 1;
-        changeChapter();
-      } else {
-        toastMessage('已经是最后一页了');
-      }
-    }
-  }
-
-  changePage(int index, {bool shouldJump = false}) async {
-    if (loadingChapter) {
-      return null;
-    }
-    if (!NEXT_PAGE_CHANGE_TRUST) {
-      NEXT_PAGE_CHANGE_TRUST = true;
-      return null;
-    }
-    if (chapterChangeTimer != null) {
-      print('chapterChangeTimer cancel');
-      chapterChangeTimer.cancel();
-    }
+  changePage(int index) async {
     _currentPageIndex = index;
-    if (shouldJump) {
-      tabController.jumpToPage(_currentPageIndex);
-    }
-
+    tabController.jumpToPage(_currentPageIndex);
     setState(() {});
   }
 
@@ -365,73 +324,85 @@ class _MangaViewerState extends State<MangaViewer> {
   }
 
   void changeChapter() async {
-    if (_currentPageIndex == 0 && preChapter != null) {
+    if (_currentPageIndex == 0) {
+      if (preChapter == null) {
+        toastMessage('已经是第一页了');
+      }
       toastMessage('正在加载上一章节');
-      loadingChapter = true;
-      nextChapter = currentChapter;
-      currentChapter = preChapter;
-      preChapter = null;
+      final _currentChapter = currentChapter;
+      final simplePreChapterData = getPreChapter(_currentChapter);
       if (mounted) {
-        setState(() { });
+        setState(() {
+          loadingChapter = true;
+        });
       } else {
         return null;
       }
-
-      final simplePreChapterData = getPreChapter(currentChapter);
       var preChapterData = await getChapterData(simplePreChapterData);
-      preChapter = preChapterData;
-      this.imagePageUrlList = getImagePageUrlListFormChapter();
-      _currentPageIndex = imagePageUrlList.length - 2;
-      if (mounted) {
+      if (mounted && !isOnScroll && _currentPageIndex == 0) {
         toastMessage('进入上一章节');
-        loadingChapter = false;
-        setState(() { });
+        setState(() {
+          nextChapter = currentChapter;
+          currentChapter = preChapter;
+          preChapter = preChapterData;
+          imagePageUrlList = getImagePageUrlListFormChapter();
+          _currentPageIndex = imagePageUrlList.length - 2;
+          _pageChangeOrigin = _PageChangeOrigin.scroll;
+          loadingChapter = false;
+        });
+        tabController.jumpToPage(_currentPageIndex);
+        Future.delayed(Duration(milliseconds: 100))
+            .then((v) => _pageChangeOrigin = _PageChangeOrigin.none);
       } else {
         return null;
       }
+    } else if (_currentPageIndex == (imagePageUrlList.length - 1)) {
+      if (nextChapter != null) {
+        toastMessage('已经是最后一页了', TextAlign.right);
+      }
 
-      NEXT_PAGE_CHANGE_TRUST = false;
-      tabController.jumpToPage(_currentPageIndex);
-      chapterChangeTimer = null;
-    } else if (_currentPageIndex == (imagePageUrlList.length - 1) &&
-        nextChapter != null) {
-      toastMessage('正在加载下一章节');
       loadingChapter = true;
-      preChapter = currentChapter;
-      currentChapter = nextChapter;
-      nextChapter = null;
+      toastMessage('正在加载下一章节', TextAlign.right);
+      final _currentChapter = currentChapter;
       if (mounted) {
-        setState(() { });
+        setState(() {
+          loadingChapter = true;
+        });
       } else {
         return null;
       }
-
-      final simpleNextChapterData = getNextChapter(currentChapter);
-      var nextChapterData = await getChapterData(simpleNextChapterData);
-      nextChapter = nextChapterData;
-      this.imagePageUrlList = getImagePageUrlListFormChapter();
-      _currentPageIndex = preChapter != null ? 1 : 0;
-      if (mounted) {
+      final simpleNextChapterData = getNextChapter(_currentChapter);
+      final nextChapterData = await getChapterData(simpleNextChapterData);
+      if (mounted &&
+          !isOnScroll &&
+          _currentPageIndex == (imagePageUrlList.length - 1)) {
         toastMessage('进入下一章节', TextAlign.right);
-    loadingChapter = false;
-        setState(() { });
+        setState(() {
+          preChapter = currentChapter;
+          currentChapter = nextChapter;
+          _pageChangeOrigin = _PageChangeOrigin.scroll;
+          nextChapter = nextChapterData;
+          imagePageUrlList = getImagePageUrlListFormChapter();
+          _currentPageIndex = pageOffsetFix;
+          loadingChapter = false;
+        });
+        Future.delayed(Duration(milliseconds: 100))
+            .then((v) => _pageChangeOrigin = _PageChangeOrigin.none);
       } else {
         return null;
       }
-
-      NEXT_PAGE_CHANGE_TRUST = false;
       tabController.jumpToPage(_currentPageIndex);
-      chapterChangeTimer = null;
     }
   }
 
   onPageViewScroll(ScrollNotification scrollNotification) {
-    if (scrollEventTimer != null) {
-      scrollEventTimer.cancel();
-      scrollEventTimer = null;
+    final tabControllerPage = tabController.page.floor();
+    _currentPageIndex = tabControllerPage;
+    changeChapter();
+    if (tabControllerPage > pageOffsetFix &&
+        _PageChangeOrigin.none == _pageChangeOrigin) {
+      setState(() {});
     }
-    scrollEventTimer =
-        Timer(Duration(milliseconds: 300), () => changeChapter());
     return true;
   }
 
@@ -443,20 +414,22 @@ class _MangaViewerState extends State<MangaViewer> {
 
   onBack() {
     if (loadStatus == _MangaViewerLoadState.over) {
-      Navigator.pop<MangaViewerPopResult>(context, MangaViewerPopResult(
-          loadOver: loadStatus == _MangaViewerLoadState.over,
-          mangaImageIndex: _currentPageIndex - (preChapter != null ? 1 : 0),
-          chapterId: currentChapter.id
-      ));
+      Navigator.pop<MangaViewerPopResult>(
+          context,
+          MangaViewerPopResult(
+              loadOver: loadStatus == _MangaViewerLoadState.over,
+              mangaImageIndex: _currentPageIndex - (pageOffsetFix),
+              chapterId: currentChapter.id));
     } else {
-      Navigator.pop<MangaViewerPopResult>(context, MangaViewerPopResult(
-          loadOver: loadStatus == _MangaViewerLoadState.over,
-      ));
+      Navigator.pop<MangaViewerPopResult>(
+          context,
+          MangaViewerPopResult(
+            loadOver: loadStatus == _MangaViewerLoadState.over,
+          ));
     }
   }
 
   Widget buildCheckNetStatePage() {
-
     return buildCenterContainer(
       children: [
         buildCenterText('检测到你现在正使用移动网络'),
@@ -464,10 +437,12 @@ class _MangaViewerState extends State<MangaViewer> {
         OutlineButton(
             borderSide: BorderSide(color: Colors.white),
             highlightedBorderColor: Colors.white,
-
-            child: const Text('继续阅读',style: TextStyle(color: Colors.white,fontSize: 16),textAlign: TextAlign.center),
-            onPressed: () {initMangaViewer();}
-        ),
+            child: const Text('继续阅读',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+                textAlign: TextAlign.center),
+            onPressed: () {
+              initMangaViewer();
+            }),
       ],
     );
   }
@@ -483,98 +458,20 @@ class _MangaViewerState extends State<MangaViewer> {
   }
 
   Widget buildCenterText(String text) => Padding(
-    padding: EdgeInsets.only(top: 5, bottom: 5),
-    child: Text(text,style: TextStyle(color: Colors.white,fontSize: 16),textAlign: TextAlign.center,),
-  );
-}
+        padding: EdgeInsets.only(top: 5, bottom: 5),
+        child: Text(
+          text,
+          style: TextStyle(color: Colors.white, fontSize: 16),
+          textAlign: TextAlign.center,
+        ),
+      );
 
-class MangaStatusBar extends StatefulWidget {
-  final Chapter currentChapter;
-  final int currentIndex;
-
-  MangaStatusBar(this.currentChapter, this.currentIndex);
-
-  @override
-  State<StatefulWidget> createState() => _MangaStatusBarState();
-}
-
-class _MangaStatusBarState extends State<MangaStatusBar> {
-  final Battery _battery = Battery();
-  StreamSubscription batteryStatusSubscription;
-
-  DateTime currentTime;
-  Timer timer;
-  BatteryState batteryState = BatteryState.discharging;
-  int currentBattery = 100;
-
-  @override
-  void initState() {
-    super.initState();
-    this.updateTimeAndBattery();
-    waitUpdateTimeByMinute();
-    batteryStatusSubscription =
-        _battery.onBatteryStateChanged.listen((state) => batteryState = state);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    const defaultTextStyle = TextStyle(color: Color(0xffeaeaea), fontSize: 13);
-    int index = widget.currentIndex;
-    if (index > widget.currentChapter.imgUrlList.length) {
-      index = widget.currentChapter.imgUrlList.length;
-    } else if (index == 0) {
-      index = 1;
+  handleTabViewScroll(ScrollNotification scrollNotification) {
+    if (scrollNotification is ScrollEndNotification) {
+      isOnScroll = false;
+      onPageViewScroll(scrollNotification);
+    } else if (scrollNotification is ScrollStartNotification) {
+      isOnScroll = true;
     }
-
-    return Align(
-        alignment: Alignment.bottomRight,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            Container(
-                padding:
-                    EdgeInsets.only(left: 10, right: 20, top: 7, bottom: 4),
-                decoration: BoxDecoration(color: Color(0xff263238)),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      LimitedBox(
-                        maxWidth: 130,
-                        child: Text(
-                          '${widget.currentChapter.title} ',
-                          overflow: TextOverflow.ellipsis,
-                          style: defaultTextStyle,
-                        ),
-                      ),
-                      Text(
-                        ' $index/${widget.currentChapter.imgUrlList.length} '
-                        ' ${currentTime.hour}:${currentTime.minute}  $currentBattery%',
-                        style: defaultTextStyle,
-                      ),
-                    ]))
-          ],
-        ));
-  }
-
-  void waitUpdateTimeByMinute() {
-    int restSeconds = 60 - currentTime.second;
-    this.timer = Timer(Duration(seconds: restSeconds), () {
-      waitUpdateTimeByMinute();
-      updateTimeAndBattery();
-    });
-  }
-
-  void updateTimeAndBattery() async {
-    currentTime = DateTime.now();
-
-    currentBattery = await _battery.batteryLevel;
-    setState(() {});
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    timer.cancel();
-    batteryStatusSubscription.cancel();
   }
 }

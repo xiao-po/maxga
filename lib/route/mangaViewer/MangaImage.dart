@@ -32,7 +32,6 @@ class _MangaImageState extends State<MangaImage> with SingleTickerProviderStateM
   }
   @override
   Widget build(BuildContext context) {
-    print(widget.source?.headers);
     return  ExtendedImage.network(
       widget.url,
       height: double.infinity,
@@ -138,7 +137,6 @@ class _MangaImageState extends State<MangaImage> with SingleTickerProviderStateM
     }
 
     _animationListener = () {
-      //print(_animation.value);
       state.handleDoubleTap(
           scale: _animation.value,
           doubleTapPosition: pointerDownPosition);
