@@ -5,7 +5,6 @@ import 'package:battery/battery.dart';
 import 'package:connectivity/connectivity.dart';
 
 import 'package:flutter/material.dart';
-import 'package:maxga/Application.dart';
 import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/Utils/MaxgaUtils.dart';
 import 'package:maxga/base/setting/SettingValue.dart';
@@ -21,7 +20,8 @@ import 'package:provider/provider.dart';
 enum _MangaViewerLoadState {
   checkNetState,
   loadingMangaData,
-  over
+  over,
+  error
 }
 
 
@@ -92,9 +92,7 @@ class _MangaViewerState extends State<MangaViewer> {
         initMangaViewer();
       } else {
         loadStatus = _MangaViewerLoadState.checkNetState;
-        setState(() {
-
-        });
+        setState(() {});
       }
     });
   }
@@ -102,32 +100,39 @@ class _MangaViewerState extends State<MangaViewer> {
   void initMangaViewer() async {
     loadStatus = _MangaViewerLoadState.loadingMangaData;
     setState(() {});
-    currentChapter = widget.currentChapter;
-    chapterList = widget.chapterList.toList();
-    chapterList.sort((a, b) => a.order.compareTo(b.order));
-    final simplePreChapterData = getPreChapter(currentChapter);
-    final simpleNextChapterData = getNextChapter(currentChapter);
-    final resultChapterList = await Future.wait<Chapter>([
-      getChapterData(simplePreChapterData),
-      getChapterData(currentChapter),
-      getChapterData(simpleNextChapterData),
-    ]);
-    Chapter preChapterData = resultChapterList[0];
-    Chapter currentChapterData = resultChapterList[1];
-    Chapter nextChapterData = resultChapterList[2];
-    print(currentChapterData.imgUrlList[0]);
+    try {
+      currentChapter = widget.currentChapter;
+      chapterList = widget.chapterList.toList();
+      chapterList.sort((a, b) => a.order.compareTo(b.order));
+      final simplePreChapterData = getPreChapter(currentChapter);
+      final simpleNextChapterData = getNextChapter(currentChapter);
+      final resultChapterList = await Future.wait<Chapter>([
+        getChapterData(simplePreChapterData),
+        getChapterData(currentChapter),
+        getChapterData(simpleNextChapterData),
+      ]);
+      Chapter preChapterData = resultChapterList[0];
+      Chapter currentChapterData = resultChapterList[1];
+      Chapter nextChapterData = resultChapterList[2];
 
-    nextChapter = nextChapterData;
-    preChapter = preChapterData;
-    currentChapter = currentChapterData;
-    this.imagePageUrlList = getImagePageUrlListFormChapter();
-    _currentPageIndex = widget.initIndex + (preChapter != null ? 1 : 0);
+      if (mounted) {
+        setState(() {
+          nextChapter = nextChapterData;
+          preChapter = preChapterData;
+          currentChapter = currentChapterData;
+          this.imagePageUrlList = getImagePageUrlListFormChapter();
+          _currentPageIndex = widget.initIndex + (preChapter != null ? 1 : 0);
+          tabController = PageController(initialPage: _currentPageIndex);
+          this.loadStatus = _MangaViewerLoadState.over;
+        });
+      }
+    } catch(e) {
+      if (mounted) {
+        setState(() {
 
-    tabController = PageController(initialPage: _currentPageIndex);
-    this.loadStatus = _MangaViewerLoadState.over;
-
-    if (mounted) {
-      setState(() {});
+          this.loadStatus = _MangaViewerLoadState.error;
+        });
+      }
     }
   }
 
@@ -145,11 +150,9 @@ class _MangaViewerState extends State<MangaViewer> {
 
   @override
   Widget build(BuildContext context) {
-    var body;
+    AppBar appbar;
+    Widget body;
     switch (loadStatus) {
-      case _MangaViewerLoadState.checkNetState: {
-        return buildCheckNetStatePage();
-      }
       case _MangaViewerLoadState.loadingMangaData:
         {
           body = buildLoadingPage();
@@ -167,7 +170,7 @@ class _MangaViewerState extends State<MangaViewer> {
                   child: MangaTabView(
                     source: MangaRepoPool.getInstance().getMangaSourceByKey(widget.manga.sourceKey),
                     controller: tabController,
-                    onPageChanged: (index) => changePage(index),
+//                    onPageChanged: (index) => changePage(index),
                     hasPrechapter: preChapter != null,
                     imgUrlList: imagePageUrlList,
                   ),
@@ -192,19 +195,35 @@ class _MangaViewerState extends State<MangaViewer> {
           );
           break;
         }
-      default:
-        {
-          body = ErrorPage('加载失败');
+      case _MangaViewerLoadState.checkNetState:
+        appbar = buildAppbarOnOtherStatus();
+        body = buildCheckNetStatePage();
+        break;
+      case _MangaViewerLoadState.error: {
+        appbar = buildAppbarOnOtherStatus();
+        body = ErrorPage('加载失败');
+        break;
         }
     }
+
     return WillPopScope(
       child: Scaffold(
         key: mangaViewerKey,
+        appBar: appbar,
         backgroundColor: Colors.black,
         body: body,
       ),
       onWillPop: () => onBack(),
     );
+
+
+  }
+
+  AppBar buildAppbarOnOtherStatus() {
+    return AppBar(
+          backgroundColor: Colors.transparent,
+          leading: BackButton(),
+        );
   }
 
   int get radioPageIndex {
@@ -281,9 +300,6 @@ class _MangaViewerState extends State<MangaViewer> {
     ));
   }
 
-  void zoomImageAction() {
-    print('zoom image');
-  }
 
   goPrePage() {
     if (_currentPageIndex != 0) {
@@ -441,25 +457,18 @@ class _MangaViewerState extends State<MangaViewer> {
 
   Widget buildCheckNetStatePage() {
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        leading: BackButton(color: Colors.white),
-      ),
-      body: buildCenterContainer(
-        children: [
-          buildCenterText('检测到你现在正使用移动网络'),
-          buildCenterText('是否继续阅读？'),
-          OutlineButton(
+    return buildCenterContainer(
+      children: [
+        buildCenterText('检测到你现在正使用移动网络'),
+        buildCenterText('是否继续阅读？'),
+        OutlineButton(
             borderSide: BorderSide(color: Colors.white),
             highlightedBorderColor: Colors.white,
 
             child: const Text('继续阅读',style: TextStyle(color: Colors.white,fontSize: 16),textAlign: TextAlign.center),
             onPressed: () {initMangaViewer();}
-            ),
-        ],
-      )
+        ),
+      ],
     );
   }
 
@@ -468,7 +477,6 @@ class _MangaViewerState extends State<MangaViewer> {
       width: double.infinity,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-
         children: children,
       ),
     );
