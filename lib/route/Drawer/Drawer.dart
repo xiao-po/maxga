@@ -16,12 +16,12 @@ class MaxgaDrawer extends StatefulWidget {
 class MaxgaDrawerState extends State<MaxgaDrawer> {
   @override
   Widget build(BuildContext context) {
-    IndexPageTypeProvider indexPageTypeProvider =
-        Provider.of<IndexPageTypeProvider>(context);
+    MaxgaMenuItemType menuItemType =
+        Provider.of<MaxgaMenuItemType>(context);
     final list = DrawerMenuList.map((menuItem) => ListTile(
         title: Text(menuItem.title),
         leading: Icon(menuItem.icon),
-        selected: menuItem.type == indexPageTypeProvider.type,
+        selected: menuItem.type == menuItemType,
         onTap: () => _handleMenuItemChoose(menuItem.type))).toList(growable: false);
     return Drawer(
       child: Column(
@@ -46,10 +46,8 @@ class MaxgaDrawerState extends State<MaxgaDrawer> {
       case MaxgaMenuItemType.collect:
       case MaxgaMenuItemType.mangaSourceViewer:
         Navigator.pop(context);
-//        await Future.delayed(Duration(milliseconds: 100));
-        IndexPageTypeProvider indexPageTypeProvider =
-            Provider.of<IndexPageTypeProvider>(context);
-        indexPageTypeProvider.changeIndexPageType(type);
+        await Future.delayed(Duration(milliseconds: 300));
+        IndexPageTypeProvider.getInstance().changeIndexPageType(type);
         break;
       case MaxgaMenuItemType.history:
         Navigator.pop(context);

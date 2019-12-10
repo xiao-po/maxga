@@ -17,14 +17,13 @@ import '../../../MangaRepoPool.dart';
 class MangaSourceViewer extends StatefulWidget {
   final name = 'MangaSourceViewer';
 
+
   @override
   State<StatefulWidget> createState() => MangaSourceViewerState();
 
 }
 class MangaSourceViewerState extends State<MangaSourceViewer> {
 
-
-  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   int loadStatus = 0;
   List<SimpleMangaInfo> mangaList;
   List<MangaSource> allMangaSource;
@@ -42,7 +41,6 @@ class MangaSourceViewerState extends State<MangaSourceViewer> {
   Widget build(BuildContext context) {
     const indexPageBackGround = Color(0xfff5f5f5);
     return Scaffold(
-      key: scaffoldKey,
       backgroundColor: indexPageBackGround,
       appBar: AppBar(
         title: const Text('MaxGa'),

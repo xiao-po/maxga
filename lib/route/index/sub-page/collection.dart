@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
+import 'package:maxga/components/MangaGridItem.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/model/maxga/MangaReadProcess.dart';
 import 'package:maxga/route/Drawer/Drawer.dart';
@@ -13,8 +14,6 @@ enum _LoadingState { loading, over, error, empty }
 class CollectionPage extends StatefulWidget {
   final String name = 'collection-page';
 
-
-  CollectionPage({Key key});
 
   @override
   State<StatefulWidget> createState() => CollectionPageState();
@@ -33,12 +32,16 @@ class CollectionPageState extends State<CollectionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: widget.key,
       drawer: MaxgaDrawer(),
       appBar: AppBar(
-        title: const Text('MaxGa'),
+        title: const Text('收藏'),
       ),
       body: buildBody(),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.refresh),
+        onPressed: () => refreshCollections(),
+      ),
+      floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
     );
   }
 
@@ -72,7 +75,7 @@ class CollectionPageState extends State<CollectionPage> {
           children: collectedMangaList.map((el) => Material(
             child: InkWell(
               onTap: () => this.startRead(el),
-              child: SmallMangaCard(
+              child: MangaGridItem(
                 manga: el,
                 tagPrefix: widget.name,
                 source: MangaRepoPool.getInstance().getMangaSourceByKey(el.sourceKey),
@@ -102,61 +105,10 @@ class CollectionPageState extends State<CollectionPage> {
     }));
   }
 
-}
 
-class SmallMangaCard extends StatelessWidget {
-  final ReadMangaStatus manga;
-  final String tagPrefix;
+  refreshCollections() {
 
-  final MangaSource source;
-
-  const SmallMangaCard(
-      {Key key, @required this.manga, @required this.tagPrefix,@required this.source})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(top: 10, bottom: 10, left: 5, right: 5),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Container(
-              width: 130,
-              height: 150,
-              margin: EdgeInsets.only(bottom: 5),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(5.0),
-                child: MangaCoverImage(
-                  url: manga.coverImgUrl,
-                  source: source,
-                  fit: BoxFit.fitWidth,
-                  tagPrefix: tagPrefix,
-                ),
-              )),
-          Text(manga.title,
-              textAlign: TextAlign.left,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 14)),
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Expanded(
-                  child: Text(manga.lastUpdateChapter.title,
-                      textAlign: TextAlign.left,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 12, textBaseline: TextBaseline.alphabetic, color: Colors.black45)),
-                ),
-                Text(source.name,
-                    textAlign: TextAlign.left,
-                    style: TextStyle(fontSize: 12, textBaseline: TextBaseline.alphabetic, color: Colors.black45))
-              ],
-            ),
-          )
-        ],
-      ),
-    );
   }
+
 }
+

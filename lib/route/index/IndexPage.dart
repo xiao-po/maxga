@@ -10,14 +10,12 @@ import 'package:maxga/components/dialog.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/model/maxga/MaxgaReleaseInfo.dart';
-import 'package:maxga/provider/IndexPageTypeProvider.dart';
 import 'package:maxga/route/index/sub-page/collection.dart';
 import 'package:maxga/route/index/sub-page/manga-source-viewer.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:maxga/route/search/search-page.dart';
 import 'package:maxga/service/UpdateService.dart';
 import 'package:provider/provider.dart';
-
 
 class IndexPage extends StatefulWidget {
   final String name = 'index_page';
@@ -38,36 +36,35 @@ class _IndexPageState extends State<IndexPage> {
   void initState() {
     super.initState();
     if (Platform.isAndroid) {
-//      this.checkUpdate();
+      this.checkUpdate();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      child: buildIndexPage(),
+      child: Scaffold(
+        key: scaffoldKey,
+        body: buildIndexPage(),
+      ),
       onWillPop: () => onBack(),
     );
   }
 
-  buildIndexPage() {
-    IndexPageTypeProvider indexPageTypeProvider = Provider.of<IndexPageTypeProvider>(context);
-    switch(indexPageTypeProvider.type) {
-
-      case MaxgaMenuItemType.collect:
-        return CollectionPage(key: scaffoldKey);
+  Widget buildIndexPage() {
+    MaxgaMenuItemType type = Provider.of<MaxgaMenuItemType>(context);
+    switch (type) {
       case MaxgaMenuItemType.mangaSourceViewer:
         return MangaSourceViewer();
         break;
       case MaxgaMenuItemType.setting:
       case MaxgaMenuItemType.about:
       case MaxgaMenuItemType.history:
-        break;
+      case MaxgaMenuItemType.collect:
+      default:
+        return CollectionPage();
     }
   }
-
-
-
 
   void showSnack(String message) {
     scaffoldKey.currentState.showSnackBar(SnackBar(
@@ -83,7 +80,8 @@ class _IndexPageState extends State<IndexPage> {
   }
 
   goMangaInfoPage(SimpleMangaInfo item) {
-    MangaSource source = MangaRepoPool.getInstance().getMangaSourceByKey(item.sourceKey);
+    MangaSource source =
+        MangaRepoPool.getInstance().getMangaSourceByKey(item.sourceKey);
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return MangaInfoPage(
           coverImageBuilder: (context) => MangaCoverImage(
@@ -113,7 +111,6 @@ class _IndexPageState extends State<IndexPage> {
   }
 
   void hiddenSnack() {
-
     scaffoldKey.currentState.hideCurrentSnackBar();
   }
 
@@ -122,25 +119,24 @@ class _IndexPageState extends State<IndexPage> {
     if (nextVersion != null) {
       final buttonPadding = const EdgeInsets.fromLTRB(15, 5, 15, 5);
       scaffoldKey.currentState.showSnackBar(SnackBar(
-        duration: Duration(seconds: 3),
-        content: GestureDetector(
-          child: Padding(
-            padding: buttonPadding,
-            child: Text('有新版本更新, 点击查看'),
+          duration: Duration(seconds: 3),
+          content: GestureDetector(
+            child: Padding(
+              padding: buttonPadding,
+              child: Text('有新版本更新, 点击查看'),
+            ),
+            onTap: () {
+              hiddenSnack();
+              openUpdateDialog(nextVersion);
+            },
           ),
-          onTap: () {
-            hiddenSnack();
-            openUpdateDialog(nextVersion);
-          },
-        ),
-        action: SnackBarAction(
-          label: '忽略',
-          textColor: Colors.greenAccent,
-          onPressed: () {
-            openUpdateDialog(nextVersion);
-          },
-        )
-      ));
+          action: SnackBarAction(
+            label: '忽略',
+            textColor: Colors.greenAccent,
+            onPressed: () {
+              openUpdateDialog(nextVersion);
+            },
+          )));
     }
   }
 

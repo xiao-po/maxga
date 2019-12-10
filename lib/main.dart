@@ -6,6 +6,7 @@ import 'package:maxga/provider/SettingProvider.dart';
 import 'package:maxga/route/index/IndexPage.dart';
 import 'package:provider/provider.dart';
 
+import 'base/drawer/menu-item.dart';
 import 'base/setting/Setting.model.dart';
 
 void main() => runApp(MyApp());
@@ -19,8 +20,11 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           builder: (context) => HistoryProvider(),
         ),
-        ChangeNotifierProvider(
-          builder: (context) => IndexPageTypeProvider(),
+//        ChangeNotifierProvider(
+//          builder: (context) => IndexPageTypeProvider(),
+//        ),
+        StreamProvider<MaxgaMenuItemType>(
+          builder: (context) => IndexPageTypeProvider.getInstance().streamController.stream,
         ),
         ChangeNotifierProvider(
           builder: (context) => SettingProvider(),
