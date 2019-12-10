@@ -4,20 +4,19 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/Utils/MaxgaUtils.dart';
-import 'package:maxga/components/Card.dart';
+import 'package:maxga/base/drawer/menu-item.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/components/dialog.dart';
-import 'package:maxga/components/skeleton.dart';
-import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/model/maxga/MaxgaReleaseInfo.dart';
-import 'package:maxga/route/Drawer/Drawer.dart';
-import 'package:maxga/route/error-page/ErrorPage.dart';
+import 'package:maxga/provider/IndexPageTypeProvider.dart';
+import 'package:maxga/route/index/sub-page/collection.dart';
+import 'package:maxga/route/index/sub-page/manga-source-viewer.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:maxga/route/search/search-page.dart';
-import 'package:maxga/service/MangaReadStorage.service.dart';
 import 'package:maxga/service/UpdateService.dart';
+import 'package:provider/provider.dart';
 
 
 class IndexPage extends StatefulWidget {
@@ -38,113 +37,37 @@ class _IndexPageState extends State<IndexPage> {
   @override
   void initState() {
     super.initState();
-    allMangaSource = MangaRepoPool.getInstance()?.allDataSource;
-    this.getMangaList();
     if (Platform.isAndroid) {
-      this.checkUpdate();
+//      this.checkUpdate();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    const indexPageBackGround = Color(0xfff5f5f5);
     return WillPopScope(
-      child: Scaffold(
-        key: scaffoldKey,
-        backgroundColor: indexPageBackGround,
-        appBar: AppBar(
-          title: const Text('MaxGa'),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(
-                Icons.search,
-                color: Colors.white,
-              ),
-              onPressed: this.toSearch,
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.delete,
-                color: Colors.white,
-              ),
-              onPressed: () => this.deleteUserData(),
-            ),
-            PopupMenuButton<MangaSource>(
-              itemBuilder: (context) => allMangaSource
-                  .map((el) => PopupMenuItem(
-                        value: el,
-                        child: Text(el.name),
-                      ))
-                  .toList(),
-              onSelected: (value) => changeMangaSource(value),
-            )
-          ],
-        ),
-        drawer: MaxgaDrawer(),
-        body: buildIndexBody(),
-      ),
+      child: buildIndexPage(),
       onWillPop: () => onBack(),
     );
   }
 
-  buildIndexBody() {
-    if (loadStatus == 0) {
-      return SkeletonCardList();
-    } else if (loadStatus == 1) {
-      final Color grayFontColor = Color(0xff9e9e9e);
-      return ListView.builder(
-          itemCount: mangaList.length,
-          itemBuilder: (context, index) {
-            MangaSource source = MangaRepoPool.getInstance().getMangaSourceByKey(mangaList[index].sourceKey);
-            return MangaCard(
-              title: Text(mangaList[index].title),
-              extra: MangaInfoCardExtra(
-                  manga: mangaList[index],
-                  textColor: grayFontColor,
-                  source: source
-              ),
-              cover: MangaCoverImage(
-                source: source,
-                url: mangaList[index].coverImgUrl,
-                tagPrefix: widget.name,
-              ),
-              onTap: () => this.goMangaInfoPage(mangaList[index]),
-            );
-          });
-    } else if (loadStatus == -1) {
-      return ErrorPage(
-        '加载失败了呢~~~，\n我们点击之后继续吧',
-        onTap: this.getMangaList,
-      );
+  buildIndexPage() {
+    IndexPageTypeProvider indexPageTypeProvider = Provider.of<IndexPageTypeProvider>(context);
+    switch(indexPageTypeProvider.type) {
+
+      case MaxgaMenuItemType.collect:
+        return CollectionPage(key: scaffoldKey);
+      case MaxgaMenuItemType.mangaSourceViewer:
+        return MangaSourceViewer();
+        break;
+      case MaxgaMenuItemType.setting:
+      case MaxgaMenuItemType.about:
+      case MaxgaMenuItemType.history:
+        break;
     }
   }
 
-  Center buildProcessIndicator() {
-    return Center(
-      child: SizedBox(
-        width: 50,
-        height: 50,
-        child: CircularProgressIndicator(),
-      ),
-    );
-  }
 
-  void getMangaList() async {
-    this.loadStatus = 0;
-    try {
-      MaxgaDataHttpRepo repo = MangaRepoPool.getInstance().currentDataRepo;
-      mangaList = await repo.getLatestUpdate(page);
-      page++;
-      await Future.delayed(Duration(seconds: 2));
-      this.loadStatus = 1;
-    } catch (e) {
-      this.loadStatus = -1;
-      print(e);
-      this.showSnack("getMangaList 失败， 页面： $page");
-    }
 
-    setState(() {});
-  }
 
   void showSnack(String message) {
     scaffoldKey.currentState.showSnackBar(SnackBar(
@@ -190,6 +113,7 @@ class _IndexPageState extends State<IndexPage> {
   }
 
   void hiddenSnack() {
+
     scaffoldKey.currentState.hideCurrentSnackBar();
   }
 
@@ -228,19 +152,5 @@ class _IndexPageState extends State<IndexPage> {
               url: nextVersion.url,
               onIgnore: () => UpdateService.ignoreUpdate(nextVersion),
             ));
-  }
-
-  changeMangaSource(MangaSource value) {
-    MangaRepoPool.getInstance().changeMangaSource(value);
-    this.getMangaList();
-    loadStatus = 0;
-    setState(() {});
-  }
-
-  deleteUserData() {
-    MangaReadStorageService.clearStatus();
-//    Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
-//      return TestPage();
-//    }));
   }
 }

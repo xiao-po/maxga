@@ -4,6 +4,7 @@ import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/model/maxga/MangaReadProcess.dart';
+import 'package:maxga/route/Drawer/Drawer.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:maxga/service/MangaReadStorage.service.dart';
 
@@ -11,6 +12,10 @@ enum _LoadingState { loading, over, error, empty }
 
 class CollectionPage extends StatefulWidget {
   final String name = 'collection-page';
+
+
+  CollectionPage({Key key});
+
   @override
   State<StatefulWidget> createState() => CollectionPageState();
 }
@@ -28,6 +33,8 @@ class CollectionPageState extends State<CollectionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: widget.key,
+      drawer: MaxgaDrawer(),
       appBar: AppBar(
         title: const Text('MaxGa'),
       ),

@@ -21,7 +21,7 @@ class ReadMangaStatus extends SimpleMangaInfo {
   }
 
   ReadMangaStatus.fromJson(Map<String, dynamic> json) {
-    sourceKey = json['source'];
+    sourceKey = json['sourceKey'];
     author = json['author'].cast<String>();
     id = json['id'];
     infoUrl = json['infoUrl'];

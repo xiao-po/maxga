@@ -134,9 +134,7 @@ class _MangaViewerState extends State<MangaViewer> {
         });
       }
     } catch (e) {
-      if (e is MaxgaHttpError) {
-        print(e.message);
-      }
+      print(e.message);
       if (mounted) {
         setState(() {
           this.loadStatus = _MangaViewerLoadState.error;
