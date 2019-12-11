@@ -102,27 +102,28 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     }
     return Scaffold(
         body: MangaInfoWrapper(
-      title: widget.manga?.title ?? '',
-      appbarActions: <Widget>[
-        IconButton(
-          icon: Icon(Icons.share, color: Colors.white),
-          onPressed: () {
-            MaxgaUtils.shareUrl(readMangaStatus.infoUrl);
-          },
+          title: widget.manga?.title ?? '',
+          appbarActions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.share, color: Colors.white),
+              onPressed: () {
+                MaxgaUtils.shareUrl(readMangaStatus.infoUrl);
+              },
+            )
+          ],
+          children: [
+            MangaInfoCover(
+              manga: widget.manga,
+              loadEnd: loadOver,
+              source: source,
+              coverImageBuilder: widget.coverImageBuilder,
+            ),
+            mangaInfoIntro,
+            mangaInfoChapter ?? Container(),
+          ],
+          bottomBar: mangaInfoBottomBar ?? Container(),
         )
-      ],
-      children: [
-        MangaInfoCover(
-          manga: widget.manga,
-          loadEnd: loadOver,
-          source: source,
-          coverImageBuilder: widget.coverImageBuilder,
-        ),
-        mangaInfoIntro,
-        mangaInfoChapter ?? Container(),
-      ],
-      bottomBar: mangaInfoBottomBar ?? Container(),
-    ));
+    );
   }
 
   Row buildChapterLoading() {

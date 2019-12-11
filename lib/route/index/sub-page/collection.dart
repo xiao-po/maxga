@@ -1,11 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/components/MangaGridItem.dart';
-import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/model/maxga/MangaReadProcess.dart';
-import 'package:maxga/route/Drawer/Drawer.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:maxga/service/MangaReadStorage.service.dart';
 
@@ -31,17 +30,15 @@ class CollectionPageState extends State<CollectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: MaxgaDrawer(),
-      appBar: AppBar(
-        title: const Text('收藏'),
-      ),
-      body: buildBody(),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.refresh),
-        onPressed: () => refreshCollections(),
-      ),
-      floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
+    return CustomScrollView(
+      slivers: <Widget>[
+        SliverAppBar(
+          title: const Text('收藏'),
+          leading: IconButton(icon: Icon(Icons.menu), onPressed: () => Scaffold.of(context).openDrawer()),
+          pinned: true,
+        ),
+        buildBody()
+      ],
     );
   }
 
@@ -64,24 +61,28 @@ class CollectionPageState extends State<CollectionPage> {
   buildBody() {
     switch (loadingState) {
       case _LoadingState.loading:
-        return Container();
+        return SliverList(
+          delegate: SliverChildListDelegate(
+              []
+          ),
+        );
         break;
       case _LoadingState.over:
-        final itemWidth = MediaQuery.of(context).size.width / 3;
-        final height = 210;
-        return GridView.count(
-          crossAxisCount: 3,
-          childAspectRatio: itemWidth / height,
-          children: collectedMangaList.map((el) => Material(
-            child: InkWell(
-              onTap: () => this.startRead(el),
-              child: MangaGridItem(
-                manga: el,
-                tagPrefix: widget.name,
-                source: MangaRepoPool.getInstance().getMangaSourceByKey(el.sourceKey),
-              ))
+        final double itemWidth = 140;
+        final double height = 210;
+        return SliverGrid.extent(
+            maxCrossAxisExtent: itemWidth,
+            childAspectRatio: itemWidth / height,
+            children: collectedMangaList.map((el) => Material(
+                child: InkWell(
+                    onTap: () => this.startRead(el),
+                    child: MangaGridItem(
+                      manga: el,
+                      tagPrefix: widget.name,
+                      source: MangaRepoPool.getInstance().getMangaSourceByKey(el.sourceKey),
+                    ))
             ),
-          ).toList(growable: false),
+            ).toList(growable: false),
         );
         break;
       case _LoadingState.error:

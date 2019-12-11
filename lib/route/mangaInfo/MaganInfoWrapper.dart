@@ -24,7 +24,7 @@ class _MangaInfoWrapperState extends State<MangaInfoWrapper> {
   void initState() {
     super.initState();
 
-    scrollController.addListener(listenScrollTopForModifyBackgroundColor);
+    scrollController.addListener(() => listenScrollTopForModifyBackgroundColor());
   }
 
   @override

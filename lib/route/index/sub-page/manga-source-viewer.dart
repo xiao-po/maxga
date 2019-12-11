@@ -8,6 +8,7 @@ import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/route/Drawer/Drawer.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
+import 'package:maxga/route/index/base/IndexSliverAppBarDelegate.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:maxga/route/search/search-page.dart';
 import 'package:maxga/service/MangaReadStorage.service.dart';
@@ -22,17 +23,20 @@ class MangaSourceViewer extends StatefulWidget {
   State<StatefulWidget> createState() => MangaSourceViewerState();
 
 }
-class MangaSourceViewerState extends State<MangaSourceViewer> {
+class MangaSourceViewerState extends State<MangaSourceViewer> with SingleTickerProviderStateMixin {
 
   int loadStatus = 0;
   List<SimpleMangaInfo> mangaList;
   List<MangaSource> allMangaSource;
+
+  TabController tabController;
 
   int page = 0;
 
   @override
   void initState() {
     super.initState();
+    tabController = TabController(vsync: this, length: 2, initialIndex: 0);
     allMangaSource = MangaRepoPool.getInstance()?.allDataSource;
     this.getMangaList();
   }
@@ -40,11 +44,39 @@ class MangaSourceViewerState extends State<MangaSourceViewer> {
   @override
   Widget build(BuildContext context) {
     const indexPageBackGround = Color(0xfff5f5f5);
-    return Scaffold(
-      backgroundColor: indexPageBackGround,
-      appBar: AppBar(
-        title: const Text('MaxGa'),
-        actions: <Widget>[
+    return SafeArea(
+      child:  CustomScrollView(
+        slivers: <Widget>[
+          SliverAppBar(
+            title: const Text('MaxGa'),
+            leading: IconButton(icon: Icon(Icons.menu), onPressed: () => Scaffold.of(context).openDrawer()),
+            actions: buildAppBarActions(),
+            floating: true,
+            snap: true,
+            pinned: false,
+          ),
+          SliverPersistentHeader(
+            delegate: IndexSliverAppBarDelegate(
+              TabBar(
+                controller: tabController,
+                labelColor: Colors.black87,
+                unselectedLabelColor: Colors.grey,
+                tabs: [
+                  Tab( text: "Tab 1"),
+                  Tab( text: "Tab 2"),
+                ],
+              ),
+            ),
+            pinned: true,
+          ),
+          buildIndexBody()
+        ],
+      ),
+    );
+  }
+
+  List<Widget> buildAppBarActions() {
+    return <Widget>[
           IconButton(
             icon: Icon(
               Icons.search,
@@ -68,43 +100,44 @@ class MangaSourceViewerState extends State<MangaSourceViewer> {
                 .toList(),
             onSelected: (value) => changeMangaSource(value),
           )
-        ],
-      ),
-      drawer: MaxgaDrawer(),
-      body: buildIndexBody(),
-    );
+        ];
   }
 
   buildIndexBody() {
     if (loadStatus == 0) {
-      return SkeletonCardList();
+      return SkeletonCardSliverList();
     } else if (loadStatus == 1) {
-      final Color grayFontColor = Color(0xff9e9e9e);
-      return ListView.builder(
-          itemCount: mangaList.length,
-          itemBuilder: (context, index) {
-            MangaSource source = MangaRepoPool.getInstance().getMangaSourceByKey(mangaList[index].sourceKey);
-            return MangaCard(
-              title: Text(mangaList[index].title),
-              extra: MangaInfoCardExtra(
-                  manga: mangaList[index],
-                  textColor: grayFontColor,
-                  source: source
-              ),
-              cover: MangaCoverImage(
-                source: source,
-                url: mangaList[index].coverImgUrl,
-                tagPrefix: widget.name,
-              ),
-              onTap: () => this.goMangaInfoPage(mangaList[index]),
-            );
-          });
+      return SliverList(
+        delegate: SliverChildBuilderDelegate(
+            (context, index) => buildMangaCard(index),
+          childCount: mangaList.length,
+        ),
+      );
     } else if (loadStatus == -1) {
       return ErrorPage(
         '加载失败了呢~~~，\n我们点击之后继续吧',
         onTap: this.getMangaList,
       );
     }
+  }
+
+  MangaCard buildMangaCard(int index) {
+    final Color grayFontColor = Color(0xff9e9e9e);
+    MangaSource source = MangaRepoPool.getInstance().getMangaSourceByKey(mangaList[index].sourceKey);
+    return MangaCard(
+      title: Text(mangaList[index].title),
+      extra: MangaInfoCardExtra(
+          manga: mangaList[index],
+          textColor: grayFontColor,
+          source: source
+      ),
+      cover: MangaCoverImage(
+        source: source,
+        url: mangaList[index].coverImgUrl,
+        tagPrefix: widget.name,
+      ),
+      onTap: () => this.goMangaInfoPage(mangaList[index]),
+    );
   }
 
   Center buildProcessIndicator() {

@@ -10,6 +10,7 @@ import 'package:maxga/components/dialog.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/model/maxga/MaxgaReleaseInfo.dart';
+import 'package:maxga/route/Drawer/Drawer.dart';
 import 'package:maxga/route/index/sub-page/collection.dart';
 import 'package:maxga/route/index/sub-page/manga-source-viewer.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
@@ -44,6 +45,7 @@ class _IndexPageState extends State<IndexPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       child: Scaffold(
+        drawer: MaxgaDrawer(),
         key: scaffoldKey,
         body: buildIndexPage(),
       ),
