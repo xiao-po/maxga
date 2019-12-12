@@ -16,12 +16,14 @@ class MangaRepoPool {
 
   List<MaxgaDataHttpRepo> get allDataRepo => _getAllRepo();
   List<MangaSource> get allDataSource => _getAllSource();
+  MangaSource get currentSource => _currentSource;
   MaxgaDataHttpRepo get currentDataRepo => _map[_currentSource.key];
   
   
 
   static MangaRepoPool _application = MangaRepoPool();
   static MangaRepoPool getInstance() => MangaRepoPool._application;
+
   
   
 

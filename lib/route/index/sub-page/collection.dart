@@ -30,15 +30,18 @@ class CollectionPageState extends State<CollectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: <Widget>[
-        SliverAppBar(
-          title: const Text('收藏'),
-          leading: IconButton(icon: Icon(Icons.menu), onPressed: () => Scaffold.of(context).openDrawer()),
-          pinned: true,
-        ),
-        buildBody()
-      ],
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: CustomScrollView(
+        slivers: <Widget>[
+          SliverAppBar(
+            title: const Text('收藏'),
+            leading: IconButton(icon: Icon(Icons.menu), onPressed: () => Scaffold.of(context).openDrawer()),
+            pinned: true,
+          ),
+          buildBody()
+        ],
+      ),
     );
   }
 

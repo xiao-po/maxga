@@ -45,6 +45,7 @@ class _IndexPageState extends State<IndexPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       child: Scaffold(
+        backgroundColor: Theme.of(context).primaryColor,
         drawer: MaxgaDrawer(),
         key: scaffoldKey,
         body: buildIndexPage(),
