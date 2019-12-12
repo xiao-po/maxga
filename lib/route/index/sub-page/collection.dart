@@ -5,6 +5,7 @@ import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/components/MangaGridItem.dart';
 import 'package:maxga/model/maxga/MangaReadProcess.dart';
+import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:maxga/service/MangaReadStorage.service.dart';
 
@@ -66,7 +67,7 @@ class CollectionPageState extends State<CollectionPage> {
       case _LoadingState.loading:
         return SliverList(
           delegate: SliverChildListDelegate(
-              []
+              [Container()]
           ),
         );
         break;
@@ -91,7 +92,7 @@ class CollectionPageState extends State<CollectionPage> {
       case _LoadingState.error:
         break;
       case _LoadingState.empty:
-        break;
+        return ErrorPage('您没有收藏的漫画');
     }
   }
 

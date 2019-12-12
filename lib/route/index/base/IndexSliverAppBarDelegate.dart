@@ -13,8 +13,9 @@ class IndexSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return new Container(
+    return Material(
       color: Theme.of(context).scaffoldBackgroundColor,
+      elevation: 2,
       child: _tabBar,
     );
   }
