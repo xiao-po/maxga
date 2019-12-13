@@ -14,7 +14,6 @@ enum _LoadingState { loading, over, error, empty }
 class CollectionPage extends StatefulWidget {
   final String name = 'collection-page';
 
-
   @override
   State<StatefulWidget> createState() => CollectionPageState();
 }
@@ -32,18 +31,21 @@ class CollectionPageState extends State<CollectionPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      child: CustomScrollView(
-        slivers: <Widget>[
-          SliverAppBar(
-            title: const Text('收藏'),
-            leading: IconButton(icon: Icon(Icons.menu), onPressed: () => Scaffold.of(context).openDrawer()),
-            pinned: true,
-          ),
-          buildBody()
-        ],
-      ),
-    );
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            AppBar(
+              title: const Text('收藏'),
+              leading: IconButton(
+                  icon: Icon(Icons.menu),
+                  onPressed: () => Scaffold.of(context).openDrawer()),
+            ),
+            Expanded(
+              child: buildBody(),
+            )
+          ],
+        ));
   }
 
   void init() async {
@@ -65,32 +67,33 @@ class CollectionPageState extends State<CollectionPage> {
   buildBody() {
     switch (loadingState) {
       case _LoadingState.loading:
-        return SliverList(
-          delegate: SliverChildListDelegate(
-              [Container()]
-          ),
-        );
+        return Container();
         break;
       case _LoadingState.over:
         final double itemWidth = 140;
         final double height = 210;
-        return SliverGrid.extent(
-            maxCrossAxisExtent: itemWidth,
-            childAspectRatio: itemWidth / height,
-            children: collectedMangaList.map((el) => Material(
-                child: InkWell(
-                    onTap: () => this.startRead(el),
-                    child: MangaGridItem(
-                      manga: el,
-                      tagPrefix: widget.name,
-                      source: MangaRepoPool.getInstance().getMangaSourceByKey(el.sourceKey),
-                    ))
-            ),
-            ).toList(growable: false),
-        );
+        return MediaQuery.removePadding(
+            context: context,
+            removeTop: true,
+            child: GridView.extent(
+              maxCrossAxisExtent: itemWidth,
+              childAspectRatio: itemWidth / height,
+              children: collectedMangaList
+                  .map(
+                    (el) => Material(
+                        child: InkWell(
+                            onTap: () => this.startRead(el),
+                            child: MangaGridItem(
+                              manga: el,
+                              tagPrefix: widget.name,
+                              source: MangaRepoPool.getInstance()
+                                  .getMangaSourceByKey(el.sourceKey),
+                            ))),
+                  )
+                  .toList(growable: false),
+            ));
         break;
       case _LoadingState.error:
-        break;
       case _LoadingState.empty:
         return ErrorPage('您没有收藏的漫画');
     }
@@ -98,22 +101,17 @@ class CollectionPageState extends State<CollectionPage> {
 
   startRead(ReadMangaStatus item) {
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
-
       return MangaInfoPage(
           coverImageBuilder: (context) => MangaCoverImage(
-            source:  MangaRepoPool.getInstance().getMangaSourceByKey(item.sourceKey),
-            url: item.coverImgUrl,
-            tagPrefix: widget.name,
-            fit: BoxFit.cover,
-          ),
+                source: MangaRepoPool.getInstance()
+                    .getMangaSourceByKey(item.sourceKey),
+                url: item.coverImgUrl,
+                tagPrefix: widget.name,
+                fit: BoxFit.cover,
+              ),
           manga: item);
     }));
   }
 
-
-  refreshCollections() {
-
-  }
-
+  refreshCollections() {}
 }
-

@@ -44,6 +44,7 @@ class MangaCard extends StatelessWidget {
     Widget body = Container(
       height: cardHeight,
       padding: cardPadding,
+      decoration: BoxDecoration(),
       child: Row(
         children: <Widget>[
           Center(

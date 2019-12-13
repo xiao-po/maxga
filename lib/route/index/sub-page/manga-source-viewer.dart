@@ -1,20 +1,16 @@
-
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/components/Card.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
-import 'package:maxga/provider/base/BaseProvider.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/index/base/IndexSliverAppBarDelegate.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:maxga/route/mangaViewer/baseComponent/MangaPageView.dart';
 import 'package:maxga/route/search/search-page.dart';
 import 'package:maxga/service/MangaReadStorage.service.dart';
-import 'package:provider/provider.dart';
 
 import '../../../MangaRepoPool.dart';
 
@@ -25,8 +21,7 @@ enum _SourceViewType {
 
 enum _MangaSourceViewerPageLoadState {
   init,
-  loading,
-  over,
+  initOver,
   initError
 }
 
@@ -35,7 +30,7 @@ class MangaSourceViewerPage {
   String title;
   _SourceViewType type;
   ScrollController controller = ScrollController();
-  List<SimpleMangaInfo> mangaList;
+  List<SimpleMangaInfo> mangaList = [];
   int page = 0;
   _MangaSourceViewerPageLoadState loadState = _MangaSourceViewerPageLoadState.init;
   MangaSourceViewerPage(this.title, this.type, this.source);
@@ -57,7 +52,6 @@ class MangaSourceViewerState extends State<MangaSourceViewer> with SingleTickerP
   TabController tabController;
   ScrollController scrollController = ScrollController();
   bool isPageCanChanged = true;
-  final source = MangaRepoPool.getInstance().currentSource;
 
   PageController pageController = PageController(initialPage: 0);
   List<MangaSourceViewerPage> tabs;
@@ -67,10 +61,13 @@ class MangaSourceViewerState extends State<MangaSourceViewer> with SingleTickerP
   @override
   void initState() {
     super.initState();
+    final source = MangaRepoPool.getInstance().currentSource;
     tabs = [
       MangaSourceViewerPage('最近更新', _SourceViewType.latestUpdate, source),
-      MangaSourceViewerPage('排名', _SourceViewType.latestUpdate, source),
-    ]..forEach((state) => this.getMangaList(state));
+      MangaSourceViewerPage('排名', _SourceViewType.rank, source),
+    ]..forEach((state) {
+      this.getMangaList(state);
+    });
 
     tabController = TabController(vsync: this, length: 2, initialIndex: 0);
     tabController.addListener(() {
@@ -155,15 +152,24 @@ class MangaSourceViewerState extends State<MangaSourceViewer> with SingleTickerP
   buildIndexBody(MangaSourceViewerPage state) {
     switch(state.loadState) {
       case _MangaSourceViewerPageLoadState.init:
-      case _MangaSourceViewerPageLoadState.loading:
         return Container();
         break;
-      case _MangaSourceViewerPageLoadState.over:
+      case _MangaSourceViewerPageLoadState.initOver:
         return ListView.builder(
           controller: state.controller,
-            dragStartBehavior: DragStartBehavior.start,
-          itemBuilder:   (context, index) => buildMangaCard(state.mangaList[index], tagPrefix: state.title),
-          itemCount: state.mangaList.length,
+          itemBuilder: (context, index) {
+            if (index == state.mangaList.length) {
+              this.getMangaList(state);
+              return buildProcessIndicator();
+            } else {
+              if (state.type == _SourceViewType.latestUpdate) {
+                return buildMangaCard(state.mangaList[index], tagPrefix: state.title);
+              } else {
+                return buildMangaCard(state.mangaList[index], tagPrefix: state.title, rank: index + 1);
+              }
+            }
+          },
+          itemCount: state.mangaList.length + 1,
         );
         break;
       case _MangaSourceViewerPageLoadState.initError:
@@ -174,9 +180,17 @@ class MangaSourceViewerState extends State<MangaSourceViewer> with SingleTickerP
     }
   }
 
-  MangaCard buildMangaCard(SimpleMangaInfo mangaInfo, {String tagPrefix}) {
+  MangaCard buildMangaCard(SimpleMangaInfo mangaInfo, {String tagPrefix, int rank}) {
     final Color grayFontColor = Color(0xff9e9e9e);
     MangaSource source = MangaRepoPool.getInstance().getMangaSourceByKey(mangaInfo.sourceKey);
+    Widget mangaCoverImage = MangaCoverImage(
+        source: source,
+        url: mangaInfo.coverImgUrl,
+        tagPrefix: '$tagPrefix${widget.name}',
+      );
+    if (rank != null) {
+      mangaCoverImage = RankedCoverImage(mangaCoverImage, rank);
+    }
     return MangaCard(
       title: Text(mangaInfo.title),
       extra: MangaInfoCardExtra(
@@ -184,12 +198,36 @@ class MangaSourceViewerState extends State<MangaSourceViewer> with SingleTickerP
           textColor: grayFontColor,
           source: source
       ),
-      cover: MangaCoverImage(
-        source: source,
-        url: mangaInfo.coverImgUrl,
-        tagPrefix: '$tagPrefix${widget.name}',
-      ),
+      cover: mangaCoverImage,
       onTap: () => this.goMangaInfoPage(mangaInfo, tagPrefix: tagPrefix),
+    );
+  }
+
+  Stack RankedCoverImage(MangaCoverImage mangaCoverImage, int rank) {
+    Color rankColor;
+    switch(rank) {
+      case 1: rankColor = Colors.redAccent;break;
+      case 2: rankColor = Colors.orangeAccent;break;
+      case 3: rankColor = Colors.amberAccent; break;
+      default: rankColor = Colors.blueGrey;
+    }
+    return Stack(
+      children: <Widget>[
+        mangaCoverImage,
+
+        Positioned(
+          top: -5,
+          left: -3,
+          child: Icon(Icons.bookmark,size: 35,color: rankColor),
+        ),
+        Padding(
+          padding: EdgeInsets.only(left: 3, top: 4),
+          child: SizedBox(
+            width: 22,
+            child: Text('$rank', style: TextStyle(color: Colors.white,fontSize: 12),textAlign:  TextAlign.center,),
+          ),
+        )
+      ],
     );
   }
 
@@ -203,29 +241,34 @@ class MangaSourceViewerState extends State<MangaSourceViewer> with SingleTickerP
     }
   }
 
-  refreshPage(MangaSourceViewerPage state) {}
+  refreshPage(MangaSourceViewerPage state) {
+    state.mangaList = [];
+    state.page = 0;
+    return this.getMangaList(state);
+  }
 
   void getMangaList(MangaSourceViewerPage state) async {
-    setState(() {
-      state.loadState = _MangaSourceViewerPageLoadState.loading;
-    });
     try {
-      MaxgaDataHttpRepo repo = MangaRepoPool.getInstance().currentDataRepo;
-      state.mangaList = await repo.getLatestUpdate(state.page++);
-      state.loadState = _MangaSourceViewerPageLoadState.over;
+      MaxgaDataHttpRepo repo = MangaRepoPool.getInstance().getRepo(key: state.source.key);
+      state.mangaList.addAll(await repo.getLatestUpdate(state.page++));
+      state.loadState = _MangaSourceViewerPageLoadState.initOver;
     } catch (e) {
+      print(e);
       state.loadState = _MangaSourceViewerPageLoadState.initError;
     } finally {
       setState(() {});
     }
   }
 
-  Center buildProcessIndicator() {
-    return Center(
-      child: SizedBox(
-        width: 50,
-        height: 50,
-        child: CircularProgressIndicator(),
+  Widget buildProcessIndicator() {
+    return Padding(
+      padding: EdgeInsets.only(top:10, bottom: 10),
+      child: Center(
+        child: SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(strokeWidth: 2)
+        ),
       ),
     );
   }
@@ -254,7 +297,12 @@ class MangaSourceViewerState extends State<MangaSourceViewer> with SingleTickerP
 
 
   changeMangaSource(MangaSource value) {
-    MangaRepoPool.getInstance().changeMangaSource(value);
+    tabs = [
+      MangaSourceViewerPage('最近更新', _SourceViewType.latestUpdate, value),
+      MangaSourceViewerPage('排名', _SourceViewType.rank, value),
+    ]..forEach((state) {
+      this.getMangaList(state);
+    });
     // TODO 更新漫画源
     if(mounted) {
       setState(() {});
