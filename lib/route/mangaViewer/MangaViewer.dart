@@ -162,6 +162,10 @@ class _MangaViewerState extends State<MangaViewer> {
     switch (loadStatus) {
       case _MangaViewerLoadState.loadingMangaData:
         {
+          appbar = AppBar(
+            backgroundColor: Colors.transparent,
+            leading: BackButton(color: Colors.white,),
+          );
           body = buildLoadingPage();
           break;
         }
@@ -425,6 +429,7 @@ class _MangaViewerState extends State<MangaViewer> {
             loadOver: loadStatus == _MangaViewerLoadState.over,
           ));
     }
+    return Future.value(true);
   }
 
   Widget buildCheckNetStatePage() {

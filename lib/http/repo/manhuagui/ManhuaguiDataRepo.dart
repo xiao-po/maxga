@@ -26,7 +26,7 @@ class ManhuaguiDataRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<List<SimpleMangaInfo>> getLatestUpdate(int page) async {
-    final response = await http.get('${_source.domain}update/?page=$page&ajax=1&order=1');
+    final response = await http.get('${_source.domain}update/?page=${page + 1}&ajax=1&order=1');
     return parser.getSimpleMangaInfoListFromUpdatePage(response.body)..forEach((manga) {
       manga.infoUrl = '${_source.domain}${manga.infoUrl.substring(1)}';
       manga.sourceKey = _source.key;
@@ -49,7 +49,6 @@ class ManhuaguiDataRepo extends MaxgaDataHttpRepo {
   @override
   Future<List<SimpleMangaInfo>> getSearchManga(String keywords) async {
     final response = await http.get('https://m.manhuagui.com/s/$keywords.html');
-
     return parser.getSimpleMangaInfoFromSearch(response.body)..forEach((manga) {
       manga.infoUrl = '${_source.domain}${manga.infoUrl.substring(1)}';
       manga.sourceKey = _source.key;
@@ -66,9 +65,12 @@ class ManhuaguiDataRepo extends MaxgaDataHttpRepo {
   MangaSource get mangaSource => _source;
 
   @override
-  Future<List<SimpleMangaInfo>> getRankedManga(int page) {
-    // TODO: implement getRankedManga
-    return null;
+  Future<List<SimpleMangaInfo>> getRankedManga(int page) async {
+    final response = await http.get('${_source.domain}rank/?page=${page + 1}&ajax=1&order=1');
+    return parser.getSimpleMangaInfoListFromUpdatePage(response.body)..forEach((manga) {
+      manga.infoUrl = '${_source.domain}${manga.infoUrl.substring(1)}';
+      manga.sourceKey = _source.key;
+    });
   }
 
 }

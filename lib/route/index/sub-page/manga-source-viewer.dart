@@ -21,7 +21,7 @@ enum _SourceViewType {
   rank,
 }
 
-enum _MangaSourceViewerPageLoadState { loading, over, error }
+enum _MangaSourceViewerPageLoadState { none,loading, over, error }
 
 class MangaSourceViewerPage {
   final MangaSource source;
@@ -32,7 +32,7 @@ class MangaSourceViewerPage {
   bool isLast = false;
   int page = 0;
   _MangaSourceViewerPageLoadState loadState =
-      _MangaSourceViewerPageLoadState.loading;
+      _MangaSourceViewerPageLoadState.none;
 
   MangaSourceViewerPage(this.title, this.type, this.source);
 
@@ -71,6 +71,8 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
   PageController pageController = PageController(initialPage: 0);
   List<MangaSourceViewerPage> tabs;
   List<MangaSource> allMangaSource;
+
+  String sourceName;
 
   @override
   void initState() {
@@ -114,7 +116,7 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
     var page = NestedScrollView(
       headerSliverBuilder: (context, isScrolled) => [
         SliverAppBar(
-          title: const Text('MaxGa'),
+          title: Text(sourceName),
           leading: IconButton(
               icon: Icon(Icons.menu),
               onPressed: () => Scaffold.of(context).openDrawer()),
@@ -127,10 +129,9 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
               controller: tabController,
               labelColor: Colors.black87,
               unselectedLabelColor: Colors.grey,
-              tabs: [
-                Tab(text: "最近更新"),
-                Tab(text: "排名"),
-              ],
+              tabs: tabs.map((item) => Tab(
+                text: item.title,
+              )).toList(growable: false),
             ),
           ),
           pinned: true,
@@ -159,13 +160,7 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
 
   List<Widget> buildAppBarActions() {
     return <Widget>[
-      IconButton(
-        icon: Icon(
-          Icons.search,
-          color: Colors.white,
-        ),
-        onPressed: this.toSearch,
-      ),
+      MaxgaSearchButton(),
       IconButton(
         icon: Icon(
           Icons.delete,
@@ -188,6 +183,7 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
   buildIndexBody(MangaSourceViewerPage state) {
     if (!state.initOver) {
       switch (state.loadState) {
+        case _MangaSourceViewerPageLoadState.none:
         case _MangaSourceViewerPageLoadState.loading:
           return Align(
               child: SizedBox(
@@ -216,7 +212,7 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
       controller: state.controller,
       itemBuilder: (context, index) {
         if (index == state.mangaList.length) {
-          this.getMangaList(state);
+          Future.microtask(() => this.getMangaList(state));
           return buildProcessIndicator();
         } else {
           if (state.type == _SourceViewType.latestUpdate) {
@@ -314,10 +310,13 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
   }
 
   Future<void> getMangaList(MangaSourceViewerPage state) async {
+    if (state.loadState == _MangaSourceViewerPageLoadState.loading) {
+      return null;
+    }
     try {
-      setState(() {
-        state.loadState = _MangaSourceViewerPageLoadState.loading;
-      });
+      sourceName = state.source.name;
+      state.loadState = _MangaSourceViewerPageLoadState.loading;
+      setState(() {});
       final mangaList = await state.getMangaList(state.page++);
       if (mangaList.length == 0) {
         state.isLast = true;
@@ -345,9 +344,7 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
   }
 
   toSearch() {
-    Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
-      return SearchPage();
-    }));
+
   }
 
   goMangaInfoPage(SimpleMangaInfo item, {String tagPrefix}) {
@@ -370,5 +367,29 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
 //    Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
 //      return TestPage();
 //    }));
+  }
+}
+
+class MaxgaSearchButton extends StatelessWidget {
+  final Color color;
+
+  const MaxgaSearchButton({
+    Key key, this.color = Colors.white,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: Icon(
+        Icons.search,
+        color: color,
+
+      ),
+      onPressed: ()  {
+        Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
+          return SearchPage();
+        }));
+      },
+    );
   }
 }

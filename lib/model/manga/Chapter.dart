@@ -26,7 +26,7 @@ class Chapter {
     updateTime = json['updateTime'];
     comicId = json['comicId'];
     url = json['url'];
-    imgUrlList = json['imgUrlList'];
+    imgUrlList = json['imgUrlList']?.cast<String>() ?? [];
   }
 
   Map<String, dynamic> toJson()=>
