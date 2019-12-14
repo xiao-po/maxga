@@ -8,3 +8,6 @@ class MaxgaHttpError extends Error {
 }
 
 
+class MaxgaHttpNullParamError extends MaxgaHttpError {
+  MaxgaHttpNullParamError(MangaSource source): super('参数错误，不允许为空值', source);
+}

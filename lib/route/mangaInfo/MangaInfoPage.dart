@@ -113,7 +113,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
           ],
           children: [
             MangaInfoCover(
-              manga: widget.manga,
+              manga: readMangaStatus,
               loadEnd: loadOver,
               source: source,
               coverImageBuilder: widget.coverImageBuilder,
@@ -167,7 +167,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
       introduce = manga.introduce;
 
       readMangaStatus =
-          await MangaReadStorageService.getMangaStatus(widget.manga);
+          await MangaReadStorageService.getMangaStatus(manga);
       await Future.delayed(Duration(milliseconds: 500));
       loading = _MangaInfoPageStatus.over;
     } catch (e) {

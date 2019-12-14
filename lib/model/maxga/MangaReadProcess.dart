@@ -7,7 +7,7 @@ class ReadMangaStatus extends SimpleMangaInfo {
   int readImageIndex;
   bool collected = false;
 
-  ReadMangaStatus.fromSimpleMangaInfo(SimpleMangaInfo manga) {
+  ReadMangaStatus.fromSimpleMangaInfo(Manga manga) {
     sourceKey = manga.sourceKey;
     author = manga.author;
     id = manga.id;
@@ -16,8 +16,10 @@ class ReadMangaStatus extends SimpleMangaInfo {
     coverImgUrl = manga.coverImgUrl;
     title = manga.title;
     introduce = manga.introduce;
-    typeList = manga.typeList.cast<String>();
-    lastUpdateChapter = manga.lastUpdateChapter;
+    typeList = manga?.typeList?.cast<String>() ?? [];
+    final tempChapterList = manga.chapterList.toList(growable: false);
+    tempChapterList.sort((a, b) => a.order - b.order);
+    lastUpdateChapter = tempChapterList.first;
   }
 
   ReadMangaStatus.fromJson(Map<String, dynamic> json) {

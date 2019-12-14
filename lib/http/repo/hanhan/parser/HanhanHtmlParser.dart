@@ -1,4 +1,4 @@
-import 'package:html/parser.dart' show parse;
+import 'package:html/parser.dart' show parse, parseFragment;
 import 'package:html/dom.dart';
 import 'package:maxga/Utils/DateUtils.dart';
 import 'package:maxga/http/repo/hanhan/crypto/HanhanCrypto.dart';
@@ -16,6 +16,14 @@ class HanhanHtmlParser {
   }
 
   List<SimpleMangaInfo> getMangaListFromLatestUpdate(String html) {
+    var document = parse(html);
+    return document
+        .querySelectorAll('.section1')
+        .map((el) => _parseMangaList(el))
+        .toList(growable: false);
+  }
+
+  List<SimpleMangaInfo> getMangaListFromRank(String html) {
     var document = parse(html);
     return document
         .querySelectorAll('.section1')
@@ -81,19 +89,21 @@ class HanhanHtmlParser {
     manga.introduce = intro;
     return manga;
   }
+
   List<String> getChapterImageList(String body, List<String> imageServerList) {
     final document = parse(body);
     final imageEncryptStringEl = document.head.querySelectorAll('script')[2];
     final imageEncryptStringElText = imageEncryptStringEl.text;
     final encryptString = imageEncryptStringElText.substring(
         imageEncryptStringElText.indexOf('sFiles="') + 'sFiles="'.length,
-        imageEncryptStringElText.indexOf('";var sPath')
-    );
+        imageEncryptStringElText.indexOf('";var sPath'));
     final sPath = imageEncryptStringElText.substring(
         imageEncryptStringElText.indexOf('sPath="') + 'sPath="'.length,
-        imageEncryptStringElText.lastIndexOf('";')
-    );
-    return  HanhanCrypto.decryptImageList(encryptString).map((url) => '${imageServerList[int.parse(sPath) - 1]}${url.substring(1)}').toList(growable: false);
+        imageEncryptStringElText.lastIndexOf('";'));
+    return HanhanCrypto.decryptImageList(encryptString)
+        .map((url) =>
+            '${imageServerList[int.parse(sPath) - 1]}${url.substring(1)}')
+        .toList(growable: false);
   }
 
   static SimpleMangaInfo _parseMangaList(Element el) {
@@ -104,12 +114,24 @@ class HanhanHtmlParser {
     final mangaId = infoUrl.substring(infoUrl.lastIndexOf('/') + 3);
     final coverImageUrl = infoEl.querySelector('img').attributes['src'];
     final mangaInfoEl = infoEl.querySelector('.con');
-    final title = mangaInfoEl.children[0].innerHtml;
-    final List<String> authors = mangaInfoEl.children[1].innerHtml.split(' ');
-    final List<String> type = [mangaInfoEl.children[2].innerHtml];
-    final time = DateUtils.convertTimeStringToTimestamp(
-        mangaInfoEl.children[4].text, 'yyyy-MM-dd hh:mm');
-    final lastChapterTitle = el.querySelector('.tool').children[1].innerHtml;
+    String title;
+    List<String> authors;
+    List<String> type;
+    int time;
+    String lastChapterTitle;
+    if (mangaInfoEl.children.length > 2) {
+      title = mangaInfoEl.children[0].innerHtml;
+      authors = mangaInfoEl.children[1].innerHtml.split(' ');
+      type = [mangaInfoEl.children[2].innerHtml];
+      time = DateUtils.convertTimeStringToTimestamp(
+          mangaInfoEl.children[4].text, 'yyyy-MM-dd hh:mm');
+      lastChapterTitle = el.querySelector('.tool').children[1].innerHtml;
+    } else {
+      var temp = mangaInfoEl.children[0].innerHtml;
+      title = mangaInfoEl.children[0].innerHtml.substring(
+          temp.lastIndexOf('nbsp;') + 5
+      );
+    }
 
     final lastChapter = Chapter();
     lastChapter.title = lastChapterTitle;
@@ -127,13 +149,10 @@ class HanhanHtmlParser {
     return manga;
   }
 
-
-  static String _replaceDomain(String url ) {
+  static String _replaceDomain(String url) {
     final domainReg = RegExp(
         'ddmm\.cc|hhssaa.com|hhaass\.com|hhaazz\.com|hhzzee\.com|bbssoo\.com|aaooss\.com');
-    final infoUrl = url
-      .replaceFirst(domainReg, 'hanhan.xiaopo.moe');
+    final infoUrl = url.replaceFirst(domainReg, 'hanhan.xiaopo.moe');
     return infoUrl;
   }
-
 }

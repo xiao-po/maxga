@@ -70,6 +70,16 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
   @override
   MangaSource get mangaSource => _source;
 
+  @override
+  Future<List<SimpleMangaInfo>> getRankedManga(int page) async {
+    if (page >= 1) {
+      return [];
+    }
+    final response = await http.get('https://m.manhuadui.com/rank/click/');
+    final List<SimpleMangaInfo> mangaList = parser.getMangaListFromRank(response.body)..forEach((el) => el.sourceKey = _source.key);
+    return mangaList;
+  }
+
 
 
 

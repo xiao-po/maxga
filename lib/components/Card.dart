@@ -185,7 +185,7 @@ class MangaInfoCardExtra extends StatelessWidget {
           alignment: Alignment.centerRight,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
-            children: [manga.lastUpdateChapter.title, updateTime]
+            children: [manga.lastUpdateChapter.title ?? '', updateTime]
                 .map((el) => Text(el,
                     textAlign: TextAlign.right,
                     overflow: TextOverflow.ellipsis,

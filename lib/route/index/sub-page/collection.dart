@@ -81,6 +81,7 @@ class CollectionPageState extends State<CollectionPage> {
               children: collectedMangaList
                   .map(
                     (el) => Material(
+                        color: Colors.transparent,
                         child: InkWell(
                             onTap: () => this.startRead(el),
                             child: MangaGridItem(

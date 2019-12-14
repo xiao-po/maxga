@@ -65,4 +65,10 @@ class ManhuaguiDataRepo extends MaxgaDataHttpRepo {
   @override
   MangaSource get mangaSource => _source;
 
+  @override
+  Future<List<SimpleMangaInfo>> getRankedManga(int page) {
+    // TODO: implement getRankedManga
+    return null;
+  }
+
 }

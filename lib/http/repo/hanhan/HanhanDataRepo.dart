@@ -1,3 +1,4 @@
+import 'package:maxga/base/error/MaxgaHttpError.dart';
 import 'package:maxga/model/manga/Manga.dart';
 
 import 'package:maxga/model/manga/MangaSource.dart';
@@ -11,7 +12,8 @@ const HanhanHttpHeader = {
   'accept':
       'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
   'user-agent':
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36'
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36',
+  'cookies': 'ASP.NET_SessionId=twmkry55pznarv55tgzhzq45; ViewCtTxt=36219*370057*%u5723%u5251%u9171%u4E0D%u80FD%u8131*%u5723%u5251%u9171%u4E0D%u80FD%u8131%20039%u96C6*%5E36219*367967*%u5723%u5251%u9171%u4E0D%u80FD%u8131*%u5723%u5251%u9171%u4E0D%u80FD%u8131%20037%u96C6*%5E36219*369087*%u5723%u5251%u9171%u4E0D%u80FD%u8131*%u5723%u5251%u9171%u4E0D%u80FD%u8131%20038%u96C6*'
 };
 
 class HanhanDateRepo extends MaxgaDataHttpRepo {
@@ -41,36 +43,52 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<List<SimpleMangaInfo>> getLatestUpdate([int page = 1]) async {
-    final response = await http.get(
-      '${_source.domain}/dfcomiclist_$page.htm',
-      headers: HanhanHttpHeader,
-    );
-    final list = parser.getMangaListFromLatestUpdate(response.body)
-      ..forEach((manga) {
-        manga.sourceKey = _source.key;
-      });
-    return list;
+    var retryTimes = 3;
+    while(retryTimes > 0) {
+      try {
+        final response = await http.get(
+          '${_source.domain}/dfcomiclist_${page + 1}.htm',
+          headers: HanhanHttpHeader,
+        );
+        final list = parser.getMangaListFromLatestUpdate(response.body)
+          ..forEach((manga) {
+            manga.sourceKey = _source.key;
+          });
+        return list;
+      } catch(e) {
+        retryTimes--;
+      }
+    }
+    throw MaxgaHttpError('', _source);
   }
 
   @override
   Future<Manga> getMangaInfo({int id, String url}) async {
-    var response;
-    if (id != null) {
-      response = await http.get(
-        '${_source.domain}/comic/18$id/',
-        headers: HanhanHttpHeader,
-      );
-    } else if (url != null) {
-      response = await http.get(
-        url,
-        headers: HanhanHttpHeader,
-      );
-    } else {
-      throw Error();
+    var retryTimes = 3;
+    while(retryTimes > 0) {
+      try {
+        var response;
+        if (id != null) {
+          response = await http.get(
+            '${_source.domain}/comic/18$id/',
+            headers: HanhanHttpHeader,
+          );
+        } else if (url != null) {
+          response = await http.get(
+            url,
+            headers: HanhanHttpHeader,
+          );
+        } else {
+          throw MaxgaHttpNullParamError(_source);
+        }
+        final manga = parser.getMangaFromInfoPate(response.body);
+        manga.sourceKey = _source.key;
+        return manga;
+      } catch(e) {
+
+        retryTimes--;
+      }
     }
-    final manga = parser.getMangaFromInfoPate(response.body);
-    manga.sourceKey = _source.key;
-    return manga;
   }
 
   @override
@@ -81,6 +99,19 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
     );
     final mangaList = parser.getMangaListFromLatestUpdate(response.body);
     mangaList.forEach((manga) => manga.sourceKey = _source.key);
+    return mangaList;
+  }
+
+
+  @override
+  Future<List<SimpleMangaInfo>> getRankedManga(int page) async {
+    var response = await http.get(
+      '${_source.domain}/top/a-${page + 1}.htm',
+      headers: HanhanHttpHeader,
+    );
+    final mangaList = parser.getMangaListFromRank(response.body);
+    mangaList.forEach((manga) => manga.sourceKey = _source.key);
+
     return mangaList;
   }
 
@@ -101,4 +132,5 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
             dsBody.indexOf('";'))
         .split('|');
   }
+
 }

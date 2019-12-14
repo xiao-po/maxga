@@ -5,6 +5,7 @@ import 'package:http/http.dart';
 import 'package:maxga/base/error/MaxgaHttpError.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/http/repo/dmzj/model/DmzjMangaInfo.dart';
+import 'package:maxga/http/repo/dmzj/model/DmzjRankedMangaInfo.dart';
 import 'package:maxga/model/manga/Chapter.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:http/http.dart' as http;
@@ -78,12 +79,38 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
 
 
   @override
+  Future<List<SimpleMangaInfo>> getRankedManga(int page) async {
+    final response = await http.get('${_source.domain}/rank/0/0/0/$page.json');
+    return (json.decode(response.body) as List<dynamic>).map((item) => DmzjRankedMangaInfo.fromJson(item)).map((item) => _convertDataFromRankedManga(item)).toList(growable: false);
+  }
+
+
+  @override
   Future<List<SimpleMangaInfo>> getSearchManga(String keywords) async {
     final response = await http.get('${_source.domain}/search/show/0/$keywords/0.json');
     final responseData = (json.decode(response.body) as List<dynamic>);
     return responseData.map((item) => _convertDataFromSearch(item)).toList();
   }
 
+  SimpleMangaInfo _convertDataFromRankedManga(DmzjRankedMangaInfo rankedMangaInfo) {
+
+    final SimpleMangaInfo manga = SimpleMangaInfo();
+
+    final Chapter latestChapter = Chapter();
+    latestChapter.title = rankedMangaInfo.lastUpdateChapterName;
+    latestChapter.updateTime = int.parse(rankedMangaInfo.lastUpdatetime) * 1000;
+
+    manga.id = int.parse(rankedMangaInfo.comicId);
+    manga.title  = rankedMangaInfo.title;
+    manga.sourceKey = _source.key;
+    manga.typeList = rankedMangaInfo.types.split('/');
+    manga.author = rankedMangaInfo.authors.split('/');
+    manga.status = rankedMangaInfo.status;
+    manga.coverImgUrl = rankedMangaInfo.cover;
+    manga.infoUrl = 'http://v3api.dmzj.com/comic/comic_${rankedMangaInfo.comicId}.json';
+    manga.lastUpdateChapter = latestChapter;
+    return manga;
+  }
 
 
   /// 用于 动漫之家 列表拿到的接口返回的数据
