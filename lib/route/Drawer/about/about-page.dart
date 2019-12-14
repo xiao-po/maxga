@@ -24,12 +24,16 @@ class AboutPage extends StatefulWidget {
 class _AboutPageState extends State<AboutPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   MaxgaReleaseInfo nextVersion;
-
+  String currentVersion;
   CheckUpdateStatus checkUpdateLoading = CheckUpdateStatus.none;
 
   @override
   void initState() {
     super.initState();
+    UpdateService.getCurrentVersion().then((v) {
+      currentVersion = v;
+      setState(() { });
+    });
     if (Platform.isAndroid) {
       checkUpdateStatus();
     }
@@ -127,7 +131,7 @@ class _AboutPageState extends State<AboutPage> {
         children: <Widget>[
           const Text('MaxGa',
               style: TextStyle(fontSize: 40, color: Colors.cyan)),
-          const Text('version: 0.0.1', style: TextStyle(color: Colors.black38))
+          Text('version: $currentVersion', style: TextStyle(color: Colors.black38))
         ],
       ),
     );

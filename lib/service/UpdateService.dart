@@ -9,10 +9,10 @@ final IgnoreUpdateVersion =  'IgnoreUpdateVersion';
 class UpdateService {
   static Future<MaxgaReleaseInfo> checkUpdateStatus() async {
     MaxgaReleaseInfo nextVersionInfo = await _getNextVersionInfo();
-    String currentVersion = await _getCurrentVersion();
+    String currentVersion = await getCurrentVersion();
     final String ignoreUpdateVersion = await LocalStorage.getString(IgnoreUpdateVersion);
 
-    if (nextVersionInfo.compare(currentVersion) && nextVersionInfo.compare(ignoreUpdateVersion)) {
+    if (nextVersionInfo.compare(currentVersion) &&( ignoreUpdateVersion == null || nextVersionInfo.compare(ignoreUpdateVersion))) {
       return nextVersionInfo;
     } else {
       return null;
@@ -32,7 +32,7 @@ class UpdateService {
     return nextVersionInfo;
   }
 
-  static Future<String> _getCurrentVersion() async {
+  static Future<String> getCurrentVersion() async {
     PackageInfo currentPackageInfo = await PackageInfo.fromPlatform();
     final String currentVersion = currentPackageInfo.version;
     return currentVersion;
