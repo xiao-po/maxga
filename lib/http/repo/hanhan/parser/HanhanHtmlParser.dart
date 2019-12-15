@@ -156,3 +156,4 @@ class HanhanHtmlParser {
     return infoUrl;
   }
 }
+

@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/components/Card.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
+import 'package:maxga/components/MaxgaButton.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
@@ -370,26 +371,3 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
   }
 }
 
-class MaxgaSearchButton extends StatelessWidget {
-  final Color color;
-
-  const MaxgaSearchButton({
-    Key key, this.color = Colors.white,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      icon: Icon(
-        Icons.search,
-        color: color,
-
-      ),
-      onPressed: ()  {
-        Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
-          return SearchPage();
-        }));
-      },
-    );
-  }
-}

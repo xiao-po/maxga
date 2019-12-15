@@ -34,9 +34,13 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
         response = await http.get(url);
       }
     } catch(e) {
-      throw MaxgaHttpError('动漫之家接口获取漫画详情失败', _source);
+      throw MangaHttpResponseError(_source);
     }
-    return _convertDataFromMangaInfo(json.decode(response.body), id);
+    try {
+      return _convertDataFromMangaInfo(json.decode(response.body), id);
+    } catch(e) {
+      throw MangaHttpConvertError(_source);
+    }
   }
 
 
@@ -45,9 +49,14 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     try {
       final response = await http.get('${_source.domain}/latest/100/$page.json');
       final responseData = (json.decode(response.body) as List<dynamic>);
-      return responseData.map((item) => _convertDataFromListItem(item)).toList();
+      try {
+        return responseData.map((item) => _convertDataFromListItem(item)).toList();
+      } catch(e) {
+        throw MangaHttpConvertError(_source);
+      }
     } catch(e) {
-      throw MaxgaHttpError('动漫之家接口获取最近更新失败', _source);
+      if (e is MangaHttpConvertError) throw e;
+      throw MangaHttpError('动漫之家接口获取最近更新失败', _source);
     }
   }
 
@@ -58,7 +67,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     try {
       response = await http.get(url);
     } catch(e) {
-      throw MaxgaHttpError('动漫之家接口获取章节图片', _source);
+      throw MangaHttpError('动漫之家接口获取章节图片', _source);
     }
     return json.decode(response.body)['page_url'].cast<String>();
   }

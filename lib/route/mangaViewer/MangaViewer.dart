@@ -329,6 +329,7 @@ class _MangaViewerState extends State<MangaViewer> {
     if (_currentPageIndex == 0) {
       if (preChapter == null) {
         toastMessage('已经是第一页了');
+        return;
       }
       toastMessage('正在加载上一章节');
       final _currentChapter = currentChapter;
@@ -361,6 +362,7 @@ class _MangaViewerState extends State<MangaViewer> {
     } else if (_currentPageIndex == (imagePageUrlList.length - 1)) {
       if (nextChapter != null) {
         toastMessage('已经是最后一页了', TextAlign.right);
+        return;
       }
 
       loadingChapter = true;
@@ -429,7 +431,7 @@ class _MangaViewerState extends State<MangaViewer> {
             loadOver: loadStatus == _MangaViewerLoadState.over,
           ));
     }
-    return Future.value(true);
+    return Future.value(false);
   }
 
   Widget buildCheckNetStatePage() {

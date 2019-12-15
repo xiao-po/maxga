@@ -59,7 +59,7 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
         retryTimes--;
       }
     }
-    throw MaxgaHttpError('', _source);
+    throw MangaHttpError('', _source);
   }
 
   @override
@@ -79,7 +79,7 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
             headers: HanhanHttpHeader,
           );
         } else {
-          throw MaxgaHttpNullParamError(_source);
+          throw MangaHttpNullParamError(_source);
         }
         final manga = parser.getMangaFromInfoPate(response.body);
         manga.sourceKey = _source.key;
@@ -125,12 +125,20 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
   MangaSource get mangaSource => _source;
 
   void initRepo() async {
-    final dsResponse = await http.get('${_source.domain}/js/ds.js');
-    final dsBody = dsResponse.body;
-    _imageServerUrl = dsBody
-        .substring(dsBody.indexOf('var sDS = "') + 'var sDS = "'.length,
+    var retryTimes = 3;
+    while(retryTimes > 0) {
+      try {
+        final dsResponse = await http.get('${_source.domain}/js/ds.js');
+        final dsBody = dsResponse.body;
+        _imageServerUrl = dsBody
+            .substring(dsBody.indexOf('var sDS = "') + 'var sDS = "'.length,
             dsBody.indexOf('";'))
-        .split('|');
+            .split('|');
+      } catch(e) {
+        retryTimes--;
+      }
+
+    }
   }
 
 }
