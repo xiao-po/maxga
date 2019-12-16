@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:maxga/base/error/MaxgaHttpError.dart';
 import 'package:maxga/components/Card.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/components/MaxgaButton.dart';
@@ -324,10 +325,12 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
       }
       state.mangaList.addAll(mangaList);
       state.loadState = _MangaSourceViewerPageLoadState.over;
-    } catch (e) {
-      print(e);
+    } on MangaHttpError catch (e) {
+      print(e.message);
       state.loadState = _MangaSourceViewerPageLoadState.error;
-    } finally {
+    } catch(e) {
+      state.loadState = _MangaSourceViewerPageLoadState.error;
+    }finally {
       setState(() {});
     }
   }
