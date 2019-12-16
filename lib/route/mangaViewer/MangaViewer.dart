@@ -303,6 +303,14 @@ class _MangaViewerState extends State<MangaViewer> {
   }
 
   changePage(int index) async {
+    if (index <= 0 && preChapter == null) {
+      toastMessage('已经是第一页了');
+      return ;
+    } else if (_currentPageIndex == (imagePageUrlList.length - 1) && nextChapter == null)  {
+      toastMessage('已经是最后一页了', TextAlign.right);
+      return;
+    }
+
     _currentPageIndex = index;
     tabController.jumpToPage(_currentPageIndex);
     setState(() {});

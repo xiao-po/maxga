@@ -118,28 +118,32 @@ class _IndexPageState extends State<IndexPage> {
   }
 
   checkUpdate() async {
-    final nextVersion = await UpdateService.checkUpdateStatus();
-    if (nextVersion != null) {
-      final buttonPadding = const EdgeInsets.fromLTRB(15, 5, 15, 5);
-      scaffoldKey.currentState.showSnackBar(SnackBar(
-          duration: Duration(seconds: 3),
-          content: GestureDetector(
-            child: Padding(
-              padding: buttonPadding,
-              child: Text('有新版本更新, 点击查看'),
+    try {
+      final nextVersion = await UpdateService.checkUpdateStatus();
+      if (nextVersion != null) {
+        final buttonPadding = const EdgeInsets.fromLTRB(15, 5, 15, 5);
+        scaffoldKey.currentState.showSnackBar(SnackBar(
+            duration: Duration(seconds: 3),
+            content: GestureDetector(
+              child: Padding(
+                padding: buttonPadding,
+                child: Text('有新版本更新, 点击查看'),
+              ),
+              onTap: () {
+                hiddenSnack();
+                openUpdateDialog(nextVersion);
+              },
             ),
-            onTap: () {
-              hiddenSnack();
-              openUpdateDialog(nextVersion);
-            },
-          ),
-          action: SnackBarAction(
-            label: '忽略',
-            textColor: Colors.greenAccent,
-            onPressed: () {
-              openUpdateDialog(nextVersion);
-            },
-          )));
+            action: SnackBarAction(
+              label: '忽略',
+              textColor: Colors.greenAccent,
+              onPressed: () {
+                openUpdateDialog(nextVersion);
+              },
+            )));
+      }
+    } catch(e) {
+      print('检查更新失败');
     }
   }
 
