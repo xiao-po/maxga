@@ -360,7 +360,7 @@ class _MangaViewerState extends State<MangaViewer> {
         return null;
       }
     } else if (_currentPageIndex == (imagePageUrlList.length - 1)) {
-      if (nextChapter != null) {
+      if (nextChapter == null) {
         toastMessage('已经是最后一页了', TextAlign.right);
         return;
       }

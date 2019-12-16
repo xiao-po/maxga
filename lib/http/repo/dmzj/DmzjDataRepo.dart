@@ -46,17 +46,17 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<List<SimpleMangaInfo>> getLatestUpdate(int page) async {
+    List<dynamic> responseData;
     try {
       final response = await http.get('${_source.domain}/latest/100/$page.json');
-      final responseData = (json.decode(response.body) as List<dynamic>);
-      try {
-        return responseData.map((item) => _convertDataFromListItem(item)).toList();
-      } catch(e) {
-        throw MangaHttpConvertError(_source);
-      }
+      responseData = (json.decode(response.body) as List<dynamic>);
     } catch(e) {
-      if (e is MangaHttpConvertError) throw e;
-      throw MangaHttpError('动漫之家接口获取最近更新失败', _source);
+      throw MangaHttpResponseError(_source);
+    }
+    try {
+      return responseData.map((item) => _convertDataFromListItem(item)).toList();
+    } catch(e) {
+      throw MangaHttpConvertError(_source);
     }
   }
 
@@ -80,8 +80,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
       final responseData = (json.decode(response.body) as List<dynamic>);
       return responseData.map((item) => DmzjSearchSuggestion.fromJson(item)).map((item) => item.title.replaceFirst('+', '')).toList();
     } catch(e) {
-      print(response.request.url);
-      throw e;
+      throw MangaHttpError('动漫之家接口获取建议失败', _source);
     }
 
   }
@@ -89,8 +88,18 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<List<SimpleMangaInfo>> getRankedManga(int page) async {
-    final response = await http.get('${_source.domain}/rank/0/0/0/$page.json');
-    return (json.decode(response.body) as List<dynamic>).map((item) => DmzjRankedMangaInfo.fromJson(item)).map((item) => _convertDataFromRankedManga(item)).toList(growable: false);
+    List<dynamic> responseData;
+    try {
+      final response = await http.get('${_source.domain}/rank/0/0/0/$page.json');
+      responseData = (json.decode(response.body) as List<dynamic>);
+    } catch(e) {
+      throw MangaHttpResponseError(_source);
+    }
+    try {
+      return responseData.map((item) => DmzjRankedMangaInfo.fromJson(item)).map((item) => _convertDataFromRankedManga(item)).toList(growable: false);
+    } catch(e) {
+      throw MangaHttpConvertError(_source);
+    }
   }
 
 

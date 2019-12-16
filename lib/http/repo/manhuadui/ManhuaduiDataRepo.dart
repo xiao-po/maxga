@@ -1,6 +1,9 @@
+import 'package:http/http.dart';
+import 'package:maxga/base/error/MaxgaHttpError.dart';
 import 'package:maxga/http/repo/manhuadui/parser/ManhuaduiHtmlParser.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:maxga/http/utils/MaxgaHttpUtils.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 
@@ -24,15 +27,24 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<List<String>> getChapterImageList(String url) async {
-    final response = await http.get('${_source.domain}$url');
-    var chapterImageList = parser.getMangaImageListFromMangaPage(response.body);
-    var chapterImagePath = parser.getMangaImagePathFromMangaPage(response.body);
-    if (chapterImagePath == "") {
-      chapterImageList = chapterImageList.map((url) => 'https://mhcdn.manhuazj.com/showImage.php?url=$url').toList(growable: false);
-    } else {
-      chapterImageList = chapterImageList.map((url) => 'https://mhcdn.manhuazj.com/$chapterImagePath$url').toList(growable: false);
+    Response response;
+    try {
+      response = await MaxgaHttpUtils.retryRequest(requestBuilder: () => http.get('${_source.domain}$url'));
+    } catch(e) {
+      throw MangaHttpResponseError(_source);
     }
-    return chapterImageList;
+    try {
+      var chapterImageList = parser.getMangaImageListFromMangaPage(response.body);
+      var chapterImagePath = parser.getMangaImagePathFromMangaPage(response.body);
+      if (chapterImagePath == "") {
+        chapterImageList = chapterImageList.map((url) => 'https://mhcdn.manhuazj.com/showImage.php?url=$url').toList(growable: false);
+      } else {
+        chapterImageList = chapterImageList.map((url) => 'https://mhcdn.manhuazj.com/$chapterImagePath$url').toList(growable: false);
+      }
+      return chapterImageList;
+    } catch(e) {
+      throw MangaHttpApiParserError(_source);
+    }
   }
 
   @override
