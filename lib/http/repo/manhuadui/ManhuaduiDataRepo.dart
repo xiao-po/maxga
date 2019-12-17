@@ -1,8 +1,5 @@
-import 'package:http/http.dart';
-import 'package:maxga/base/error/MaxgaHttpError.dart';
 import 'package:maxga/http/repo/manhuadui/parser/ManhuaduiHtmlParser.dart';
 
-import 'package:http/http.dart' as http;
 import 'package:maxga/http/utils/MaxgaHttpUtils.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';

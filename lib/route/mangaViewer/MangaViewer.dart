@@ -303,7 +303,7 @@ class _MangaViewerState extends State<MangaViewer> {
   }
 
   changePage(int index) async {
-    if (index <= 0 && preChapter == null) {
+    if (index < 0 && preChapter == null) {
       toastMessage('已经是第一页了');
       return ;
     } else if (index > (imagePageUrlList.length - 1) && nextChapter == null)  {

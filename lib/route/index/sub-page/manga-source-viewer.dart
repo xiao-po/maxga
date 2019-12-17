@@ -44,15 +44,17 @@ class MangaSourceViewerPage {
     if (type == _SourceViewType.latestUpdate) {
       final mangaList = await repo.getLatestUpdate(page);
       print('更新列表已经加载完毕， 数量：${mangaList.length}');
+      initOver = true;
       return mangaList;
     } else {
       final mangaList = await repo.getRankedManga(page);
       print('排行列表已经加载完毕， 数量：${mangaList.length}');
+      initOver = true;
       return mangaList;
     }
   }
 
-  bool get initOver => isLast || mangaList.length > 0;
+  bool initOver = false;
 }
 
 class MangaSourceViewer extends StatefulWidget {
@@ -305,30 +307,35 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
     }
   }
 
-  refreshPage(MangaSourceViewerPage state) {
-    state.mangaList = [];
-    state.page = 0;
-    return this.getMangaList(state);
-  }
+  refreshPage(MangaSourceViewerPage state) => this.getMangaList(state, isRefresh: true);
 
-  Future<void> getMangaList(MangaSourceViewerPage state) async {
+  Future<void> getMangaList(MangaSourceViewerPage state, {bool isRefresh = false}) async {
     if (state.loadState == _MangaSourceViewerPageLoadState.loading) {
       return null;
     }
     try {
       sourceName = state.source.name;
+      if (isRefresh) {
+        state.page = 0;
+      }
       state.loadState = _MangaSourceViewerPageLoadState.loading;
       setState(() {});
       final mangaList = await state.getMangaList(state.page++);
       if (mangaList.length == 0) {
         state.isLast = true;
       }
-      state.mangaList.addAll(mangaList);
+      if (isRefresh) {
+
+        state.mangaList = mangaList;
+      } else  {
+        state.mangaList.addAll(mangaList);
+      }
       state.loadState = _MangaSourceViewerPageLoadState.over;
     } on MangaHttpError catch (e) {
       print(e.message);
       state.loadState = _MangaSourceViewerPageLoadState.error;
     } catch(e) {
+      print(e.message);
       state.loadState = _MangaSourceViewerPageLoadState.error;
     }finally {
       setState(() {});

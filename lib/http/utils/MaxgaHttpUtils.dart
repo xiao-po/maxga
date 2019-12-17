@@ -16,6 +16,7 @@ class MaxgaHttpUtils {
       while (retryTimes > 0) {
         try {
           response = await http.get(url, headers: source.headers);
+          break;
         } catch (e) {
           retryTimes--;
         }
@@ -29,7 +30,7 @@ class MaxgaHttpUtils {
     try {
       return parser(response);
     } catch (e) {
-      throw MangaHttpConvertError(source);
+      throw MangaHttpJsonParserError(source);
     }
   }
 }

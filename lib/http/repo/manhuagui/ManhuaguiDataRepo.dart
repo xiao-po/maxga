@@ -1,11 +1,9 @@
-import 'package:http/http.dart';
 import 'package:maxga/base/error/MaxgaHttpError.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/http/repo/manhuagui/crypto/ManhuaguiCrypto.dart';
 import 'package:maxga/http/repo/manhuagui/parser/ManhuaguiHtmlParser.dart';
 import 'package:maxga/http/utils/MaxgaHttpUtils.dart';
 import 'package:maxga/model/manga/Manga.dart';
-import 'package:http/http.dart' as http;
 import 'package:maxga/model/manga/MangaSource.dart';
 
 final ManhuaguiMangaSource = MangaSource(

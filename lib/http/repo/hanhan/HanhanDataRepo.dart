@@ -4,7 +4,6 @@ import 'package:maxga/http/utils/MaxgaHttpUtils.dart';
 import 'package:maxga/model/manga/Manga.dart';
 
 import 'package:maxga/model/manga/MangaSource.dart';
-import 'package:http/http.dart' as http;
 
 import '../MaxgaDataHttpRepo.dart';
 import 'parser/HanhanHtmlParser.dart';
@@ -38,11 +37,8 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<List<String>> getChapterImageList(String url) async {
-    final response = await http.get(
-      url,
-      headers: _source.headers,
-    );
-    return parser.getChapterImageList(response.body, _imageServerUrl);
+    return _httpUtils.requestApi<List<String>>(url,
+        parser: (res) => parser.getChapterImageList(res.body, _imageServerUrl));
   }
 
   @override
@@ -87,18 +83,11 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
   MangaSource get mangaSource => _source;
 
   void initRepo() async {
-    var retryTimes = 3;
-    while (retryTimes > 0) {
-      try {
-        final dsResponse = await http.get('${_source.domain}/js/ds.js');
-        final dsBody = dsResponse.body;
-        _imageServerUrl = dsBody
-            .substring(dsBody.indexOf('var sDS = "') + 'var sDS = "'.length,
-                dsBody.indexOf('";'))
-            .split('|');
-      } catch (e) {
-        retryTimes--;
-      }
-    }
+    _imageServerUrl = await _httpUtils.requestApi<List<String>>(
+        '${_source.domain}/js/ds.js',
+        parser: (res) => res.body
+            .substring(res.body.indexOf('var sDS = "') + 'var sDS = "'.length,
+                res.body.indexOf('";'))
+            .split('|'));
   }
 }

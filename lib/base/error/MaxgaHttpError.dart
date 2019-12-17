@@ -20,11 +20,14 @@ class MangaHttpApiTimeoutError extends MangaHttpError {
   MangaHttpApiTimeoutError(MangaSource source): super('${source.name} api 超时', source);
 }
 
+class MangaHttpHtmlParserError extends MangaHttpConvertError {
+  MangaHttpHtmlParserError(MangaSource source): super('${source.name} 解析 html 异常', source);
+}
 
-class MangaHttpApiParserError extends MangaHttpError {
-  MangaHttpApiParserError(MangaSource source): super('${source.name} 解析 html 异常', source);
+class MangaHttpJsonParserError extends MangaHttpConvertError {
+  MangaHttpJsonParserError(MangaSource source): super('${source.name} 解析 JSON 异常', source);
 }
 
 class MangaHttpConvertError extends MangaHttpError {
-  MangaHttpConvertError(MangaSource source): super('${source.name} 序列化异常', source);
+  MangaHttpConvertError(String msg,MangaSource source): super('序列化异常, $msg', source);
 }

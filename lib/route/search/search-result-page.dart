@@ -8,7 +8,7 @@ import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 
 import '../../MangaRepoPool.dart';
 
-enum _LoadingState { loading, retry, over, error, empty }
+enum _LoadingState { loading, over, error, empty }
 
 class _SearchResult {
   final MangaSource source;
@@ -50,36 +50,26 @@ class _SearchResultPageState extends State<SearchResultPage> {
 
   void searchAction(resultItem) async {
     final repo = MangaRepoPool.getInstance().getDataRepo(resultItem.source.key);
-    int retryTimes = 4;
     setState(() {
       resultItem.status = _LoadingState.loading;
-      resultItem.retryTimes = 0;
     });
-    while (--retryTimes >= 0) {
-      try {
-        final resultList = await repo.getSearchManga(widget.keyword);
-        if (resultList != null && resultList.length > 0) {
-          resultItem.mangaList = resultList;
-          resultItem.status = _LoadingState.over;
-        } else {
-          resultItem.status = _LoadingState.empty;
-        }
-        break;
-      } catch (e) {
-        print(e);
-        resultItem.status = _LoadingState.retry;
-        resultItem.retryTimes += 1;
-      } finally {
-        print('$mounted');
-        if (mounted) {
-          setState(() {});
-        }
+    try {
+      final resultList = await repo.getSearchManga(widget.keyword);
+      if (resultList != null && resultList.length > 0) {
+        resultItem.mangaList = resultList;
+        resultItem.status = _LoadingState.over;
+      } else {
+        resultItem.status = _LoadingState.empty;
+      }
+    } catch (e) {
+      resultItem.status = _LoadingState.error;
+    } finally {
+      print('$mounted');
+      if (mounted) {
+        setState(() {});
       }
     }
 
-    if (_LoadingState.retry == resultItem.status) {
-      resultItem.status = _LoadingState.error;
-    }
   }
 
   @override
@@ -202,25 +192,25 @@ class _SearchResultPageState extends State<SearchResultPage> {
           '搜索结果: ${item.mangaList.length}',
         );
         break;
-      case _LoadingState.retry:
-        extraWidth = 180;
-        extra = Row(
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(right: 10),
-              child: Text(
-                '搜索失败，重试第 ${item.retryTimes} 次',
-                style: extraTextStyle,
-              ),
-            ),
-            SizedBox(
-              height: 20,
-              width: 20,
-              child: CircularProgressIndicator(
-                  strokeWidth: 2, valueColor: progressColor),
-            )
-          ],
-        );
+//      case _LoadingState.retry:
+//        extraWidth = 180;
+//        extra = Row(
+//          children: <Widget>[
+//            Padding(
+//              padding: EdgeInsets.only(right: 10),
+//              child: Text(
+//                '搜索失败，重试第 ${item.retryTimes} 次',
+//                style: extraTextStyle,
+//              ),
+//            ),
+//            SizedBox(
+//              height: 20,
+//              width: 20,
+//              child: CircularProgressIndicator(
+//                  strokeWidth: 2, valueColor: progressColor),
+//            )
+//          ],
+//        );
         break;
     }
     var body = Row(
