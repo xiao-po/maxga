@@ -48,6 +48,11 @@ class ManhuaduiHtmlParser {
     var document = parse(html);
     final body = document.body;
     final imageKeyScript = body.querySelector('script');
+
+    final imagePath = imageKeyScript.innerHtml.substring(
+        imageKeyScript.innerHtml.indexOf('chapterPath = "') + 15,
+        imageKeyScript.innerHtml.indexOf('";var chapterPrice')
+    );
     final imageListEncryptText = imageKeyScript.innerHtml.substring(
         imageKeyScript.innerHtml.indexOf('chapterImages = "') + 17,
         imageKeyScript.innerHtml.indexOf('";'));
@@ -56,8 +61,11 @@ class ManhuaduiHtmlParser {
 
     List<String> imageList =
         jsonResult.map((str) => '$str').toList(growable: false);
-
-    return imageList;
+    if (imagePath == "") {
+      return imageList.map((url) => 'https://mhcdn.manhuazj.com/showImage.php?url=$url').toList(growable: false);
+    } else {
+      return imageList.map((url) => 'https://mhcdn.manhuazj.com/$imagePath$url').toList(growable: false);
+    }
   }
 
   String getMangaImagePathFromMangaPage(String html) {

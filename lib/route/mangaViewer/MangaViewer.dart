@@ -306,7 +306,7 @@ class _MangaViewerState extends State<MangaViewer> {
     if (index <= 0 && preChapter == null) {
       toastMessage('已经是第一页了');
       return ;
-    } else if (_currentPageIndex == (imagePageUrlList.length - 1) && nextChapter == null)  {
+    } else if (index > (imagePageUrlList.length - 1) && nextChapter == null)  {
       toastMessage('已经是最后一页了', TextAlign.right);
       return;
     }
@@ -340,8 +340,7 @@ class _MangaViewerState extends State<MangaViewer> {
         return;
       }
       toastMessage('正在加载上一章节');
-      final _currentChapter = currentChapter;
-      final simplePreChapterData = getPreChapter(_currentChapter);
+      final simplePreChapterData = getPreChapter(nextChapter);
       if (mounted) {
         setState(() {
           loadingChapter = true;
@@ -375,7 +374,6 @@ class _MangaViewerState extends State<MangaViewer> {
 
       loadingChapter = true;
       toastMessage('正在加载下一章节', TextAlign.right);
-      final _currentChapter = currentChapter;
       if (mounted) {
         setState(() {
           loadingChapter = true;
@@ -383,7 +381,7 @@ class _MangaViewerState extends State<MangaViewer> {
       } else {
         return null;
       }
-      final simpleNextChapterData = getNextChapter(_currentChapter);
+      final simpleNextChapterData = getNextChapter(nextChapter);
       final nextChapterData = await getChapterData(simpleNextChapterData);
       if (mounted &&
           !isOnScroll &&

@@ -18,16 +18,16 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          builder: (context) => HistoryProvider(),
+          create: (context) => HistoryProvider(),
         ),
 //        ChangeNotifierProvider(
 //          builder: (context) => IndexPageTypeProvider(),
 //        ),
         StreamProvider<MaxgaMenuItemType>(
-          builder: (context) => IndexPageTypeProvider.getInstance().streamController.stream,
+          create: (context) => IndexPageTypeProvider.getInstance().streamController.stream,
         ),
         ChangeNotifierProvider(
-          builder: (context) => SettingProvider(),
+          create: (context) => SettingProvider(),
         ),
       ],
       child: MaterialApp(

@@ -1,18 +1,35 @@
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart';
-class MaxgaHttpUtils {
-  static Future<Response> retryRequest({int retryCount = 3,@required Future<Response> Function() requestBuilder}) async {
-    var retryTimes = 3;
-    while(retryTimes > 0) {
-      try {
-        return requestBuilder();
-      } catch(e) {
-        retryTimes--;
-      }
+import 'package:maxga/base/error/MaxgaHttpError.dart';
+import 'package:maxga/model/manga/MangaSource.dart';
+import 'package:http/http.dart' as http;
 
+class MaxgaHttpUtils {
+  final MangaSource source;
+
+  MaxgaHttpUtils(this.source);
+
+  Future<T> requestApi<T>(String url,
+      {T Function(Response response) parser}) async {
+    Response response;
+    try {
+      var retryTimes = 3;
+      while (retryTimes > 0) {
+        try {
+          response = await http.get(url, headers: source.headers);
+        } catch (e) {
+          retryTimes--;
+        }
+      }
+      if (retryTimes == 0) {
+        throw Error();
+      }
+    } catch (e) {
+      throw MangaHttpResponseError(source);
     }
-    if (retryTimes == 0) {
-      throw Error();
+    try {
+      return parser(response);
+    } catch (e) {
+      throw MangaHttpConvertError(source);
     }
   }
 }

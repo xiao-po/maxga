@@ -9,6 +9,8 @@ class Manga extends MangaBase {
 
   Manga();
 
+
+
 }
 
 class SimpleMangaInfo extends MangaBase {

@@ -9,15 +9,17 @@ import 'package:maxga/model/manga/MangaSource.dart';
 
 import '../MaxgaDataHttpRepo.dart';
 
-class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
-  MangaSource  _source = MangaSource(
-      name: '漫画堆',
-      key: 'manhuadui',
-      domain: 'https://www.manhuadui.com',
-      iconUrl:  'https://www.manhuadui.com/favicon.ico',
-  );
-  ManhuaduiHtmlParser parser = ManhuaduiHtmlParser.getInstance();
+final ManhuaduiMangaSource = MangaSource(
+  name: '漫画堆',
+  key: 'manhuadui',
+  domain: 'https://www.manhuadui.com',
+  iconUrl: 'https://www.manhuadui.com/favicon.ico',
+);
 
+class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
+  MangaSource _source = ManhuaduiMangaSource;
+  ManhuaduiHtmlParser parser = ManhuaduiHtmlParser.getInstance();
+  MaxgaHttpUtils _httpUtils = MaxgaHttpUtils(ManhuaduiMangaSource);
 
   @override
   Future<List<String>> getSuggestion(String words) {
@@ -27,56 +29,34 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<List<String>> getChapterImageList(String url) async {
-    Response response;
-    try {
-      response = await MaxgaHttpUtils.retryRequest(requestBuilder: () => http.get('${_source.domain}$url'));
-    } catch(e) {
-      throw MangaHttpResponseError(_source);
-    }
-    try {
-      var chapterImageList = parser.getMangaImageListFromMangaPage(response.body);
-      var chapterImagePath = parser.getMangaImagePathFromMangaPage(response.body);
-      if (chapterImagePath == "") {
-        chapterImageList = chapterImageList.map((url) => 'https://mhcdn.manhuazj.com/showImage.php?url=$url').toList(growable: false);
-      } else {
-        chapterImageList = chapterImageList.map((url) => 'https://mhcdn.manhuazj.com/$chapterImagePath$url').toList(growable: false);
-      }
-      return chapterImageList;
-    } catch(e) {
-      throw MangaHttpApiParserError(_source);
-    }
+    return _httpUtils.requestApi<List<String>>('${_source.domain}$url',
+        parser: (res) => parser.getMangaImageListFromMangaPage(res.body));
   }
 
   @override
   Future<List<SimpleMangaInfo>> getLatestUpdate(int page) async {
-    final response = await http.get('${_source.domain}/list/riben/update/$page/');
-
-    final mangaList = parser.getMangaListFromLatestUpdate(response.body);
-    mangaList.forEach((manga) => manga.sourceKey = _source.key);
-    return mangaList;
+    return _httpUtils.requestApi<List<SimpleMangaInfo>>(
+        '${_source.domain}/list/riben/update/$page/',
+        parser: (res) => parser.getMangaListFromLatestUpdate(res.body)
+          ..forEach((manga) => manga.sourceKey = _source.key));
   }
-
-
-
 
   @override
   Future<Manga> getMangaInfo({int id, String url}) async {
-    final response = await http.get(url);
-    final Manga mangaInfo = parser.getMangaFromMangaInfoPage(response.body);
-    mangaInfo.chapterList.forEach((item) => item.comicId = id);
-    mangaInfo.sourceKey = _source.key;
-    mangaInfo.id = id;
-    mangaInfo.infoUrl = url;
-    return mangaInfo;
+    return _httpUtils.requestApi<Manga>(url,
+        parser: (res) => parser.getMangaFromMangaInfoPage(res.body)
+          ..chapterList.forEach((item) => item.comicId = id)
+          ..sourceKey = _source.key
+          ..id = id
+          ..infoUrl = url);
   }
 
   @override
   Future<List<SimpleMangaInfo>> getSearchManga(String keywords) async {
-
-    final response = await http.get('${_source.domain}/search/?keywords=$keywords');
-    final List<SimpleMangaInfo> mangaList = parser.getMangaListFromSearch(response.body);
-    mangaList.forEach((item) => item.sourceKey = _source.key);
-    return mangaList;
+    return _httpUtils.requestApi<List<SimpleMangaInfo>>(
+        '${_source.domain}/search/?keywords=$keywords',
+        parser: (res) => parser.getMangaListFromSearch(res.body)
+          ..forEach((item) => item.sourceKey = _source.key));
   }
 
   @override
@@ -87,14 +67,10 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
     if (page >= 1) {
       return [];
     }
-    final response = await http.get('https://m.manhuadui.com/rank/click/');
-    final List<SimpleMangaInfo> mangaList = parser.getMangaListFromRank(response.body)..forEach((el) => el.sourceKey = _source.key);
-    return mangaList;
+
+    return _httpUtils.requestApi<List<SimpleMangaInfo>>(
+        'https://m.manhuadui.com/rank/click/',
+        parser: (res) => parser.getMangaListFromRank(res.body)
+          ..forEach((el) => el.sourceKey = _source.key));
   }
-
-
-
-
-
-
 }
