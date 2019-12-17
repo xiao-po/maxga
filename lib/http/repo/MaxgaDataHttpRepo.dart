@@ -1,3 +1,4 @@
+import 'package:maxga/http/utils/MaxgaHttpUtils.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 
