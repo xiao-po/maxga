@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/components/MangaGridItem.dart';
+import 'package:maxga/components/MaxgaButton.dart';
 import 'package:maxga/model/maxga/MangaReadProcess.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
@@ -40,6 +41,9 @@ class CollectionPageState extends State<CollectionPage> {
               leading: IconButton(
                   icon: Icon(Icons.menu),
                   onPressed: () => Scaffold.of(context).openDrawer()),
+              actions: <Widget>[
+                MaxgaSearchButton()
+              ],
             ),
             Expanded(
               child: buildBody(),
@@ -57,7 +61,7 @@ class CollectionPageState extends State<CollectionPage> {
           ? _LoadingState.over
           : _LoadingState.empty;
     } catch (e) {
-      print(e);
+      debugPrint(e);
       loadingState = _LoadingState.error;
     } finally {
       setState(() {});

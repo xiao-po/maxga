@@ -1,33 +1,33 @@
 import 'package:maxga/model/manga/MangaSource.dart';
 
+enum MangaHttpErrorType {
+  NULL_PARAM,
+  ERROR_PARAM,
+  RESPONSE_ERROR,
+  CONNECT_TIMEOUT,
+  PARSE_ERROR,
+
+}
+
+
 class MangaHttpError extends Error {
-  final String message;
+  String get message {
+    switch(this.type) {
+      case MangaHttpErrorType.NULL_PARAM:
+        return '参数不允许为空值';
+      case MangaHttpErrorType.ERROR_PARAM:
+        return '参数错误';
+      case MangaHttpErrorType.RESPONSE_ERROR:
+        return '${source.name} api 出现异常';
+      case MangaHttpErrorType.CONNECT_TIMEOUT:
+        return '${source.name} api 超时';
+      case MangaHttpErrorType.PARSE_ERROR:
+        return '序列化异常, ${source.name} 解析异常';
+      default:
+        return '未知错误';
+    }
+  }
   final MangaSource source;
-
-  MangaHttpError(this.message, this.source);
-}
-
-
-class MangaHttpNullParamError extends MangaHttpError {
-  MangaHttpNullParamError(MangaSource source): super('参数错误，不允许为空值', source);
-}
-
-class MangaHttpResponseError extends MangaHttpError {
-  MangaHttpResponseError(MangaSource source): super('${source.name} api 出现异常',source);
-}
-
-class MangaHttpApiTimeoutError extends MangaHttpError {
-  MangaHttpApiTimeoutError(MangaSource source): super('${source.name} api 超时', source);
-}
-
-class MangaHttpHtmlParserError extends MangaHttpConvertError {
-  MangaHttpHtmlParserError(MangaSource source): super('${source.name} 解析 html 异常', source);
-}
-
-class MangaHttpJsonParserError extends MangaHttpConvertError {
-  MangaHttpJsonParserError(MangaSource source): super('${source.name} 解析 JSON 异常', source);
-}
-
-class MangaHttpConvertError extends MangaHttpError {
-  MangaHttpConvertError(String msg,MangaSource source): super('序列化异常, $msg', source);
+  final MangaHttpErrorType type;
+  MangaHttpError(this.type, this.source);
 }

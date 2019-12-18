@@ -30,7 +30,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     return _httpUtils.requestApi<Manga>(
         id == null ? url : '${_source.domain}/comic/comic_$id.json',
         parser: (response) => DmzjModelConvertUtils.convertToMangaFromMangaInfo(
-              DmzjMangaInfo.fromJson(json.decode(response.body)),
+              DmzjMangaInfo.fromJson(json.decode(response.data)),
               _source,
             ));
   }
@@ -39,7 +39,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
   Future<List<SimpleMangaInfo>> getLatestUpdate(int page) async {
     return _httpUtils.requestApi<List<SimpleMangaInfo>>(
         '${_source.domain}/latest/100/$page.json',
-        parser: (response) => (json.decode(response.body) as List<dynamic>)
+        parser: (response) => (json.decode(response.data) as List<dynamic>)
             .map((item) => _convertDataFromListItem(item))
             .toList());
   }
@@ -49,14 +49,14 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     return _httpUtils.requestApi<List<String>>(
         url,
         parser: (response) =>
-            json.decode(response.body)['page_url'].cast<String>());
+            json.decode(response.data)['page_url'].cast<String>());
   }
 
   @override
   Future<List<String>> getSuggestion(String words) async {
     return _httpUtils.requestApi<List<String>>(
         '${_source.domain}/search/fuzzy/0/$words.json',
-        parser: (response) => (json.decode(response.body) as List<dynamic>)
+        parser: (response) => (json.decode(response.data) as List<dynamic>)
             .map((item) => DmzjSearchSuggestion.fromJson(item))
             .map((item) => item.title.replaceFirst('+', ''))
             .toList(growable: false));
@@ -66,7 +66,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
   Future<List<SimpleMangaInfo>> getRankedManga(int page) async {
     return _httpUtils.requestApi<List<SimpleMangaInfo>>(
         '${_source.domain}/rank/0/0/0/$page.json',
-        parser: (response) => (json.decode(response.body) as List<dynamic>)
+        parser: (response) => (json.decode(response.data) as List<dynamic>)
             .map((item) => DmzjRankedMangaInfo.fromJson(item))
             .map((item) => _convertDataFromRankedManga(item))
             .toList(growable: false));
@@ -76,7 +76,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
   Future<List<SimpleMangaInfo>> getSearchManga(String keywords) async {
     return _httpUtils.requestApi<List<SimpleMangaInfo>>(
         '${_source.domain}/search/show/0/$keywords/0.json',
-        parser: (response) => (json.decode(response.body) as List<dynamic>)
+        parser: (response) => (json.decode(response.data) as List<dynamic>)
             .map((item) => _convertDataFromSearch(item))
             .toList(growable: false));
   }

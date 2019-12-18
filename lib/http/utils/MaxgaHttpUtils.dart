@@ -1,7 +1,9 @@
-import 'package:http/http.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:maxga/base/error/MaxgaHttpError.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
-import 'package:http/http.dart' as http;
+
+import '../../MangaRepoPool.dart';
 
 class MaxgaHttpUtils {
   final MangaSource source;
@@ -9,28 +11,32 @@ class MaxgaHttpUtils {
   MaxgaHttpUtils(this.source);
 
   Future<T> requestApi<T>(String url,
-      {T Function(Response response) parser}) async {
-    Response response;
-    try {
-      var retryTimes = 3;
-      while (retryTimes > 0) {
-        try {
-          response = await http.get(url, headers: source.headers);
-          break;
-        } catch (e) {
-          retryTimes--;
+      {T Function(Response<String> response) parser}) async {
+    Response<String> response;
+    Dio dio = MangaRepoPool.getInstance().dio;
+    var retryTimes = 3;
+    while (retryTimes > 0) {
+      try {
+        response = await dio.get(url, options: Options(
+            headers: source.headers,
+
+        ));
+        break;
+      } on DioError catch(e) {
+        retryTimes--;
+        if (e.type == DioErrorType.CONNECT_TIMEOUT) {
+          throw MangaHttpError( MangaHttpErrorType.CONNECT_TIMEOUT, source);
+        }
+        if (retryTimes == 0) {
+          throw MangaHttpError(MangaHttpErrorType.RESPONSE_ERROR, source);
         }
       }
-      if (retryTimes == 0) {
-        throw Error();
-      }
-    } catch (e) {
-      throw MangaHttpResponseError(source);
     }
+
     try {
       return parser(response);
     } catch (e) {
-      throw MangaHttpJsonParserError(source);
+      throw MangaHttpError(MangaHttpErrorType.PARSE_ERROR,source);
     }
   }
 }

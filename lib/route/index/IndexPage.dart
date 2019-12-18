@@ -143,7 +143,7 @@ class _IndexPageState extends State<IndexPage> {
             )));
       }
     } catch(e) {
-      print('检查更新失败');
+      debugPrint('检查更新失败');
     }
   }
 

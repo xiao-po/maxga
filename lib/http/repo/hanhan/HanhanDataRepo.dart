@@ -38,14 +38,14 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
   @override
   Future<List<String>> getChapterImageList(String url) async {
     return _httpUtils.requestApi<List<String>>(url,
-        parser: (res) => parser.getChapterImageList(res.body, _imageServerUrl));
+        parser: (res) => parser.getChapterImageList(res.data, _imageServerUrl));
   }
 
   @override
   Future<List<SimpleMangaInfo>> getLatestUpdate([int page = 1]) async {
     return _httpUtils.requestApi<List<SimpleMangaInfo>>(
         '${_source.domain}/dfcomiclist_${page + 1}.htm',
-        parser: (res) => parser.getMangaListFromLatestUpdate(res.body)
+        parser: (res) => parser.getMangaListFromLatestUpdate(res.data)
           ..forEach((manga) {
             manga.sourceKey = _source.key;
           }));
@@ -55,14 +55,14 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
   Future<Manga> getMangaInfo({int id, String url}) async {
     return _httpUtils.requestApi<Manga>('${_source.domain}/comic/18$id/',
         parser: (res) =>
-            parser.getMangaFromInfoPate(res.body)..sourceKey = _source.key);
+            parser.getMangaFromInfoPate(res.data)..sourceKey = _source.key);
   }
 
   @override
   Future<List<SimpleMangaInfo>> getSearchManga(String keywords) async {
     return _httpUtils.requestApi<List<SimpleMangaInfo>>(
         '${_source.domain}/comicsearch/s.aspx?s=$keywords',
-        parser: (res) => parser.getMangaListFromLatestUpdate(res.body)
+        parser: (res) => parser.getMangaListFromLatestUpdate(res.data)
           ..forEach((manga) => manga.sourceKey = _source.key));
   }
 
@@ -70,7 +70,7 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
   Future<List<SimpleMangaInfo>> getRankedManga(int page) async {
     return _httpUtils.requestApi<List<SimpleMangaInfo>>(
         '${_source.domain}/top/a-${page + 1}.htm',
-        parser: (res) => parser.getMangaListFromRank(res.body)
+        parser: (res) => parser.getMangaListFromRank(res.data)
           ..forEach((manga) => manga.sourceKey = _source.key));
   }
 
@@ -85,9 +85,9 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
   void initRepo() async {
     _imageServerUrl = await _httpUtils.requestApi<List<String>>(
         '${_source.domain}/js/ds.js',
-        parser: (res) => res.body
-            .substring(res.body.indexOf('var sDS = "') + 'var sDS = "'.length,
-                res.body.indexOf('";'))
+        parser: (res) => res.data
+            .substring(res.data.indexOf('var sDS = "') + 'var sDS = "'.length,
+                res.data.indexOf('";'))
             .split('|'));
   }
 }

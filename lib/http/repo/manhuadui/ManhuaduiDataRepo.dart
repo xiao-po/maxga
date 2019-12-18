@@ -27,21 +27,21 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
   @override
   Future<List<String>> getChapterImageList(String url) async {
     return _httpUtils.requestApi<List<String>>('${_source.domain}$url',
-        parser: (res) => parser.getMangaImageListFromMangaPage(res.body));
+        parser: (res) => parser.getMangaImageListFromMangaPage(res.data));
   }
 
   @override
   Future<List<SimpleMangaInfo>> getLatestUpdate(int page) async {
     return _httpUtils.requestApi<List<SimpleMangaInfo>>(
         '${_source.domain}/list/riben/update/$page/',
-        parser: (res) => parser.getMangaListFromLatestUpdate(res.body)
+        parser: (res) => parser.getMangaListFromLatestUpdate(res.data)
           ..forEach((manga) => manga.sourceKey = _source.key));
   }
 
   @override
   Future<Manga> getMangaInfo({int id, String url}) async {
     return _httpUtils.requestApi<Manga>(url,
-        parser: (res) => parser.getMangaFromMangaInfoPage(res.body)
+        parser: (res) => parser.getMangaFromMangaInfoPage(res.data)
           ..chapterList.forEach((item) => item.comicId = id)
           ..sourceKey = _source.key
           ..id = id
@@ -52,7 +52,7 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
   Future<List<SimpleMangaInfo>> getSearchManga(String keywords) async {
     return _httpUtils.requestApi<List<SimpleMangaInfo>>(
         '${_source.domain}/search/?keywords=$keywords',
-        parser: (res) => parser.getMangaListFromSearch(res.body)
+        parser: (res) => parser.getMangaListFromSearch(res.data)
           ..forEach((item) => item.sourceKey = _source.key));
   }
 
@@ -67,7 +67,7 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
 
     return _httpUtils.requestApi<List<SimpleMangaInfo>>(
         'https://m.manhuadui.com/rank/click/',
-        parser: (res) => parser.getMangaListFromRank(res.body)
+        parser: (res) => parser.getMangaListFromRank(res.data)
           ..forEach((el) => el.sourceKey = _source.key));
   }
 }

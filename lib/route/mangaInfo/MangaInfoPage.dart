@@ -87,7 +87,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
               backgroundColor: Color(0xfffafafa),
             ),
             body: ErrorPage("读取漫画信息发生了错误呢~~~", onTap: () {
-              print('error page on tap');
+              debugPrint('error page on tap');
             }),
           );
         }
@@ -171,7 +171,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
       await Future.delayed(Duration(milliseconds: 500));
       loading = _MangaInfoPageStatus.over;
     } catch (e) {
-      print(e);
+      debugPrint(e);
       loading = _MangaInfoPageStatus.error;
     }
     if (mounted) {

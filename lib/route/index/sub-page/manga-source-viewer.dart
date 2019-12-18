@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:maxga/base/error/MaxgaHttpError.dart';
 import 'package:maxga/components/Card.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
+import 'package:maxga/components/MangaOutlineButton.dart';
 import 'package:maxga/components/MaxgaButton.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/manga/Manga.dart';
@@ -23,12 +24,13 @@ enum _SourceViewType {
   rank,
 }
 
-enum _MangaSourceViewerPageLoadState { none,loading, over, error }
+enum _MangaSourceViewerPageLoadState { none, loading, over, error }
 
 class MangaSourceViewerPage {
   final MangaSource source;
   String title;
   _SourceViewType type;
+  MangaHttpErrorType errorType;
   ScrollController controller = ScrollController(initialScrollOffset: 0);
   List<SimpleMangaInfo> mangaList = [];
   bool isLast = false;
@@ -38,17 +40,17 @@ class MangaSourceViewerPage {
 
   MangaSourceViewerPage(this.title, this.type, this.source);
 
-  Future<List<SimpleMangaInfo>> getMangaList(int page)  async {
+  Future<List<SimpleMangaInfo>> getMangaList(int page) async {
     MaxgaDataHttpRepo repo =
         MangaRepoPool.getInstance().getRepo(key: source.key);
     if (type == _SourceViewType.latestUpdate) {
       final mangaList = await repo.getLatestUpdate(page);
-      print('更新列表已经加载完毕， 数量：${mangaList.length}');
+      debugPrint('更新列表已经加载完毕， 数量：${mangaList.length}');
       initOver = true;
       return mangaList;
     } else {
       final mangaList = await repo.getRankedManga(page);
-      print('排行列表已经加载完毕， 数量：${mangaList.length}');
+      debugPrint('排行列表已经加载完毕， 数量：${mangaList.length}');
       initOver = true;
       return mangaList;
     }
@@ -133,9 +135,11 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
               controller: tabController,
               labelColor: Colors.black87,
               unselectedLabelColor: Colors.grey,
-              tabs: tabs.map((item) => Tab(
-                text: item.title,
-              )).toList(growable: false),
+              tabs: tabs
+                  .map((item) => Tab(
+                        text: item.title,
+                      ))
+                  .toList(growable: false),
             ),
           ),
           pinned: true,
@@ -165,13 +169,6 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
   List<Widget> buildAppBarActions() {
     return <Widget>[
       MaxgaSearchButton(),
-      IconButton(
-        icon: Icon(
-          Icons.delete,
-          color: Colors.white,
-        ),
-        onPressed: () => this.deleteUserData(),
-      ),
       PopupMenuButton<MangaSource>(
         itemBuilder: (context) => allMangaSource
             .map((el) => PopupMenuItem(
@@ -201,9 +198,10 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
         case _MangaSourceViewerPageLoadState.over:
           return buildMangaListView(state);
         case _MangaSourceViewerPageLoadState.error:
-          return ErrorPage(
-            '加载失败了呢~~~，\n我们点击之后继续吧',
-            onTap: () => getMangaList(state),
+          return MangaSourceViewerErrorPage(
+            errorType: state.errorType,
+            source: state.source,
+            onTap: () => this.getMangaList(state),
           );
       }
     } else {
@@ -271,7 +269,9 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
     }
     return Stack(
       children: <Widget>[
-        mangaCoverImage,
+        Align(
+          child: mangaCoverImage,
+        ),
         Positioned(
           top: -5,
           left: -3,
@@ -307,9 +307,11 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
     }
   }
 
-  refreshPage(MangaSourceViewerPage state) => this.getMangaList(state, isRefresh: true);
+  refreshPage(MangaSourceViewerPage state) =>
+      this.getMangaList(state, isRefresh: true);
 
-  Future<void> getMangaList(MangaSourceViewerPage state, {bool isRefresh = false}) async {
+  Future<void> getMangaList(MangaSourceViewerPage state,
+      {bool isRefresh = false}) async {
     if (state.loadState == _MangaSourceViewerPageLoadState.loading) {
       return null;
     }
@@ -325,19 +327,18 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
         state.isLast = true;
       }
       if (isRefresh) {
-
         state.mangaList = mangaList;
-      } else  {
+      } else {
         state.mangaList.addAll(mangaList);
       }
+
+      state.errorType = null;
       state.loadState = _MangaSourceViewerPageLoadState.over;
     } on MangaHttpError catch (e) {
-      print(e.message);
+      debugPrint(e.message);
+      state.errorType = e.type;
       state.loadState = _MangaSourceViewerPageLoadState.error;
-    } catch(e) {
-      print(e.message);
-      state.loadState = _MangaSourceViewerPageLoadState.error;
-    }finally {
+    } finally {
       setState(() {});
     }
   }
@@ -354,9 +355,7 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
     );
   }
 
-  toSearch() {
-
-  }
+  toSearch() {}
 
   goMangaInfoPage(SimpleMangaInfo item, {String tagPrefix}) {
     MangaSource source =
@@ -381,3 +380,38 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
   }
 }
 
+class MangaSourceViewerErrorPage extends StatelessWidget {
+  final MangaHttpErrorType errorType;
+  final MangaSource source;
+  final VoidCallback onTap;
+
+  MangaSourceViewerErrorPage({this.errorType, this.source, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    switch (this.errorType) {
+      case MangaHttpErrorType.NULL_PARAM:
+      case MangaHttpErrorType.ERROR_PARAM:
+        return ErrorPage('${source.name}接口参数错误，暂时无法提供服务\n'
+            '请等待更新或者联系作者');
+      case MangaHttpErrorType.RESPONSE_ERROR:
+        return ErrorPage(
+          '${source.name}接口请求失败，点击重试',
+          onTap: this.onTap,
+        );
+      case MangaHttpErrorType.CONNECT_TIMEOUT:
+        return ErrorPage(
+          '${source.name}接口请求超时，点击重试',
+          onTap: this.onTap,
+        );
+      case MangaHttpErrorType.PARSE_ERROR:
+        return ErrorPage(
+          '${source.name}接口解析失败，暂时无法提供服务\n'
+          '请等待更新或者联系作者',
+          onTap: this.onTap,
+        );
+      default:
+        return ErrorPage('未知错误，暂时无法使用');
+    }
+  }
+}

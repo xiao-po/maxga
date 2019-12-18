@@ -64,7 +64,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
     } catch (e) {
       resultItem.status = _LoadingState.error;
     } finally {
-      print('$mounted');
+      debugPrint('$mounted');
       if (mounted) {
         setState(() {});
       }

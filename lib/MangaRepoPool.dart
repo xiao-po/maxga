@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import 'http/repo/MaxgaDataHttpRepo.dart';
 import 'http/repo/dmzj/DmzjDataRepo.dart';
 import 'http/repo/hanhan/HanhanDataRepo.dart';
@@ -9,6 +11,11 @@ class MangaRepoPool {
   Map<String, MaxgaDataHttpRepo> _map = {};
   Map<String, MangaSource> _mangaSourceMap = {};
   MangaSource _currentSource;
+  Dio _dio = Dio(
+    BaseOptions(
+      connectTimeout: 15000,
+    )
+  );
 
   void changeMangaSource(MangaSource source) {
     _currentSource = source;
@@ -18,6 +25,8 @@ class MangaRepoPool {
   List<MangaSource> get allDataSource => _getAllSource();
   MangaSource get currentSource => _currentSource;
   MaxgaDataHttpRepo get currentDataRepo => _map[_currentSource.key];
+
+  Dio get dio => _dio;
   
   
 

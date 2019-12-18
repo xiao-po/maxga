@@ -134,7 +134,7 @@ class _MangaViewerState extends State<MangaViewer> {
         });
       }
     } catch (e) {
-      print(e.message);
+      debugPrint(e.message);
       if (mounted) {
         setState(() {
           this.loadStatus = _MangaViewerLoadState.error;
