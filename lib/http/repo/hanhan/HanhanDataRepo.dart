@@ -19,19 +19,14 @@ final HanhanMangaSource = MangaSource(
           'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
       'user-agent':
           'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36',
-      'cookies':
-          'ASP.NET_SessionId=twmkry55pznarv55tgzhzq45; ViewCtTxt=36219*370057*%u5723%u5251%u9171%u4E0D%u80FD%u8131*%u5723%u5251%u9171%u4E0D%u80FD%u8131%20039%u96C6*%5E36219*367967*%u5723%u5251%u9171%u4E0D%u80FD%u8131*%u5723%u5251%u9171%u4E0D%u80FD%u8131%20037%u96C6*%5E36219*369087*%u5723%u5251%u9171%u4E0D%u80FD%u8131*%u5723%u5251%u9171%u4E0D%u80FD%u8131%20038%u96C6*'
-    });
+        });
 
 class HanhanDateRepo extends MaxgaDataHttpRepo {
   MangaSource _source = HanhanMangaSource;
   MaxgaHttpUtils _httpUtils = MaxgaHttpUtils(HanhanMangaSource);
 
-  List<String> _imageServerUrl = [];
+  List<String> _imageServerUrl;
 
-  HanhanDateRepo() {
-    this.initRepo();
-  }
 
   HanhanHtmlParser parser = HanhanHtmlParser.getInstance();
 
@@ -53,6 +48,7 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<Manga> getMangaInfo({int id, String url}) async {
+    await this.initRepo();
     return _httpUtils.requestApi<Manga>('${_source.domain}/comic/18$id/',
         parser: (res) =>
             parser.getMangaFromInfoPate(res.data)..sourceKey = _source.key);
@@ -82,12 +78,14 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
   @override
   MangaSource get mangaSource => _source;
 
-  void initRepo() async {
-    _imageServerUrl = await _httpUtils.requestApi<List<String>>(
-        '${_source.domain}/js/ds.js',
-        parser: (res) => res.data
-            .substring(res.data.indexOf('var sDS = "') + 'var sDS = "'.length,
-                res.data.indexOf('";'))
-            .split('|'));
+  Future<void> initRepo() async {
+    if (_imageServerUrl == null ) {
+      _imageServerUrl = await _httpUtils.requestApi<List<String>>(
+          '${_source.domain}/js/ds.js',
+          parser: (res) => res.data
+              .substring(res.data.indexOf('var sDS = "') + 'var sDS = "'.length,
+              res.data.indexOf('";'))
+              .split('|'));
+    }
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:maxga/base/error/MaxgaHttpError.dart';
@@ -17,9 +19,9 @@ class MaxgaHttpUtils {
     var retryTimes = 3;
     while (retryTimes > 0) {
       try {
+        
         response = await dio.get(url, options: Options(
-            headers: source.headers,
-
+            headers: Map.from(source.headers),
         ));
         break;
       } on DioError catch(e) {

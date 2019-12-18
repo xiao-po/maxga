@@ -102,7 +102,7 @@ class HanhanHtmlParser {
         imageEncryptStringElText.lastIndexOf('";'));
     return HanhanCrypto.decryptImageList(encryptString)
         .map((url) =>
-            '${imageServerList[int.parse(sPath) - 1]}${url.substring(1)}')
+            '${imageServerList[int.parse(sPath) - 1]}${url}')
         .toList(growable: false);
   }
 

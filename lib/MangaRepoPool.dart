@@ -37,6 +37,7 @@ class MangaRepoPool {
   
 
   MangaRepoPool() {
+    print('pool init');
     final manhuaduiDataRepo = ManhuaduiDataRepo();
     final dmzjDataRepo = DmzjDataRepo();
     final hanhanDateRepo = HanhanDateRepo();
