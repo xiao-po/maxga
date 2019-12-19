@@ -1,4 +1,7 @@
+import 'package:maxga/http/repo/dmzj/constants/DmzjMangaSource.dart';
 import 'package:maxga/http/repo/dmzj/model/DmzjTag.dart';
+import 'package:maxga/model/manga/Chapter.dart';
+import 'package:maxga/model/manga/Manga.dart';
 import 'DmzjChapterData.dart';
 
 class DmzjMangaInfo {
@@ -68,6 +71,28 @@ class DmzjMangaInfo {
     }
     isHideChapter = json['isHideChapter'];
   }
+
+  Manga convertToManga() {
+    final Manga manga = Manga();
+    manga.author =
+        authors.map((tag) => tag.tagName).toList(growable: false);
+    manga.introduce = description;
+    manga.typeList = types.map((type) => type.tagName).toList();
+    manga.title = title;
+    manga.coverImgUrl = cover;
+    manga.id = id;
+    manga.status = status[0].tagName;
+    manga.chapterList =
+        chapters.singleWhere((item) => item.title == '连载').data;
+    manga.chapterList.forEach((chapter) {
+      chapter.url = '${DmzjMangaSource.domain}/chapter/${id}/${chapter.id}.json';
+    });
+    manga.sourceKey = DmzjMangaSource.key;
+    return manga;
+  }
+
+
+
 }
 
 

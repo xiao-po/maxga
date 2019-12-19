@@ -1,3 +1,7 @@
+import 'package:maxga/http/repo/dmzj/constants/DmzjMangaSource.dart';
+import 'package:maxga/model/manga/Chapter.dart';
+import 'package:maxga/model/manga/Manga.dart';
+
 class DmzjMangaSearchResult {
   String sBiz;
   int addtime;
@@ -73,4 +77,23 @@ class DmzjMangaSearchResult {
     data['id'] = this.id;
     return data;
   }
+
+  /// 用于 动漫之家 列表拿到的接口返回的数据
+  SimpleMangaInfo convertToSimpleMangaInfoForSearchResult() {
+    final SimpleMangaInfo manga = SimpleMangaInfo();
+
+    final Chapter latestChapter = Chapter();
+    latestChapter.title = lastName;
+    manga.lastUpdateChapter = latestChapter;
+    manga.infoUrl = '${DmzjMangaSource.domain}/comic/comic_$id.json';
+    manga.author = authors.split('/');
+    manga.coverImgUrl = cover;
+    manga.title = title;
+    manga.id = id;
+    manga.typeList = types.split('/');
+    manga.sourceKey = DmzjMangaSource.key;
+    return manga;
+  }
+
+
 }

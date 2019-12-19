@@ -2,24 +2,17 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
+import 'package:maxga/http/repo/dmzj/model/DmzjLatestUpdateManga.dart';
 import 'package:maxga/http/repo/dmzj/model/DmzjMangaInfo.dart';
+import 'package:maxga/http/repo/dmzj/model/DmzjMangaSearchResult.dart';
 import 'package:maxga/http/repo/dmzj/model/DmzjRankedMangaInfo.dart';
-import 'package:maxga/http/repo/dmzj/utils/DmzjModelConvertUtils.dart';
 import 'package:maxga/http/utils/MaxgaHttpUtils.dart';
 import 'package:maxga/model/manga/Chapter.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 
+import 'constants/DmzjMangaSource.dart';
 import 'model/DmzjSearchSuggestion.dart';
-
-final DmzjMangaSource = MangaSource(
-    name: '动漫之家',
-    key: 'dmzj',
-    domain: 'https://v3api.dmzj.com',
-    iconUrl: 'https://www.dmzj.com/favicon.ico',
-    headers: {
-      'referer': 'http://m.dmzj.com/latest.html',
-    });
 
 class DmzjDataRepo extends MaxgaDataHttpRepo {
   MangaSource _source = DmzjMangaSource;
@@ -29,10 +22,8 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
   Future<Manga> getMangaInfo({id, url}) async {
     return _httpUtils.requestApi<Manga>(
         id == null ? url : '${_source.domain}/comic/comic_$id.json',
-        parser: (response) => DmzjModelConvertUtils.convertToMangaFromMangaInfo(
-              DmzjMangaInfo.fromJson(json.decode(response.data)),
-              _source,
-            ));
+        parser: (response) => DmzjMangaInfo.fromJson(json.decode(response.data))
+            .convertToManga());
   }
 
   @override
@@ -40,14 +31,14 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     return _httpUtils.requestApi<List<SimpleMangaInfo>>(
         '${_source.domain}/latest/100/$page.json',
         parser: (response) => (json.decode(response.data) as List<dynamic>)
-            .map((item) => _convertDataFromListItem(item))
+            .map((item) => DmzjLatestUpdateManga.fromJson(item)
+                .convertToSimpleMangaInfoForLatestUpdate())
             .toList());
   }
 
   @override
   Future<List<String>> getChapterImageList(String url) async {
-    return _httpUtils.requestApi<List<String>>(
-        url,
+    return _httpUtils.requestApi<List<String>>(url,
         parser: (response) =>
             json.decode(response.data)['page_url'].cast<String>());
   }
@@ -67,8 +58,8 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     return _httpUtils.requestApi<List<SimpleMangaInfo>>(
         '${_source.domain}/rank/0/0/0/$page.json',
         parser: (response) => (json.decode(response.data) as List<dynamic>)
-            .map((item) => DmzjRankedMangaInfo.fromJson(item))
-            .map((item) => _convertDataFromRankedManga(item))
+            .map((item) => DmzjRankedMangaInfo.fromJson(item)
+                .convertToSimpleMangaInfoForRank())
             .toList(growable: false));
   }
 
@@ -77,85 +68,9 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
     return _httpUtils.requestApi<List<SimpleMangaInfo>>(
         '${_source.domain}/search/show/0/$keywords/0.json',
         parser: (response) => (json.decode(response.data) as List<dynamic>)
-            .map((item) => _convertDataFromSearch(item))
+            .map((item) => DmzjMangaSearchResult.fromJson(item))
+            .map((item) => item.convertToSimpleMangaInfoForSearchResult())
             .toList(growable: false));
-  }
-
-  SimpleMangaInfo _convertDataFromRankedManga(
-      DmzjRankedMangaInfo rankedMangaInfo) {
-    final SimpleMangaInfo manga = SimpleMangaInfo();
-
-    final Chapter latestChapter = Chapter();
-    latestChapter.title = rankedMangaInfo.lastUpdateChapterName;
-    latestChapter.updateTime = int.parse(rankedMangaInfo.lastUpdatetime) * 1000;
-
-    manga.id = int.parse(rankedMangaInfo.comicId);
-    manga.title = rankedMangaInfo.title;
-    manga.sourceKey = _source.key;
-    manga.typeList = rankedMangaInfo.types.split('/');
-    manga.author = rankedMangaInfo.authors.split('/');
-    manga.status = rankedMangaInfo.status;
-    manga.coverImgUrl = rankedMangaInfo.cover;
-    manga.infoUrl =
-        'http://v3api.dmzj.com/comic/comic_${rankedMangaInfo.comicId}.json';
-    manga.lastUpdateChapter = latestChapter;
-    return manga;
-  }
-
-  /// 用于 动漫之家 列表拿到的接口返回的数据
-  SimpleMangaInfo _convertDataFromListItem(Map<String, dynamic> json) {
-    final SimpleMangaInfo manga = SimpleMangaInfo();
-
-    final Chapter latestChapter = Chapter();
-    latestChapter.id = json['last_update_chapter_id'];
-    latestChapter.title = json['last_update_chapter_name'];
-    latestChapter.updateTime = json['last_updatetime'] * 1000;
-    manga.lastUpdateChapter = latestChapter;
-    manga.infoUrl = 'http://v3api.dmzj.com/comic/comic_${json['id']}.json';
-    manga.author = json['authors'].split('/');
-    manga.coverImgUrl = json['cover'];
-    manga.title = json['title'];
-    manga.id = json['id'];
-    manga.typeList = (json['types'] as String).split('/');
-    manga.sourceKey = _source.key;
-    return manga;
-  }
-
-  /// 用于 动漫之家 列表拿到的接口返回的数据
-  SimpleMangaInfo _convertDataFromSearch(Map<String, dynamic> json) {
-    final SimpleMangaInfo manga = SimpleMangaInfo();
-
-    final Chapter latestChapter = Chapter();
-    latestChapter.title = json['last_name'];
-    manga.lastUpdateChapter = latestChapter;
-    manga.infoUrl = '${_source.domain}/comic/comic_${json['id']}.json';
-    manga.author = json['authors'].split('/');
-    manga.coverImgUrl = json['cover'];
-    manga.title = json['title'];
-    manga.id = json['id'];
-    manga.typeList = (json['types'] as String).split('/');
-    manga.sourceKey = _source.key;
-    return manga;
-  }
-
-  Manga _convertDataFromMangaInfo(Map<String, dynamic> json, int comicId) {
-    final DmzjMangaInfo dmzjMangaInfo = DmzjMangaInfo.fromJson(json);
-    final Manga manga = Manga();
-    manga.author =
-        dmzjMangaInfo.authors.map((tag) => tag.tagName).toList(growable: false);
-    manga.introduce = dmzjMangaInfo.description;
-    manga.typeList = dmzjMangaInfo.types.map((type) => type.tagName).toList();
-    manga.title = dmzjMangaInfo.title;
-    manga.coverImgUrl = dmzjMangaInfo.cover;
-    manga.id = dmzjMangaInfo.id;
-    manga.status = dmzjMangaInfo.status[0].tagName;
-    manga.chapterList =
-        dmzjMangaInfo.chapters.singleWhere((item) => item.title == '连载').data;
-    manga.chapterList.forEach((chapter) {
-      chapter.url = '${_source.domain}/chapter/$comicId/${chapter.id}.json';
-    });
-    manga.sourceKey = _source.key;
-    return manga;
   }
 
   // ignore: unused_element

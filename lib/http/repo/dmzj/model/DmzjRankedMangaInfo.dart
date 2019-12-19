@@ -1,3 +1,7 @@
+import 'package:maxga/http/repo/dmzj/constants/DmzjMangaSource.dart';
+import 'package:maxga/model/manga/Chapter.dart';
+import 'package:maxga/model/manga/Manga.dart';
+
 class DmzjRankedMangaInfo {
   String comicId;
   String title;
@@ -52,5 +56,22 @@ class DmzjRankedMangaInfo {
     data['num'] = this.num;
     data['tag_id'] = this.tagId;
     return data;
+  }
+
+  /// 用于 动漫之家 列表拿到的接口返回的数据
+  SimpleMangaInfo convertToSimpleMangaInfoForRank() {
+    final SimpleMangaInfo manga = SimpleMangaInfo();
+    final Chapter latestChapter = Chapter();
+    latestChapter.title = lastUpdateChapterName;
+    latestChapter.updateTime = int.parse(lastUpdatetime) * 1000;
+    manga.lastUpdateChapter = latestChapter;
+    manga.infoUrl = 'http://v3api.dmzj.com/comic/comic_$comicId.json';
+    manga.author = authors.split('/');
+    manga.coverImgUrl = cover;
+    manga.title = title;
+    manga.id = int.parse(comicId);
+    manga.typeList = types.split('/');
+    manga.sourceKey = DmzjMangaSource.key;
+    return manga;
   }
 }
