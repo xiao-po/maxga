@@ -21,7 +21,7 @@ class MaxgaHttpUtils {
       try {
         
         response = await dio.get(url, options: Options(
-            headers: Map.from(source.headers),
+            headers: Map.from(source?.headers ?? {}),
         ));
         break;
       } on DioError catch(e) {

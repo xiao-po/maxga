@@ -10,9 +10,12 @@ class MangaReadStorageService {
   static Future<ReadMangaStatus> getMangaStatus(MangaBase manga) async {
     final allReadManga = await _getAllReadManga();
     final index = allReadManga.indexWhere((el) => el.id == manga.id && manga.sourceKey == el.sourceKey);
-    return index != -1
-        ? allReadManga[index]
-        : ReadMangaStatus.fromSimpleMangaInfo(manga);
+    if (index != -1) {
+      final mangaReadProcess = allReadManga[index];
+      return mangaReadProcess;
+    } else {
+      return ReadMangaStatus.fromSimpleMangaInfo(manga);
+    }
   }
 
   static Future<List<ReadMangaStatus>> getAllCollectedManga() async {

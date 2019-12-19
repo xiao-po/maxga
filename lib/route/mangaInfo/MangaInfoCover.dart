@@ -14,17 +14,19 @@ class MangaInfoCover extends StatelessWidget {
 
   final int updateTime;
 
-  const MangaInfoCover(
-      {Key key,
-      this.manga,
-      this.updateTime,
-      this.loadEnd,
-      this.coverImageBuilder, @required this.source})
+  const MangaInfoCover({Key key,
+    this.manga,
+    this.updateTime,
+    this.loadEnd,
+    this.coverImageBuilder, @required this.source})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    double deviceHeight = MediaQuery.of(context).size.height;
+    double deviceHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     var coverMessage;
     if (loadEnd) {
       coverMessage = buildCoverMessage(context);
@@ -39,7 +41,8 @@ class MangaInfoCover extends StatelessWidget {
             child: coverImageBuilder(context),
           ),
           coverMessage,
-        ]..removeWhere((el) => el == null),
+        ]
+          ..removeWhere((el) => el == null),
       ),
     );
   }
@@ -65,7 +68,9 @@ class MangaInfoCover extends StatelessWidget {
       textAlign: TextAlign.left,
     );
     var mangaUpdateTime = Text(
-        '${manga.lastUpdateChapter.updateTime != null ? DateUtils.formatTime(timestamp: manga.lastUpdateChapter.updateTime, template: "yyyy-MM-dd") : ''}',
+        '${manga.lastUpdateChapter.updateTime != null ? DateUtils.formatTime(
+            timestamp: manga.lastUpdateChapter.updateTime,
+            template: "yyyy-MM-dd") : ''}',
         style: TextStyle(color: coverStringColor, fontSize: subtitleTextSize),
         textAlign: TextAlign.left);
     return Container(
@@ -94,51 +99,54 @@ class MangaInfoCover extends StatelessWidget {
                 children: <Widget>[
                   Expanded(
                       child: Column(
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 10),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            const Padding(
-                              padding: const EdgeInsets.only(top: 5),
-                              child: const Text('作者: ',
-                                  style: TextStyle(color: coverStringColor)),
-                            ),
-                            Expanded(
-                              child: Wrap(
-                                direction: Axis.horizontal,
-                                children:
-                                manga.author.map((text) => CoverMessageTag(
-                                  onTap: () => searchTag(text, context),
-                                  child: Text(
-                                    text,
-                                    style: TextStyle(
-                                        color: coverStringColor,
-                                        fontSize: subtitleTextSize),
-                                    textAlign: TextAlign.left,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                )).toList(growable: false),
-                              ),
-                            )
-
-                          ],
-                        ),
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Padding(
-                            padding: EdgeInsets.only(top: 5),
-                            child: const Text('标签: ',
-                                style: TextStyle(color: coverStringColor)),
+                            padding: EdgeInsets.only(bottom: 10),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                const Padding(
+                                  padding: const EdgeInsets.only(top: 5),
+                                  child: const Text('作者: ',
+                                      style: TextStyle(
+                                          color: coverStringColor)),
+                                ),
+                                Expanded(
+                                  child: Wrap(
+                                    direction: Axis.horizontal,
+                                    children:
+                                    manga.author.map((text) =>
+                                        CoverMessageTag(
+                                          onTap: () => searchTag(text, context),
+                                          child: Text(
+                                            text,
+                                            style: TextStyle(
+                                                color: coverStringColor,
+                                                fontSize: subtitleTextSize),
+                                            textAlign: TextAlign.left,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        )).toList(growable: false),
+                                  ),
+                                )
+
+                              ],
+                            ),
                           ),
-                          Expanded(
-                            child: Wrap(
-                              direction: Axis.horizontal,
-                              children:
-                                  manga.typeList.map((text) => CoverMessageTag(
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Padding(
+                                padding: EdgeInsets.only(top: 5),
+                                child: const Text('标签: ',
+                                    style: TextStyle(color: coverStringColor)),
+                              ),
+                              Expanded(
+                                child: Wrap(
+                                  direction: Axis.horizontal,
+                                  children:
+                                  manga.typeList.map((text) =>
+                                      CoverMessageTag(
                                         onTap: () => searchTag(text, context),
                                         child: Text(
                                           text,
@@ -149,12 +157,12 @@ class MangaInfoCover extends StatelessWidget {
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       )).toList(growable: false),
-                            ),
+                                ),
+                              )
+                            ],
                           )
                         ],
-                      )
-                    ],
-                  )),
+                      )),
                   Text(
                     '来源: ${source.name}',
                     style: TextStyle(
@@ -181,10 +189,19 @@ class MangaInfoCover extends StatelessWidget {
 
 class CoverMessageTag extends StatelessWidget {
   final Widget child;
+  final Color backgroundColor;
+  final EdgeInsets padding;
+  final EdgeInsets margin;
 
   final GestureTapCallback onTap;
 
-  const CoverMessageTag({Key key, this.child, @required this.onTap})
+  const CoverMessageTag(
+      {Key key, this.child, @required this.onTap, this.backgroundColor = Colors
+          .white24, this.padding = const EdgeInsets.only(top: 4,
+          bottom: 4,
+          left: 10,
+          right: 10), this.margin = const EdgeInsets.only(
+          top: 2, bottom: 2, right: 5)})
       : super(key: key);
 
   @override
@@ -192,11 +209,11 @@ class CoverMessageTag extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.only(top: 2, bottom: 2, right: 5),
-        padding: EdgeInsets.only(top: 4, bottom: 4, left: 10, right: 10),
+        margin: margin,
+        padding: padding,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15.0),
-          color: Colors.white24,
+          color: backgroundColor,
         ),
         child: child,
       ),

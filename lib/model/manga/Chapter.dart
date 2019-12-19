@@ -4,26 +4,23 @@ class Chapter {
   int comicId;
   String title;
   int updateTime;
+  bool isCollectionLatestUpdate;
   String url;
   List<String> imgUrlList;
+
 
   // 条漫还是翻页
   int direction;
 
   Chapter();
 
-  Chapter.fromDmzjJson(Map<String, dynamic> json) {
-    id = json['chapter_id'];
-    title = json['chapter_title'];
-    order = json['chapter_order'];
-    updateTime = json['updatetime'] * 1000;
-  }
 
   Chapter.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     title = json['title'];
     order = json['order'];
     updateTime = json['updateTime'];
+    isCollectionLatestUpdate = json['isCollectionLatestUpdate'];
     comicId = json['comicId'];
     url = json['url'];
     imgUrlList = json['imgUrlList']?.cast<String>() ?? [];
@@ -34,6 +31,7 @@ class Chapter {
         'id': id,
         'title': title,
         'order': order,
+        'isCollectionLatestUpdate': isCollectionLatestUpdate,
         'updateTime': updateTime,
         'comicId': comicId,
         'url': url,

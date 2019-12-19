@@ -102,7 +102,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     }
     return Scaffold(
         body: MangaInfoWrapper(
-          title: widget.manga?.title ?? '',
+          title: readMangaStatus?.title ?? '',
           appbarActions: <Widget>[
             IconButton(
               icon: Icon(Icons.share, color: Colors.white),
@@ -184,7 +184,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
         context,
         MaterialPageRoute(
             builder: (context) => MangaViewer(
-                  manga: widget.manga,
+                  manga: readMangaStatus,
                   currentChapter: chapter,
                   chapterList: chapterList,
                   initIndex: imagePage,

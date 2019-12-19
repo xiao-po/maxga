@@ -4,6 +4,7 @@ import 'package:maxga/components/Card.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
+import 'package:maxga/route/mangaInfo/MangaInfoCover.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 
 import '../../MangaRepoPool.dart';
@@ -69,7 +70,6 @@ class _SearchResultPageState extends State<SearchResultPage> {
         setState(() {});
       }
     }
-
   }
 
   @override
@@ -159,6 +159,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
   Widget buildExpansionPanelHeader(_SearchResult item) {
     var sourceName = Text(item.source.name);
     var extra;
+    var searchResultCountTag;
     const extraTextStyle = const TextStyle(color: Colors.black12);
     const errorTextStyle = const TextStyle(color: Colors.redAccent);
     const progressColor = const AlwaysStoppedAnimation<Color>(Colors.black12);
@@ -188,9 +189,16 @@ class _SearchResultPageState extends State<SearchResultPage> {
         break;
       case _LoadingState.over:
       case _LoadingState.empty:
-        extra = Text(
-          '搜索结果: ${item.mangaList.length}',
-        );
+//        extra = Text(
+//          '搜索结果: ${item.mangaList.length}',
+//        );
+        searchResultCountTag =
+            CoverMessageTag(
+              margin: EdgeInsets.only(top: 2, right: 5, left: 5),
+              padding: EdgeInsets.only(top: 2,bottom: 1, left: 7, right: 7),
+              child: Text('${item.mangaList.length}', style: TextStyle(fontSize: 10, color: Colors.white),),
+              backgroundColor: Colors.redAccent
+            );
         break;
 //      case _LoadingState.retry:
 //        extraWidth = 180;
@@ -227,12 +235,13 @@ class _SearchResultPageState extends State<SearchResultPage> {
               ),
             ),
             sourceName,
+            searchResultCountTag ?? Container()
           ],
         ),
         SizedBox(
           width: extraWidth,
           child: extra,
-        )
+        ),
       ],
     );
     return Padding(
