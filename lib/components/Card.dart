@@ -211,7 +211,6 @@ class MangaInfoCardExtra extends StatelessWidget {
 class SkeletonCardSliverList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final itemCount = (MediaQuery.of(context).size.height - 100) / 120;
     return SliverList(
       delegate: SliverChildListDelegate(
           [SkeletonCardList()]

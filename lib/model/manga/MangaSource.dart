@@ -1,29 +1,25 @@
 import 'package:flutter/cupertino.dart';
 
+typedef MangaSourceProxyReplaceCallback = String Function(String url);
+
+
+
 class MangaSource {
   String name;
   String domain;
   String key;
-  String iconUrl;
+  String proxyDomain;
+  // todo Proxy 功能搁置
+  MangaSourceProxyReplaceCallback proxyReplaceCallback;
 
   Map<String, String> headers;
+
 
   MangaSource(
       {@required this.name,
       @required this.key,
-      @required this.iconUrl,
+        this.proxyDomain,
       this.headers,
+      proxyReplaceCallback,
       @required this.domain});
-
-  MangaSource.fromJson(Map<String, dynamic> json) {
-    name = json['name'];
-    domain = json['domain'];
-    key = json['key'];
-    headers = json['headers'] != null
-        ? new Map<String, String>.from(json['headers'])
-        : null;
-  }
-
-  Map<String, dynamic> toJson() =>
-      {'name': name, 'key': key, 'headers': headers, 'domain': domain};
 }

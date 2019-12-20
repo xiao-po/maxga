@@ -1,5 +1,3 @@
-import 'package:maxga/model/manga/MangaSource.dart';
-
 import 'Chapter.dart';
 
 class Manga extends MangaBase {

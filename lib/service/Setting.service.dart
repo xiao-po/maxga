@@ -10,9 +10,9 @@ class SettingService {
     final List<MaxgaSettingItem> settingList = [];
 
     for (var item in SettingItemList) {
-      final settingItem = MaxgaSettingItem.copy(item);
-      final value = await LocalStorage.getString('$_key${SettingTypeNameList[item.name]}');
-      settingItem.setValue(value);
+      final settingItem = item.copy();
+      final value = await LocalStorage.getString('$_key${SettingTypeNameList[item.key]}');
+      settingItem.value = value;
       settingList.add(settingItem);
     }
     return settingList;

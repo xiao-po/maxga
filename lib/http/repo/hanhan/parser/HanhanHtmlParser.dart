@@ -1,4 +1,4 @@
-import 'package:html/parser.dart' show parse, parseFragment;
+import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart';
 import 'package:maxga/Utils/DateUtils.dart';
 import 'package:maxga/http/repo/hanhan/crypto/HanhanCrypto.dart';
@@ -102,7 +102,7 @@ class HanhanHtmlParser {
         imageEncryptStringElText.lastIndexOf('";'));
     return HanhanCrypto.decryptImageList(encryptString)
         .map((url) =>
-            '${imageServerList[int.parse(sPath) - 1]}${url}')
+            '${imageServerList[int.parse(sPath) - 1]}$url')
         .toList(growable: false);
   }
 

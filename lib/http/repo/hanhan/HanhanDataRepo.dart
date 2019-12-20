@@ -1,5 +1,3 @@
-import 'package:http/http.dart';
-import 'package:maxga/base/error/MaxgaHttpError.dart';
 import 'package:maxga/http/utils/MaxgaHttpUtils.dart';
 import 'package:maxga/model/manga/Manga.dart';
 
@@ -8,10 +6,11 @@ import 'package:maxga/model/manga/MangaSource.dart';
 import '../MaxgaDataHttpRepo.dart';
 import 'parser/HanhanHtmlParser.dart';
 
+// ignore: non_constant_identifier_names
 final HanhanMangaSource = MangaSource(
     name: '汗汗漫画',
     key: 'hanhan',
-    iconUrl: 'http://hanhan.xiaopo.moe/favicon.ico',
+    proxyDomain: 'http://hanhan.xiaopo.moe',
     domain: 'http://hanhan.xiaopo.moe',
     headers: {
       'Accept-Encoding': 'gzip, deflate',

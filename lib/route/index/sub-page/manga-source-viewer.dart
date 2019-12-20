@@ -14,7 +14,6 @@ import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/index/base/IndexSliverAppBarDelegate.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:maxga/route/mangaViewer/baseComponent/MangaPageView.dart';
-import 'package:maxga/route/search/search-page.dart';
 import 'package:maxga/service/MangaReadStorage.service.dart';
 
 import '../../../MangaRepoPool.dart';

@@ -10,7 +10,6 @@ final ManhuaduiMangaSource = MangaSource(
   name: '漫画堆',
   key: 'manhuadui',
   domain: 'https://www.manhuadui.com',
-  iconUrl: 'https://www.manhuadui.com/favicon.ico',
 );
 
 class ManhuaduiDataRepo extends MaxgaDataHttpRepo {

@@ -1,6 +1,5 @@
 import 'package:maxga/http/repo/dmzj/constants/DmzjMangaSource.dart';
 import 'package:maxga/http/repo/dmzj/model/DmzjTag.dart';
-import 'package:maxga/model/manga/Chapter.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'DmzjChapterData.dart';
 
@@ -85,7 +84,7 @@ class DmzjMangaInfo {
     manga.chapterList =
         chapters.singleWhere((item) => item.title == '连载').data;
     manga.chapterList.forEach((chapter) {
-      chapter.url = '${DmzjMangaSource.domain}/chapter/${id}/${chapter.id}.json';
+      chapter.url = '${DmzjMangaSource.domain}/chapter/$id/${chapter.id}.json';
     });
     manga.sourceKey = DmzjMangaSource.key;
     return manga;

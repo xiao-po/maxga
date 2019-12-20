@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:maxga/Application.dart';
 import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/Utils/MaxgaUtils.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
@@ -171,7 +170,6 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
       await Future.delayed(Duration(milliseconds: 500));
       loading = _MangaInfoPageStatus.over;
     } catch (e) {
-      debugPrint(e);
       loading = _MangaInfoPageStatus.error;
     }
     if (mounted) {

@@ -4,7 +4,7 @@ import 'package:maxga/model/maxga/MaxgaReleaseInfo.dart';
 import 'package:maxga/service/LocalStorage.service.dart';
 import 'package:package_info/package_info.dart';
 
-final IgnoreUpdateVersion =  'IgnoreUpdateVersion';
+const IgnoreUpdateVersion =  'IgnoreUpdateVersion';
 
 class UpdateService {
   static Future<MaxgaReleaseInfo> checkUpdateStatus() async {

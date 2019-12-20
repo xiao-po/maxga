@@ -1,11 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:maxga/base/setting/SettingValue.dart';
 import 'package:maxga/components/Card.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
+import 'package:maxga/provider/SettingProvider.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoCover.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
+import 'package:provider/provider.dart';
 
 import '../../MangaRepoPool.dart';
 
@@ -189,16 +192,14 @@ class _SearchResultPageState extends State<SearchResultPage> {
         break;
       case _LoadingState.over:
       case _LoadingState.empty:
-//        extra = Text(
-//          '搜索结果: ${item.mangaList.length}',
-//        );
-        searchResultCountTag =
-            CoverMessageTag(
-              margin: EdgeInsets.only(top: 2, right: 5, left: 5),
-              padding: EdgeInsets.only(top: 2,bottom: 1, left: 7, right: 7),
-              child: Text('${item.mangaList.length}', style: TextStyle(fontSize: 10, color: Colors.white),),
-              backgroundColor: Colors.redAccent
-            );
+        searchResultCountTag = CoverMessageTag(
+            margin: EdgeInsets.only(top: 2, right: 5, left: 5),
+            padding: EdgeInsets.only(top: 2, bottom: 1, left: 7, right: 7),
+            child: Text(
+              '${item.mangaList.length}',
+              style: TextStyle(fontSize: 10, color: Colors.white),
+            ),
+            backgroundColor: Colors.redAccent);
         break;
 //      case _LoadingState.retry:
 //        extraWidth = 180;
@@ -221,6 +222,11 @@ class _SearchResultPageState extends State<SearchResultPage> {
 //        );
         break;
     }
+    final useMaxgaProxy = Provider.of<SettingProvider>(context)
+        .getBoolItemValue(MaxgaSettingItemType.useMaxgaProxy);
+    final domain = useMaxgaProxy && item.source.proxyDomain != null
+        ? item.source.proxyDomain
+        : item.source.domain;
     var body = Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -231,7 +237,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
               height: 20,
               width: 20,
               child: CachedNetworkImage(
-                imageUrl: item.source.iconUrl,
+                imageUrl: '$domain/favicon.ico',
               ),
             ),
             sourceName,

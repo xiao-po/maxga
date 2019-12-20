@@ -15,23 +15,12 @@ class ManhuaguiCrypto {
     final dataString = encryptString.substring(
       encryptString.indexOf('p;}(') + 'p;}('.length,
     );
-    final imageListStartIndex = dataString.indexOf('":[') + 2;
-    final imageListEndIndex = dataString.indexOf('"],') + 2;
-//    final encryptImageString = dataString.substring(
-//      imageListStartIndex,
-//      imageListEndIndex,
-//    );
     
     var jsonString = dataString.substring(
       dataString.indexOf('({"') + 1,
       dataString.indexOf('}})') + 2,
     );
 
-//    final encryptPath = dataString.substring(
-//      dataString.indexOf(':"/', imageListEndIndex) + 2,
-//      dataString.indexOf('/",', imageListEndIndex) + 1,
-//    );
-//
     final aStartIndex = dataString.indexOf(');\',') + 4;
     final a = int.parse(dataString.substring(
       aStartIndex,
@@ -48,15 +37,7 @@ class ManhuaguiCrypto {
       var key = getKey(a, c);
       keyValueMap[key] = wordStringList[c] != '' ? wordStringList[c] : key ;
     }
-//    final encryptImageList = json.decode(encryptImageString);
     final regExp = RegExp('\\b\\w+\\b');
-//    final path = encryptPath.replaceAllMapped(
-//        regExp, (match) {
-//      return keyValueMap[match.group(0)];
-//    });
-//    final imagePathList = encryptImageList.map((str) => path + str.replaceAllMapped(regExp, (match) {
-//      return  keyValueMap[match.group(0)];
-//    })).toList(growable: false);
     jsonString = jsonString.replaceAllMapped(
         regExp, (match) {
       return keyValueMap[match.group(0)];

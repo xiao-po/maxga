@@ -1,6 +1,5 @@
 import '../manga/Chapter.dart';
 import '../manga/Manga.dart';
-import '../manga/MangaSource.dart';
 
 class ReadMangaStatus extends SimpleMangaInfo {
   int readChapterId;

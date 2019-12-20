@@ -57,29 +57,3 @@ class _TestPageState extends State<TestPage> {
 
 
 }
-
-class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
-  _SliverAppBarDelegate(this.child, this._minExtent);
-
-  final Widget child;
-  final double _minExtent;
-
-  @override
-  double get minExtent => _minExtent;
-
-  @override
-  double get maxExtent => 200;
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return new Container(
-      child: child,
-    );
-  }
-
-  @override
-  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
-    return false;
-  }
-}

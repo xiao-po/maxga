@@ -3,7 +3,6 @@ import 'package:maxga/base/drawer/menu-item.dart';
 import 'package:maxga/constant/DrawerValue.dart';
 import 'package:maxga/provider/IndexPageTypeProvider.dart';
 import 'package:maxga/route/Drawer/about/about-page.dart';
-import 'package:maxga/route/index/sub-page/collection.dart';
 import 'package:maxga/route/Drawer/history/history-page.dart';
 import 'package:maxga/route/Drawer/setting/Setting-page.dart';
 import 'package:provider/provider.dart';
