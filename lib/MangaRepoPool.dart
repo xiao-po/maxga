@@ -21,6 +21,14 @@ class MangaRepoPool {
     _currentSource = source;
   }
 
+  void changeTimeoutLimit(int value) {
+    this._dio = Dio(
+        BaseOptions(
+          connectTimeout: value,
+        )
+    );
+  }
+
   List<MaxgaDataHttpRepo> get allDataRepo => _getAllRepo();
   List<MangaSource> get allDataSource => _getAllSource();
   MangaSource get currentSource => _currentSource;
@@ -82,6 +90,7 @@ class MangaRepoPool {
   MangaSource getMangaSourceByKey(String key) {
     return _mangaSourceMap[key];
   }
+
 
 
   

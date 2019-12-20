@@ -68,7 +68,7 @@ class CommandSettingListTile extends StatelessWidget {
       subtitle: setting.subTitle != null ? Text(setting.subTitle) : null,
       onTap: () async {
         var isSuccess = await Provider.of<SettingProvider>(context)
-            .dispatchCommand(setting);
+            .onChange(setting);
         if (isSuccess) {
           Scaffold.of(context).showSnackBar(SnackBar(
             content: Text('${setting.title}结束'),
@@ -105,7 +105,7 @@ class AlertCommandSettingListTile extends StatelessWidget {
                       onPressed: () async {
                         var isSuccess =
                             await Provider.of<SettingProvider>(context)
-                                .dispatchCommand(setting);
+                                .onChange(setting);
                         if (isSuccess) {
                           Scaffold.of(context).showSnackBar(SnackBar(
                             content: Text('${setting.title}结束'),

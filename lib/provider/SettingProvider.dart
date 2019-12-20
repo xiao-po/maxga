@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/base/setting/Setting.model.dart';
 import 'package:maxga/base/setting/SettingValue.dart';
+import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/provider/base/BaseProvider.dart';
 import 'package:maxga/service/Setting.service.dart';
 
@@ -68,15 +70,17 @@ class SettingProvider extends BaseProvider {
     return isSuccess;
   }
 
-  Future<bool> dispatchCommand(MaxgaSettingItem setting) async {
+  Future<bool> onChange(MaxgaSettingItem setting) async {
     switch(setting.key) {
       case MaxgaSettingItemType.cleanCache:
         var cacheManager = DefaultCacheManager();
         await cacheManager.emptyCache();
         return true;
+      case MaxgaSettingItemType.timeoutLimit:
+        MangaRepoPool.getInstance().changeTimeoutLimit(int.parse(setting.value));
+        break;
       case MaxgaSettingItemType.readOnlyOnWiFi:
       case MaxgaSettingItemType.useMaxgaProxy:
-      case MaxgaSettingItemType.timeoutLimit:
       default:
         return false;
     }
