@@ -4,6 +4,7 @@ import 'package:maxga/base/setting/Setting.model.dart';
 enum MaxgaSettingCategoryType {
   application,
   network,
+  other,
 }
 
 enum MaxgaSettingListTileType { none, checkbox, text, select, title, command, confirmCommand }
@@ -12,7 +13,8 @@ enum MaxgaSettingItemType {
   readOnlyOnWiFi,
   timeoutLimit,
   cleanCache,
-  useMaxgaProxy
+  useMaxgaProxy,
+  resetSetting,
 }
 
 const Map<MaxgaSettingItemType, List<DropdownMenuItem<String>>>
@@ -49,6 +51,7 @@ final Map<MaxgaSettingItemType, String> SettingTypeNameList = {
 final Map<MaxgaSettingCategoryType, String> SettingCategoryList = {
   MaxgaSettingCategoryType.application: '应用设置',
   MaxgaSettingCategoryType.network: '网络设置',
+  MaxgaSettingCategoryType.other: '其他设置',
 };
 
 // ignore: non_constant_identifier_names
@@ -77,8 +80,15 @@ final List<MaxgaSettingItem> SettingItemList = [
   ),
   MaxgaSettingItem(
     key: MaxgaSettingItemType.cleanCache,
-    type: MaxgaSettingListTileType.confirmCommand,
+    type: MaxgaSettingListTileType.command,
     title: '清除缓存',
     category: MaxgaSettingCategoryType.network,
+  ),
+  MaxgaSettingItem(
+    key: MaxgaSettingItemType.resetSetting,
+    type: MaxgaSettingListTileType.confirmCommand,
+    title: '重置设置',
+    category: MaxgaSettingCategoryType.other,
   )
+
 ];

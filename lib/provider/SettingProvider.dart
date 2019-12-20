@@ -75,14 +75,21 @@ class SettingProvider extends BaseProvider {
       case MaxgaSettingItemType.cleanCache:
         var cacheManager = DefaultCacheManager();
         await cacheManager.emptyCache();
-        return true;
+        return Future.value(true);
       case MaxgaSettingItemType.timeoutLimit:
         MangaRepoPool.getInstance().changeTimeoutLimit(int.parse(setting.value));
         break;
+      case MaxgaSettingItemType.resetSetting:
+        final isSuccess = await SettingService.resetAllValue();
+        if (isSuccess) {
+          return this.init();
+        }
+        return Future.value(true);
       case MaxgaSettingItemType.readOnlyOnWiFi:
       case MaxgaSettingItemType.useMaxgaProxy:
       default:
         return false;
     }
+    return false;
   }
 }
