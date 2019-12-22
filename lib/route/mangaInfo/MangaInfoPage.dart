@@ -215,40 +215,6 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     }
   }
 
-  void initMangaInfoForCollection() {}
-
-  void initMangaInfo() async {
-    MaxgaDataHttpRepo repo =
-        MangaRepoPool.getInstance().getRepo(key: widget.sourceKey);
-    await Future.wait<dynamic>([
-      Future.microtask(() async {
-        try {
-          final manga = await repo.getMangaInfo(widget.infoUrl);
-          introduce = manga.introduce;
-          readMangaStatus = await MangaReadStorageService.getMangaStatus(manga);
-          if (manga.chapterList.length != readMangaStatus.chapterList.length &&
-              widget.manga != null) {
-            readMangaStatus.chapterList = manga.chapterList
-              ..forEach((item) {
-                final isExist = readMangaStatus.chapterList
-                        .indexWhere((chapter) => chapter.title == item.title) !=
-                    -1;
-                item.isCollectionLatestUpdate = !isExist;
-              });
-          }
-          chapterList = readMangaStatus.chapterList;
-          loading = _MangaInfoPageStatus.over;
-        } catch (e) {
-          loading = _MangaInfoPageStatus.error;
-        }
-      }),
-      Future.delayed(Duration(milliseconds: 500))
-    ]);
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
   void enjoyMangaContent(Chapter chapter, {int imagePage = 0}) async {
     var result = await Navigator.push<MangaViewerPopResult>(
         context,
