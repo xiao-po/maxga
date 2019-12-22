@@ -41,7 +41,6 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
         parser: (res) => parser.getMangaListFromLatestUpdate(res.data)
           ..forEach((manga) {
             manga.sourceKey = _source.key;
-            manga.infoUrl = _source.domain + manga.infoUrl;
           }));
   }
 
@@ -60,7 +59,6 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
         parser: (res) => parser.getMangaListFromLatestUpdate(res.data)
           ..forEach((manga) {
             manga.sourceKey = _source.key;
-            manga.infoUrl = _source.domain + manga.infoUrl;
           }));
   }
 

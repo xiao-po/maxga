@@ -138,11 +138,10 @@ class HanhanHtmlParser {
     lastChapter.updateTime = time;
     manga.status = '';
     manga.author = authors;
-    manga.infoUrl = infoUrl + '/';
     manga.title = title;
     manga.coverImgUrl = coverImageUrl;
     manga.id = int.parse(mangaId);
-    manga.infoUrl = '/comic/18${manga.id}/';
+    manga.infoUrl = '${HanhanMangaSource.domain}/comic/18${manga.id}/';
     manga.typeList = type;
     manga.lastUpdateChapter = lastChapter;
 

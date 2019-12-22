@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:maxga/base/error/MaxgaHttpError.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 
@@ -36,7 +37,8 @@ class MaxgaHttpUtils {
     }
 
     try {
-      return parser(response);
+      final T result = parser(response);
+      return result;
     } catch (e) {
       throw MangaHttpError(MangaHttpErrorType.PARSE_ERROR,source);
     }
