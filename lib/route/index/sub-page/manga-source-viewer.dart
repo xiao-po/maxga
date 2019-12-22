@@ -213,19 +213,30 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
       controller: state.controller,
       itemBuilder: (context, index) {
         if (index == state.mangaList.length) {
-          Future.microtask(() => this.getMangaList(state));
-          return buildProcessIndicator();
+          if (state.isLast) {
+            return Padding(
+              padding: EdgeInsets.only(top: 10, bottom: 10),
+              child: Center(
+                child: SizedBox(
+                    height: 20,
+                    child: Text('没有更多的漫画了')),
+              ),
+            );
+          } else {
+            Future.microtask(() => this.getMangaList(state));
+            return buildProcessIndicator();
+          }
         } else {
           if (state.type == _SourceViewType.latestUpdate) {
             return buildMangaCard(state.mangaList[index],
-                tagPrefix: state.title);
+                tagPrefix: '${index}state.title');
           } else {
             return buildMangaCard(state.mangaList[index],
-                tagPrefix: state.title, rank: index + 1);
+                tagPrefix: '${index}state.title', rank: index + 1);
           }
         }
       },
-      itemCount: state.mangaList.length + (state.isLast ? 0 : 1),
+      itemCount: state.mangaList.length + 1,
     );
   }
 
@@ -367,7 +378,7 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
                 tagPrefix: '$tagPrefix${widget.name}',
                 fit: BoxFit.cover,
               ),
-          manga: item);
+          infoUrl: item.infoUrl, sourceKey: item.sourceKey,);
     }));
   }
 

@@ -24,6 +24,7 @@ class MangaCoverImage extends StatelessWidget {
         child: CachedNetworkImage(
             imageUrl: url,
             fit: fit,
+            alignment: Alignment.topCenter,
             httpHeaders: {
               'referer': source?.headers != null ? source?.headers['referer'] : "",
             },

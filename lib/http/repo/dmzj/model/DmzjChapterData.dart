@@ -13,10 +13,10 @@ class DmzjChapterData {
       data = new List<Chapter>();
       json['data'].forEach((v) {
         final chapter = Chapter();
-        chapter.id = json['chapter_id'];
-        chapter.title = json['chapter_title'];
-        chapter.order = json['chapter_order'];
-        chapter.updateTime = json['updatetime'] * 1000;
+        chapter.id = v['chapter_id'];
+        chapter.title = v['chapter_title'];
+        chapter.order = v['chapter_order'];
+        chapter.updateTime = v['updatetime'] * 1000;
         data.add(chapter);
       });
     }

@@ -1,12 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:maxga/provider/HistoryProvider.dart';
 import 'package:maxga/route/search/search-page.dart';
+import 'package:maxga/service/MangaReadStorage.service.dart';
+import 'package:provider/provider.dart';
 
 class MaxgaSearchButton extends StatelessWidget {
   final Color color;
 
   const MaxgaSearchButton({
-    Key key, this.color = Colors.white,
+    Key key,
+    this.color = Colors.white,
   }) : super(key: key);
 
   @override
@@ -15,12 +19,38 @@ class MaxgaSearchButton extends StatelessWidget {
       icon: Icon(
         Icons.search,
         color: color,
-
       ),
-      onPressed: ()  {
+      onPressed: () {
         Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
           return SearchPage();
         }));
+      },
+    );
+  }
+}
+
+class MaxgaDebuggerDeleteCacheButton extends StatelessWidget {
+  final Color color;
+
+  const MaxgaDebuggerDeleteCacheButton({
+    Key key,
+    this.color = Colors.white,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: Icon(
+        Icons.delete_outline,
+        color: color,
+      ),
+      onPressed: () async {
+        await Future.wait([
+          MangaReadStorageService.clearStatus(),
+          Provider.of<HistoryProvider>(context).clearHistory()
+        ]);
+        Scaffold.of(context).showSnackBar(SnackBar(content: const Text('删除完毕')));
+
       },
     );
   }

@@ -82,20 +82,6 @@ class _IndexPageState extends State<IndexPage> {
     }));
   }
 
-  goMangaInfoPage(SimpleMangaInfo item) {
-    MangaSource source =
-        MangaRepoPool.getInstance().getMangaSourceByKey(item.sourceKey);
-    Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
-      return MangaInfoPage(
-          coverImageBuilder: (context) => MangaCoverImage(
-                source: source,
-                url: item.coverImgUrl,
-                tagPrefix: widget.name,
-                fit: BoxFit.cover,
-              ),
-          manga: item);
-    }));
-  }
 
   DateTime _lastPressedAt; //上次点击时间
   Future<bool> onBack() async {
@@ -108,8 +94,7 @@ class _IndexPageState extends State<IndexPage> {
     } else {
       hiddenSnack();
       await Future.delayed(Duration(milliseconds: 100));
-      MaxgaUtils.backDeskTop();
-      return false;
+      return true;
     }
   }
 

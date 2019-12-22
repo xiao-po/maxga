@@ -18,14 +18,13 @@ final HanhanMangaSource = MangaSource(
           'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
       'user-agent':
           'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36',
-        });
+    });
 
 class HanhanDateRepo extends MaxgaDataHttpRepo {
   MangaSource _source = HanhanMangaSource;
   MaxgaHttpUtils _httpUtils = MaxgaHttpUtils(HanhanMangaSource);
 
   List<String> _imageServerUrl;
-
 
   HanhanHtmlParser parser = HanhanHtmlParser.getInstance();
 
@@ -42,15 +41,16 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
         parser: (res) => parser.getMangaListFromLatestUpdate(res.data)
           ..forEach((manga) {
             manga.sourceKey = _source.key;
+            manga.infoUrl = _source.domain + manga.infoUrl;
           }));
   }
 
   @override
-  Future<Manga> getMangaInfo({int id, String url}) async {
+  Future<Manga> getMangaInfo(String url) async {
     await this.initRepo();
-    return _httpUtils.requestApi<Manga>('${_source.domain}/comic/18$id/',
+    return _httpUtils.requestApi<Manga>(url,
         parser: (res) =>
-            parser.getMangaFromInfoPate(res.data)..sourceKey = _source.key);
+            parser.getMangaFromInfoPate(res.data)..infoUrl = url);
   }
 
   @override
@@ -58,7 +58,10 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
     return _httpUtils.requestApi<List<SimpleMangaInfo>>(
         '${_source.domain}/comicsearch/s.aspx?s=$keywords',
         parser: (res) => parser.getMangaListFromLatestUpdate(res.data)
-          ..forEach((manga) => manga.sourceKey = _source.key));
+          ..forEach((manga) {
+            manga.sourceKey = _source.key;
+            manga.infoUrl = _source.domain + manga.infoUrl;
+          }));
   }
 
   @override
@@ -78,12 +81,12 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
   MangaSource get mangaSource => _source;
 
   Future<void> initRepo() async {
-    if (_imageServerUrl == null ) {
+    if (_imageServerUrl == null) {
       _imageServerUrl = await _httpUtils.requestApi<List<String>>(
           '${_source.domain}/js/ds.js',
           parser: (res) => res.data
               .substring(res.data.indexOf('var sDS = "') + 'var sDS = "'.length,
-              res.data.indexOf('";'))
+                  res.data.indexOf('";'))
               .split('|'));
     }
   }

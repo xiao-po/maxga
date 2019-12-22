@@ -7,11 +7,12 @@ import 'MangaCoverImage.dart';
 class MangaGridItem extends StatelessWidget {
   final ReadMangaStatus manga;
   final String tagPrefix;
+  final double width;
 
   final MangaSource source;
 
   const MangaGridItem(
-      {Key key, @required this.manga, @required this.tagPrefix,@required this.source})
+      {Key key, @required this.manga, @required this.tagPrefix,@required this.source, this.width = 130})
       : super(key: key);
 
   @override
@@ -22,8 +23,8 @@ class MangaGridItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Container(
-              width: 130,
-              height: 150,
+              width: width,
+              height: width / 13 * 15,
               margin: EdgeInsets.only(bottom: 5),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(5.0),
@@ -34,11 +35,17 @@ class MangaGridItem extends StatelessWidget {
                   tagPrefix: tagPrefix,
                 ),
               )),
-          Text(manga.title,
-              textAlign: TextAlign.left,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 14)),
+          SizedBox(
+            height: 20,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(manga.title,
+                  textAlign: TextAlign.left,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 14)),
+            ),
+          ),
           Expanded(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -42,7 +42,7 @@ class CollectionPageState extends State<CollectionPage> {
                   icon: Icon(Icons.menu),
                   onPressed: () => Scaffold.of(context).openDrawer()),
               actions: <Widget>[
-                MaxgaSearchButton()
+                MaxgaSearchButton(),
               ],
             ),
             Expanded(
@@ -61,7 +61,6 @@ class CollectionPageState extends State<CollectionPage> {
           ? _LoadingState.over
           : _LoadingState.empty;
     } catch (e) {
-      debugPrint(e);
       loadingState = _LoadingState.error;
     } finally {
       setState(() {});
@@ -74,8 +73,9 @@ class CollectionPageState extends State<CollectionPage> {
         return Container();
         break;
       case _LoadingState.over:
-        final double itemWidth = 140;
-        final double height = 210;
+        final count = (MediaQuery.of(context).size.width / 140).floor();
+        final double itemWidth = count > 3 ? 80 : MediaQuery.of(context).size.width / 3;
+        final double height = itemWidth / 13 * 15 + 60;
         return MediaQuery.removePadding(
             context: context,
             removeTop: true,
@@ -106,15 +106,16 @@ class CollectionPageState extends State<CollectionPage> {
 
   startRead(ReadMangaStatus item) {
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
-      return MangaInfoPage(
+      return MangaInfoPage.fromCollection(
           coverImageBuilder: (context) => MangaCoverImage(
                 source: MangaRepoPool.getInstance()
                     .getMangaSourceByKey(item.sourceKey),
                 url: item.coverImgUrl,
                 tagPrefix: widget.name,
                 fit: BoxFit.cover,
+
               ),
-          manga: item);
+          manga: item,);
     }));
   }
 

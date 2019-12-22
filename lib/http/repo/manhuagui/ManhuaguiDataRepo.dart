@@ -39,13 +39,10 @@ class ManhuaguiDataRepo extends MaxgaDataHttpRepo {
   }
 
   @override
-  Future<Manga> getMangaInfo({int id, String url}) async {
-    if (url == null) {
-      throw MangaHttpError(MangaHttpErrorType.ERROR_PARAM, _source);
-    }
-
+  Future<Manga> getMangaInfo( String url) async {
     return _httpUtils.requestApi<Manga>(url,
         parser: (res) => parser.getMangaInfo(res.data)
+          ..infoUrl = url
           ..chapterList.forEach((chapter) {
             chapter.url = '${_source.domain}${chapter.url.substring(1)}';
           }));

@@ -38,7 +38,7 @@ class HistoryProvider extends BaseProvider {
   }
 
 
-  void clearHistory() async {
+  Future<void> clearHistory() async {
     await LocalStorage.clearItem(_key);
     _items = [];
 

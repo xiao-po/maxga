@@ -7,11 +7,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 class MangaReadStorageService {
   static final String _key = 'manga_process_';
 
-  static Future<ReadMangaStatus> getMangaStatus(MangaBase manga) async {
+  static Future<ReadMangaStatus> getMangaStatus(Manga manga) async {
     final allReadManga = await _getAllReadManga();
     final index = allReadManga.indexWhere((el) => el.id == manga.id && manga.sourceKey == el.sourceKey);
     if (index != -1) {
-      final mangaReadProcess = allReadManga[index];
+      final mangaReadProcess = allReadManga[index]..chapterList.forEach((item) => item.isCollectionLatestUpdate = false);
       return mangaReadProcess;
     } else {
       return ReadMangaStatus.fromSimpleMangaInfo(manga);

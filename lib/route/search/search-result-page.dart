@@ -116,7 +116,8 @@ class _SearchResultPageState extends State<SearchResultPage> {
           tagPrefix: '${widget.name}${searchTime.toIso8601String()}',
           fit: BoxFit.cover,
         ),
-        manga: item,
+        sourceKey: item.sourceKey,
+        infoUrl: item.infoUrl,
       );
     }));
   }

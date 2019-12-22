@@ -1,6 +1,7 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:maxga/Utils/DateUtils.dart';
+import 'package:maxga/http/repo/manhuagui/ManhuaguiDataRepo.dart';
 import 'package:maxga/model/manga/Chapter.dart';
 import 'package:maxga/model/manga/Manga.dart';
 
@@ -16,7 +17,8 @@ class ManhuaguiHtmlParser {
 
   List<SimpleMangaInfo> getSimpleMangaInfoFromSearch(String body) {
     final document = parseFragment(body);
-    final mangaListEl = document.querySelector('#detail').querySelectorAll('li');
+    final mangaListEl =
+        document.querySelector('#detail').querySelectorAll('li');
     return getSimpleMangaInfoFromLiList(mangaListEl);
   }
 
@@ -26,7 +28,8 @@ class ManhuaguiHtmlParser {
     return getSimpleMangaInfoFromLiList(document.querySelectorAll('li'));
   }
 
-  List<SimpleMangaInfo> getSimpleMangaInfoFromLiList(List<Element> mangaElList) {
+  List<SimpleMangaInfo> getSimpleMangaInfoFromLiList(
+      List<Element> mangaElList) {
     return mangaElList.map((el) {
       final infoEl = el.querySelector('a');
       final url = infoEl.attributes['href'];
@@ -38,15 +41,15 @@ class ManhuaguiHtmlParser {
       final title = infoEl.children[1].innerHtml;
       final authors =
           infoEl.children[2].querySelector('dd').innerHtml.split(',');
-    
+
       final typeList =
           infoEl.children[3].querySelector('dd').innerHtml.split(',');
       final lastUpdateChapterTitle =
           infoEl.children[4].querySelector('dd').innerHtml;
-    
+
       final lastUpdateTime = DateUtils.convertTimeStringToTimestamp(
           infoEl.children[5].querySelector('dd').innerHtml, 'yyyy-MM-dd');
-    
+
       SimpleMangaInfo manga = SimpleMangaInfo();
       manga.infoUrl = url;
       manga.id = id;
@@ -54,13 +57,13 @@ class ManhuaguiHtmlParser {
       manga.title = title;
       manga.author = authors;
       manga.typeList = typeList;
-    
+
       Chapter lastUpdateChapter = Chapter();
       lastUpdateChapter.updateTime = lastUpdateTime;
       lastUpdateChapter.title = lastUpdateChapterTitle;
-    
+
       manga.lastUpdateChapter = lastUpdateChapter;
-    
+
       return manga;
     }).toList(growable: false);
   }
@@ -92,17 +95,18 @@ class ManhuaguiHtmlParser {
         .map((el) => _getChapter(el, index--))
         .toList(growable: false);
 
-    Manga manga = Manga();
-    manga.title = title;
-    manga.coverImgUrl = coverImageUrl;
-    manga.status = mangaStatus;
-    manga.author = authors;
-    manga.typeList = typeList;
-    manga.introduce = bookIntro;
-    manga.chapterList = chapterList;
 
-    return manga;
-    
+    return Manga.fromMangaInfoRequest(
+        authors: authors,
+        types: typeList,
+        introduce: bookIntro,
+        title: title,
+        id: 0,
+        infoUrl: null,
+        status: mangaStatus,
+        coverImgUrl: coverImageUrl,
+        sourceKey: ManhuaguiMangaSource.key,
+        chapterList: chapterList);
   }
 
   Chapter _getChapter(Element el, int index) {

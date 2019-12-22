@@ -1,5 +1,6 @@
 import 'package:maxga/http/repo/dmzj/constants/DmzjMangaSource.dart';
 import 'package:maxga/http/repo/dmzj/model/DmzjTag.dart';
+import 'package:maxga/model/manga/Chapter.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'DmzjChapterData.dart';
 
@@ -30,7 +31,32 @@ class DmzjMangaInfo {
   List<Null> urlLinks;
   String isHideChapter;
 
-  DmzjMangaInfo({this.id, this.islong, this.direction, this.title, this.isDmzj, this.cover, this.description, this.lastUpdatetime, this.lastUpdateChapterName, this.copyright, this.firstLetter, this.comicPy, this.hidden, this.hotNum, this.hitNum, this.uid, this.isLock, this.lastUpdateChapterId, this.status, this.types, this.authors, this.subscribeNum, this.chapters, this.urlLinks, this.isHideChapter});
+  DmzjMangaInfo(
+      {this.id,
+      this.islong,
+      this.direction,
+      this.title,
+      this.isDmzj,
+      this.cover,
+      this.description,
+      this.lastUpdatetime,
+      this.lastUpdateChapterName,
+      this.copyright,
+      this.firstLetter,
+      this.comicPy,
+      this.hidden,
+      this.hotNum,
+      this.hitNum,
+      this.uid,
+      this.isLock,
+      this.lastUpdateChapterId,
+      this.status,
+      this.types,
+      this.authors,
+      this.subscribeNum,
+      this.chapters,
+      this.urlLinks,
+      this.isHideChapter});
 
   DmzjMangaInfo.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -53,47 +79,48 @@ class DmzjMangaInfo {
     lastUpdateChapterId = json['last_update_chapter_id'];
     if (json['status'] != null) {
       status = new List<DmzjTag>();
-      json['status'].forEach((v) { status.add(new DmzjTag.fromJson(v)); });
+      json['status'].forEach((v) {
+        status.add(new DmzjTag.fromJson(v));
+      });
     }
     if (json['types'] != null) {
       types = new List<DmzjTag>();
-      json['types'].forEach((v) { types.add(new DmzjTag.fromJson(v)); });
+      json['types'].forEach((v) {
+        types.add(new DmzjTag.fromJson(v));
+      });
     }
     if (json['authors'] != null) {
       authors = new List<DmzjTag>();
-      json['authors'].forEach((v) { authors.add(new DmzjTag.fromJson(v)); });
+      json['authors'].forEach((v) {
+        authors.add(new DmzjTag.fromJson(v));
+      });
     }
     subscribeNum = json['subscribe_num'];
     if (json['chapters'] != null) {
       chapters = new List<DmzjChapterData>();
-      json['chapters'].forEach((v) { chapters.add(new DmzjChapterData.fromJson(v)); });
+      json['chapters'].forEach((v) {
+        chapters.add(new DmzjChapterData.fromJson(v));
+      });
     }
     isHideChapter = json['isHideChapter'];
   }
 
   Manga convertToManga() {
-    final Manga manga = Manga();
-    manga.author =
-        authors.map((tag) => tag.tagName).toList(growable: false);
-    manga.introduce = description;
-    manga.typeList = types.map((type) => type.tagName).toList();
-    manga.title = title;
-    manga.coverImgUrl = cover;
-    manga.id = id;
-    manga.status = status[0].tagName;
-    manga.chapterList =
-        chapters.singleWhere((item) => item.title == '连载').data;
-    manga.chapterList.forEach((chapter) {
-      chapter.url = '${DmzjMangaSource.domain}/chapter/$id/${chapter.id}.json';
-    });
-    manga.sourceKey = DmzjMangaSource.key;
-    return manga;
+    return Manga.fromMangaInfoRequest(
+      infoUrl: '',
+      introduce: description,
+      authors: authors.map((tag) => tag.tagName).toList(growable: false),
+      status: status[0].tagName,
+      types: types.map((type) => type.tagName).toList(),
+      coverImgUrl: cover,
+      chapterList: chapters.singleWhere((item) => item.title == '连载').data
+        ..forEach((chapter) {
+          chapter.url =
+              '${DmzjMangaSource.domain}/chapter/$id/${chapter.id}.json';
+        }),
+      id: id,
+      title: title,
+      sourceKey: DmzjMangaSource.key,
+    );
   }
-
-
-
 }
-
-
-
-

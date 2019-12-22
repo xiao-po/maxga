@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/components/Card.dart';
@@ -9,7 +8,6 @@ import 'package:maxga/provider/HistoryProvider.dart';
 import 'package:maxga/route/error-page/EmptyPage.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:provider/provider.dart';
-
 
 class HistoryPage extends StatefulWidget {
   final name = 'history_page';
@@ -23,7 +21,8 @@ class _HistToryPageState extends State<HistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    List<SimpleMangaInfo> mangaHistoryList = Provider.of<HistoryProvider>(context).historyMangaList;
+    List<SimpleMangaInfo> mangaHistoryList =
+        Provider.of<HistoryProvider>(context).historyMangaList;
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
@@ -36,22 +35,26 @@ class _HistToryPageState extends State<HistoryPage> {
           )
         ],
       ),
-      body: mangaHistoryList?.length != 0 ? ListView(
-          children:
-          mangaHistoryList.map((item) {
-            MangaSource source = MangaRepoPool.getInstance().getMangaSourceByKey(item.sourceKey);
-            return MangaCard(
-              title: Text(item.title),
-              extra: MangaInfoCardExtra(manga: item, source: source,),
-              cover: MangaCoverImage(
-                source: source,
-                url: item.coverImgUrl,
-                tagPrefix: widget.name,
-              ),
-              onTap: () => this.goMangaInfoPage(item),
-            );
-          })
-              .toList()) : EmptyPage('暂无历史记录'),
+      body: mangaHistoryList?.length != 0
+          ? ListView(
+              children: mangaHistoryList.map((item) {
+              MangaSource source = MangaRepoPool.getInstance()
+                  .getMangaSourceByKey(item.sourceKey);
+              return MangaCard(
+                title: Text(item.title),
+                extra: MangaInfoCardExtra(
+                  manga: item,
+                  source: source,
+                ),
+                cover: MangaCoverImage(
+                  source: source,
+                  url: item.coverImgUrl,
+                  tagPrefix: widget.name,
+                ),
+                onTap: () => this.goMangaInfoPage(item),
+              );
+            }).toList())
+          : EmptyPage('暂无历史记录'),
     );
   }
 
@@ -60,11 +63,13 @@ class _HistToryPageState extends State<HistoryPage> {
       return MangaInfoPage(
           coverImageBuilder: (c) => MangaCoverImage(
                 url: item.coverImgUrl,
-                source: MangaRepoPool.getInstance().getMangaSourceByKey(item.sourceKey),
+                source: MangaRepoPool.getInstance()
+                    .getMangaSourceByKey(item.sourceKey),
                 tagPrefix: widget.name,
                 fit: BoxFit.cover,
               ),
-          manga: item);
+          infoUrl: item.infoUrl,
+          sourceKey: item.sourceKey);
     }));
   }
 

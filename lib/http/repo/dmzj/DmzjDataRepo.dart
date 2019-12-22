@@ -19,11 +19,11 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
   MaxgaHttpUtils _httpUtils = MaxgaHttpUtils(DmzjMangaSource);
 
   @override
-  Future<Manga> getMangaInfo({id, url}) async {
-    return _httpUtils.requestApi<Manga>(
-        id == null ? url : '${_source.domain}/comic/comic_$id.json',
-        parser: (response) => DmzjMangaInfo.fromJson(json.decode(response.data))
-            .convertToManga());
+  Future<Manga> getMangaInfo(String url) async {
+    return _httpUtils.requestApi<Manga>(url,
+        parser: (response) =>
+            DmzjMangaInfo.fromJson(json.decode(response.data)).convertToManga()
+              ..infoUrl = url);
   }
 
   @override

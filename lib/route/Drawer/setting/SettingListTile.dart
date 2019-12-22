@@ -69,7 +69,6 @@ class CommandSettingListTile extends StatelessWidget {
       onTap: () async {
         var isSuccess = await Provider.of<SettingProvider>(context)
             .onChange(setting);
-        Navigator.pop(context);
         if (isSuccess) {
           Scaffold.of(context).showSnackBar(SnackBar(
             content: Text('${setting.title}结束'),

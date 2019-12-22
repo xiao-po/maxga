@@ -1,6 +1,7 @@
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart';
 import 'package:maxga/Utils/DateUtils.dart';
+import 'package:maxga/http/repo/hanhan/HanhanDataRepo.dart';
 import 'package:maxga/http/repo/hanhan/crypto/HanhanCrypto.dart';
 import 'package:maxga/model/manga/Chapter.dart';
 import 'package:maxga/model/manga/Manga.dart';
@@ -78,16 +79,17 @@ class HanhanHtmlParser {
       return chapter;
     }).toList(growable: false);
 
-    Manga manga = Manga();
-    manga.id = mangaId;
-    manga.title = title;
-    manga.status = chapterStatusList[0];
-    manga.author = authors;
-    manga.typeList = type;
-    manga.coverImgUrl = coverImageUrl;
-    manga.chapterList = chapterList;
-    manga.introduce = intro;
-    return manga;
+    return Manga.fromMangaInfoRequest(
+        authors: authors,
+        types: type,
+        introduce: intro,
+        title: title,
+        id: mangaId,
+        infoUrl: null,
+        status: chapterStatusList[0],
+        coverImgUrl: coverImageUrl,
+        sourceKey: HanhanMangaSource.key,
+        chapterList: chapterList);
   }
 
   List<String> getChapterImageList(String body, List<String> imageServerList) {
@@ -101,8 +103,7 @@ class HanhanHtmlParser {
         imageEncryptStringElText.indexOf('sPath="') + 'sPath="'.length,
         imageEncryptStringElText.lastIndexOf('";'));
     return HanhanCrypto.decryptImageList(encryptString)
-        .map((url) =>
-            '${imageServerList[int.parse(sPath) - 1]}$url')
+        .map((url) => '${imageServerList[int.parse(sPath) - 1]}$url')
         .toList(growable: false);
   }
 
@@ -128,21 +129,20 @@ class HanhanHtmlParser {
       lastChapterTitle = el.querySelector('.tool').children[1].innerHtml;
     } else {
       var temp = mangaInfoEl.children[0].innerHtml;
-      title = mangaInfoEl.children[0].innerHtml.substring(
-          temp.lastIndexOf('nbsp;') + 5
-      );
+      title = mangaInfoEl.children[0].innerHtml
+          .substring(temp.lastIndexOf('nbsp;') + 5);
     }
 
     final lastChapter = Chapter();
     lastChapter.title = lastChapterTitle;
     lastChapter.updateTime = time;
-
     manga.status = '';
     manga.author = authors;
     manga.infoUrl = infoUrl + '/';
     manga.title = title;
     manga.coverImgUrl = coverImageUrl;
     manga.id = int.parse(mangaId);
+    manga.infoUrl = '/comic/18${manga.id}/';
     manga.typeList = type;
     manga.lastUpdateChapter = lastChapter;
 
@@ -156,4 +156,3 @@ class HanhanHtmlParser {
     return infoUrl;
   }
 }
-

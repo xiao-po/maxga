@@ -3,7 +3,7 @@ import 'package:maxga/model/manga/MangaSource.dart';
 
 abstract class MaxgaDataHttpRepo {
 
-  Future<Manga> getMangaInfo({int id, String url});
+  Future<Manga> getMangaInfo(String url);
 
   Future<List<SimpleMangaInfo>> getRankedManga(int page);
 

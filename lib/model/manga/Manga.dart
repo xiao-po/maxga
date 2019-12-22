@@ -1,18 +1,38 @@
+import 'package:flutter/cupertino.dart';
+
 import 'Chapter.dart';
 
 class Manga extends MangaBase {
-
   List<Chapter> chapterList;
 
-
-  Manga();
-
-
-
+  Manga.fromMangaInfoRequest({
+    @required List<String> authors,
+    @required List<String> types,
+    @required String introduce,
+    @required String title,
+    @required int id,
+    @required String infoUrl,
+    @required String status,
+    @required String coverImgUrl,
+    @required String sourceKey,
+    @required List<Chapter> chapterList,
+  }) {
+    this.infoUrl = infoUrl;
+    this.author = authors;
+    this.introduce = introduce;
+    this.typeList = types;
+    this.title = title;
+    this.coverImgUrl = coverImgUrl;
+    this.id = id;
+    this.status = status;
+    this.chapterList = chapterList;
+    this.sourceKey = sourceKey;
+  }
 }
 
 class SimpleMangaInfo extends MangaBase {
   Chapter lastUpdateChapter;
+
   SimpleMangaInfo();
 
   SimpleMangaInfo.fromJson(Map<String, dynamic> json) {
@@ -28,8 +48,7 @@ class SimpleMangaInfo extends MangaBase {
     lastUpdateChapter = Chapter.fromJson(json['lastUpdateChapter']);
   }
 
-  Map<String, dynamic> toJson()=>
-      {
+  Map<String, dynamic> toJson() => {
         'sourceKey': sourceKey,
         'author': author,
         'id': id,
@@ -54,5 +73,3 @@ class MangaBase {
   String introduce;
   List<String> typeList;
 }
-
-
