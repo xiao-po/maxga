@@ -108,8 +108,6 @@ class HanhanHtmlParser {
   }
 
   static SimpleMangaInfo _parseMangaList(Element el) {
-    final SimpleMangaInfo manga = SimpleMangaInfo();
-
     final infoEl = el.querySelector('.pic');
     String infoUrl = _replaceDomain(infoEl.attributes['href']);
     final mangaId = infoUrl.substring(infoUrl.lastIndexOf('/') + 3);
@@ -136,16 +134,17 @@ class HanhanHtmlParser {
     final lastChapter = Chapter();
     lastChapter.title = lastChapterTitle;
     lastChapter.updateTime = time;
-    manga.status = '';
-    manga.author = authors;
-    manga.title = title;
-    manga.coverImgUrl = coverImageUrl;
-    manga.id = int.parse(mangaId);
-    manga.infoUrl = '${HanhanMangaSource.domain}/comic/18${manga.id}/';
-    manga.typeList = type;
-    manga.lastUpdateChapter = lastChapter;
 
-    return manga;
+    var id = int.parse(mangaId);
+    return SimpleMangaInfo.fromMangaRepo(
+        sourceKey: null,
+        id: id,
+        author: authors,
+        infoUrl: '${HanhanMangaSource.domain}/comic/18$id/',
+        coverImgUrl: coverImageUrl,
+        typeList: type,
+        lastUpdateChapter: lastChapter,
+        title: title);
   }
 
   static String _replaceDomain(String url) {

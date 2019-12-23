@@ -10,6 +10,15 @@ class HistoryProvider extends BaseProvider {
   List<SimpleMangaInfo> get historyMangaList => _items;
   final String _key = 'mangaHistroy_';
 
+  static HistoryProvider _instance;
+
+  static HistoryProvider getInstance() {
+    if (_instance == null) {
+      _instance = HistoryProvider();
+    }
+    return _instance;
+  }
+
 
 
   HistoryProvider() {

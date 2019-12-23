@@ -1,9 +1,10 @@
 import 'dart:convert';
 
+import 'package:maxga/model/manga/Chapter.dart';
 import 'package:maxga/model/manga/Manga.dart';
-import 'package:maxga/model/maxga/MangaReadProcess.dart';
+import 'package:maxga/model/maxga/ReadMangaStatus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+/// TODO: 准备作废
 class MangaReadStorageService {
   static final String _key = 'manga_process_';
 
@@ -12,9 +13,12 @@ class MangaReadStorageService {
     final index = allReadManga.indexWhere((el) => el.id == manga.id && manga.sourceKey == el.sourceKey);
     if (index != -1) {
       final mangaReadProcess = allReadManga[index]..chapterList.forEach((item) => item.isCollectionLatestUpdate = false);
+      final testChpater = Chapter();
+      testChpater.title = 'test';
+      mangaReadProcess.chapterList.add(testChpater);
       return mangaReadProcess;
     } else {
-      return ReadMangaStatus.fromSimpleMangaInfo(manga);
+      return ReadMangaStatus.fromManga(manga);
     }
   }
 

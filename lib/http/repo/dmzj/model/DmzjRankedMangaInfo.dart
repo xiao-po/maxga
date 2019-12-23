@@ -15,18 +15,17 @@ class DmzjRankedMangaInfo {
   String num;
   String tagId;
 
-  DmzjRankedMangaInfo(
-      {this.comicId,
-        this.title,
-        this.authors,
-        this.status,
-        this.cover,
-        this.types,
-        this.lastUpdatetime,
-        this.lastUpdateChapterName,
-        this.comicPy,
-        this.num,
-        this.tagId});
+  DmzjRankedMangaInfo({this.comicId,
+    this.title,
+    this.authors,
+    this.status,
+    this.cover,
+    this.types,
+    this.lastUpdatetime,
+    this.lastUpdateChapterName,
+    this.comicPy,
+    this.num,
+    this.tagId});
 
   DmzjRankedMangaInfo.fromJson(Map<String, dynamic> json) {
     comicId = json['comic_id'];
@@ -60,18 +59,16 @@ class DmzjRankedMangaInfo {
 
   /// 用于 动漫之家 列表拿到的接口返回的数据
   SimpleMangaInfo convertToSimpleMangaInfoForRank() {
-    final SimpleMangaInfo manga = SimpleMangaInfo();
     final Chapter latestChapter = Chapter();
     latestChapter.title = lastUpdateChapterName;
     latestChapter.updateTime = int.parse(lastUpdatetime) * 1000;
-    manga.lastUpdateChapter = latestChapter;
-    manga.infoUrl = 'http://v3api.dmzj.com/comic/comic_$comicId.json';
-    manga.author = authors.split('/');
-    manga.coverImgUrl = cover;
-    manga.title = title;
-    manga.id = int.parse(comicId);
-    manga.typeList = types.split('/');
-    manga.sourceKey = DmzjMangaSource.key;
-    return manga;
+    return SimpleMangaInfo.fromMangaRepo(sourceKey: DmzjMangaSource.key,
+        id:  int.parse(comicId),
+        infoUrl: 'http://v3api.dmzj.com/comic/comic_$comicId.json',
+        coverImgUrl: cover,
+        author: authors.split('/'),
+        typeList: types.split('/'),
+        title: title,
+        lastUpdateChapter: latestChapter);
   }
 }

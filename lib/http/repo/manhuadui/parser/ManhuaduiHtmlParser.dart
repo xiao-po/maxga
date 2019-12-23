@@ -135,19 +135,9 @@ class ManhuaduiHtmlParser {
         .querySelector('.newPage')
         .innerHtml;
 
-    SimpleMangaInfo manga = SimpleMangaInfo();
-    manga.coverImgUrl = mangaCoverUrl;
-    manga.title = mangaTitle;
-    manga.id = int.parse(comicId);
-    manga.status = '';
-    manga.author = mangaAuthor.split(',');
-    manga.typeList = [];
-    manga.infoUrl = mangaInfoUrl;
 
     Chapter lastChapter = Chapter();
     lastChapter.title = lastChapterTitle;
-
-    manga.lastUpdateChapter = lastChapter;
 
     return SimpleMangaInfo.fromMangaRepo(
       sourceKey: ManhuaduiMangaSource.key,
@@ -265,22 +255,23 @@ class ManhuaduiHtmlParser {
               .innerHtml,
           'yyyy-MM-dd hh:mm');
 
-      SimpleMangaInfo manga = SimpleMangaInfo();
-      manga.coverImgUrl = mangaCoverUrl;
-      manga.title = mangaTitle;
-      manga.id = int.parse(mangaId);
-      manga.status = '';
-      manga.author = mangaAuthors;
-      manga.typeList = mangaTypeList;
-      manga.infoUrl = mangaInfoUrl;
 
       Chapter lastChapter = Chapter();
       lastChapter.title = '';
       lastChapter.updateTime = mangaUpdateTime;
 
-      manga.lastUpdateChapter = lastChapter;
 
-      return manga;
+      return SimpleMangaInfo.fromMangaRepo(
+        sourceKey: ManhuaduiMangaSource.key,
+        id: int.parse(mangaId),
+        infoUrl: mangaInfoUrl,
+        coverImgUrl: mangaCoverUrl,
+        title: mangaTitle,
+        typeList: mangaTypeList,
+        author: mangaAuthors,
+        status: null,
+        lastUpdateChapter: lastChapter,
+      );
     }).toList(growable: false);
   }
 

@@ -24,7 +24,7 @@ enum _MangaViewerLoadState { checkNetState, loadingMangaData, over, error }
 enum _PageChangeOrigin { onTap, scroll, none }
 
 class MangaViewer extends StatefulWidget {
-  final SimpleMangaInfo manga;
+  final Manga manga;
   final Chapter currentChapter;
   final List<Chapter> chapterList;
   final int initIndex;

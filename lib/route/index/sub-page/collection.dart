@@ -5,12 +5,13 @@ import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/components/MangaGridItem.dart';
 import 'package:maxga/components/MaxgaButton.dart';
-import 'package:maxga/model/maxga/MangaReadProcess.dart';
+import 'package:maxga/model/maxga/ReadMangaStatus.dart';
+import 'package:maxga/provider/CollectionProvider.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:maxga/service/MangaReadStorage.service.dart';
+import 'package:provider/provider.dart';
 
-enum _LoadingState { loading, over, error, empty }
 
 class CollectionPage extends StatefulWidget {
   final String name = 'collection-page';
@@ -20,13 +21,10 @@ class CollectionPage extends StatefulWidget {
 }
 
 class CollectionPageState extends State<CollectionPage> {
-  _LoadingState loadingState = _LoadingState.loading;
-  List<ReadMangaStatus> collectedMangaList;
 
   @override
   void initState() {
     super.initState();
-    this.init();
   }
 
   @override
@@ -52,60 +50,44 @@ class CollectionPageState extends State<CollectionPage> {
         ));
   }
 
-  void init() async {
-    try {
-      final collectedMangaList =
-          await MangaReadStorageService.getAllCollectedManga();
-      this.collectedMangaList = collectedMangaList;
-      loadingState = collectedMangaList.length > 0
-          ? _LoadingState.over
-          : _LoadingState.empty;
-    } catch (e) {
-      loadingState = _LoadingState.error;
-    } finally {
-      setState(() {});
+  Widget buildBody() {
+    CollectionProvider provider = Provider.of<CollectionProvider>(context);
+    if (!provider.loadOver) {
+      return Container();
+    } else if (provider.loadOver && provider.isEmpty) {
+      return ErrorPage('您没有收藏的漫画');
+    } else {
+      double screenWith = MediaQuery.of(context).size.width;
+      double itemMaxWidth = 140;
+      double radio = screenWith / itemMaxWidth;
+      final double itemWidth = radio.floor() > 3 ? itemMaxWidth : screenWith / 3;
+      final double height = (itemWidth + 20) / 13 * 15 + 40;
+      return MediaQuery.removePadding(
+          context: context,
+          removeTop: true,
+          child: GridView.count(
+            crossAxisCount: radio.floor() > 3 ? radio.floor() : 3,
+            childAspectRatio: itemWidth / height,
+            children: provider.collectionMangaList
+                .map(
+                  (el) => Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                      onTap: () => this.startRead(el),
+                      child: MangaGridItem(
+                        manga: el,
+                        tagPrefix: widget.name,
+                        source: MangaRepoPool.getInstance()
+                            .getMangaSourceByKey(el.sourceKey),
+                      ))),
+            )
+                .toList(growable: false),
+          ));
     }
   }
 
-  buildBody() {
-    switch (loadingState) {
-      case _LoadingState.loading:
-        return Container();
-        break;
-      case _LoadingState.over:
-        final count = (MediaQuery.of(context).size.width / 140).floor();
-        final double itemWidth = count > 3 ? 80 : MediaQuery.of(context).size.width / 3;
-        final double height = itemWidth / 13 * 15 + 60;
-        return MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
-            child: GridView.extent(
-              maxCrossAxisExtent: itemWidth,
-              childAspectRatio: itemWidth / height,
-              children: collectedMangaList
-                  .map(
-                    (el) => Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                            onTap: () => this.startRead(el),
-                            child: MangaGridItem(
-                              manga: el,
-                              tagPrefix: widget.name,
-                              source: MangaRepoPool.getInstance()
-                                  .getMangaSourceByKey(el.sourceKey),
-                            ))),
-                  )
-                  .toList(growable: false),
-            ));
-        break;
-      case _LoadingState.error:
-      case _LoadingState.empty:
-        return ErrorPage('您没有收藏的漫画');
-    }
-  }
-
-  startRead(ReadMangaStatus item) {
-    Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
+  startRead(ReadMangaStatus item) async {
+    await Navigator.push(context, MaterialPageRoute(builder: (context) {
       return MangaInfoPage.fromCollection(
           coverImageBuilder: (context) => MangaCoverImage(
                 source: MangaRepoPool.getInstance()

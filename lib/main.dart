@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maxga/provider/CollectionProvider.dart';
 import 'package:maxga/provider/HistoryProvider.dart';
 import 'package:maxga/provider/IndexPageTypeProvider.dart';
 import 'package:maxga/provider/SettingProvider.dart';
@@ -16,7 +17,10 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => HistoryProvider(),
+          create: (context) => HistoryProvider.getInstance(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => CollectionProvider.getInstance(),
         ),
 //        ChangeNotifierProvider(
 //          builder: (context) => IndexPageTypeProvider(),

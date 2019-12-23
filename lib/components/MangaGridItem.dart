@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
-import 'package:maxga/model/maxga/MangaReadProcess.dart';
+import 'package:maxga/model/maxga/ReadMangaStatus.dart';
 
 import 'MangaCoverImage.dart';
 
@@ -12,11 +12,16 @@ class MangaGridItem extends StatelessWidget {
   final MangaSource source;
 
   const MangaGridItem(
-      {Key key, @required this.manga, @required this.tagPrefix,@required this.source, this.width = 130})
+      {Key key,
+      @required this.manga,
+      @required this.tagPrefix,
+      @required this.source,
+      this.width = 130})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    Future.microtask(() => print('${context.size.height}  ${context.size.width}'));
     return Container(
       margin: EdgeInsets.only(top: 10, bottom: 10, left: 5, right: 5),
       child: Column(
@@ -54,11 +59,17 @@ class MangaGridItem extends StatelessWidget {
                   child: Text(manga.lastUpdateChapter.title,
                       textAlign: TextAlign.left,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 12, textBaseline: TextBaseline.alphabetic, color: Colors.black45)),
+                      style: TextStyle(
+                          fontSize: 12,
+                          textBaseline: TextBaseline.alphabetic,
+                          color: Colors.black45)),
                 ),
                 Text(source.name,
                     textAlign: TextAlign.left,
-                    style: TextStyle(fontSize: 12, textBaseline: TextBaseline.alphabetic, color: Colors.black45))
+                    style: TextStyle(
+                        fontSize: 12,
+                        textBaseline: TextBaseline.alphabetic,
+                        color: Colors.black45))
               ],
             ),
           )

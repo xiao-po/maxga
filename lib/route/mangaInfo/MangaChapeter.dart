@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maxga/components/MangaOutlineButton.dart';
 import 'package:maxga/constant/SortValue.dart';
 import 'package:maxga/model/manga/Chapter.dart';
-import 'package:maxga/model/maxga/MangaReadProcess.dart';
+import 'package:maxga/model/maxga/ReadMangaStatus.dart';
 import 'package:shimmer/shimmer.dart';
 
 typedef EnjoyMangaCallback = void Function(Chapter chapter);

@@ -1,43 +1,40 @@
 import '../manga/Chapter.dart';
 import '../manga/Manga.dart';
 
-class ReadMangaStatus extends SimpleMangaInfo {
+class ReadMangaStatus extends Manga {
   int readChapterId;
   int readImageIndex;
   bool collected = false;
+  bool isReadAfterUpdate;
+  Chapter lastUpdateChapter;
   List<Chapter> chapterList;
 
-  ReadMangaStatus.fromSimpleMangaInfo(Manga manga) {
-    sourceKey = manga.sourceKey;
-    author = manga.author;
-    id = manga.id;
-    infoUrl = manga.infoUrl;
-    status = manga.status;
-    coverImgUrl = manga.coverImgUrl;
-    title = manga.title;
+  ReadMangaStatus.fromManga(Manga manga)
+      : super.fromMangaInfoRequest(
+          id: manga.id,
+          sourceKey: manga.sourceKey,
+          authors: manga.author,
+          infoUrl: manga.infoUrl,
+          status: manga.status,
+          coverImgUrl: manga.coverImgUrl,
+          title: manga.title,
+          types: manga.typeList,
+          introduce: manga.introduce,
+          chapterList: manga.chapterList,
+        ) {
     introduce = manga.introduce;
-    typeList = manga?.typeList?.cast<String>() ?? [];
-    chapterList = manga.chapterList.toList(growable: false)
+    isReadAfterUpdate = true;
+    chapterList = manga.chapterList.toList(growable: true)
       ..sort((a, b) => b.order - a.order)
       ..forEach((item) => item.isCollectionLatestUpdate = false);
     lastUpdateChapter = chapterList.first;
   }
 
-  ReadMangaStatus.fromJson(Map<String, dynamic> json) {
-    sourceKey = json['sourceKey'];
-    author = json['author'].cast<String>();
-    id = json['id'];
-    infoUrl = json['infoUrl'];
-    status = json['status'];
-    coverImgUrl = json['coverImgUrl'];
-    title = json['title'];
-    introduce = json['introduce'];
-    typeList = json['typeList'].cast<String>();
+  ReadMangaStatus.fromJson(Map<String, dynamic> json) : super.fromJson(json) {
     collected = json['collected'];
     readImageIndex = json['readImageIndex'];
+    isReadAfterUpdate = json['isReadAfterUpdate'];
     readChapterId = json['readChapterId'];
-    List<Chapter> chapterArray = (json['chapterList'] as List<dynamic>).map((item) => Chapter.fromJson(item)).cast<Chapter>().toList(growable: false);
-    chapterList = chapterArray;
     lastUpdateChapter = Chapter.fromJson(json['lastUpdateChapter']);
   }
 
@@ -52,6 +49,7 @@ class ReadMangaStatus extends SimpleMangaInfo {
         'introduce': introduce,
         'readImageIndex': readImageIndex,
         'readChapterId': readChapterId,
+        'isReadAfterUpdate': isReadAfterUpdate,
         'collected': collected,
         'typeList': typeList,
         'chapterList': chapterList,

@@ -20,23 +20,22 @@ class DmzjMangaSearchResult {
   String types;
   int id;
 
-  DmzjMangaSearchResult(
-      {this.sBiz,
-        this.addtime,
-        this.aliasName,
-        this.authors,
-        this.copyright,
-        this.cover,
-        this.deviceShow,
-        this.grade,
-        this.hidden,
-        this.hotHits,
-        this.lastName,
-        this.quality,
-        this.status,
-        this.title,
-        this.types,
-        this.id});
+  DmzjMangaSearchResult({this.sBiz,
+    this.addtime,
+    this.aliasName,
+    this.authors,
+    this.copyright,
+    this.cover,
+    this.deviceShow,
+    this.grade,
+    this.hidden,
+    this.hotHits,
+    this.lastName,
+    this.quality,
+    this.status,
+    this.title,
+    this.types,
+    this.id});
 
   DmzjMangaSearchResult.fromJson(Map<String, dynamic> json) {
     sBiz = json['_biz'];
@@ -80,19 +79,16 @@ class DmzjMangaSearchResult {
 
   /// 用于 动漫之家 列表拿到的接口返回的数据
   SimpleMangaInfo convertToSimpleMangaInfoForSearchResult() {
-    final SimpleMangaInfo manga = SimpleMangaInfo();
-
     final Chapter latestChapter = Chapter();
     latestChapter.title = lastName;
-    manga.lastUpdateChapter = latestChapter;
-    manga.infoUrl = '${DmzjMangaSource.domain}/comic/comic_$id.json';
-    manga.author = authors.split('/');
-    manga.coverImgUrl = cover;
-    manga.title = title;
-    manga.id = id;
-    manga.typeList = types.split('/');
-    manga.sourceKey = DmzjMangaSource.key;
-    return manga;
+    return SimpleMangaInfo.fromMangaRepo(sourceKey: DmzjMangaSource.key,
+        author: authors.split('/'),
+        id: id,
+        infoUrl: '${DmzjMangaSource.domain}/comic/comic_$id.json',
+        coverImgUrl: cover,
+        title: lastName,
+        lastUpdateChapter: latestChapter,
+        typeList: types.split('/'));
   }
 
 

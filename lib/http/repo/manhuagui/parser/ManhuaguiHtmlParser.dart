@@ -1,6 +1,7 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:maxga/Utils/DateUtils.dart';
+import 'package:maxga/http/repo/manhuadui/ManhuaduiDataRepo.dart';
 import 'package:maxga/http/repo/manhuagui/ManhuaguiDataRepo.dart';
 import 'package:maxga/model/manga/Chapter.dart';
 import 'package:maxga/model/manga/Manga.dart';
@@ -50,21 +51,20 @@ class ManhuaguiHtmlParser {
       final lastUpdateTime = DateUtils.convertTimeStringToTimestamp(
           infoEl.children[5].querySelector('dd').innerHtml, 'yyyy-MM-dd');
 
-      SimpleMangaInfo manga = SimpleMangaInfo();
-      manga.infoUrl = url;
-      manga.id = id;
-      manga.coverImgUrl = coverImageUrl;
-      manga.title = title;
-      manga.author = authors;
-      manga.typeList = typeList;
-
       Chapter lastUpdateChapter = Chapter();
       lastUpdateChapter.updateTime = lastUpdateTime;
       lastUpdateChapter.title = lastUpdateChapterTitle;
 
-      manga.lastUpdateChapter = lastUpdateChapter;
-
-      return manga;
+      return SimpleMangaInfo.fromMangaRepo(
+        sourceKey: ManhuaduiMangaSource.key,
+        id: id,
+        infoUrl: url,
+        coverImgUrl: coverImageUrl,
+        title: title,
+        author: authors,
+        typeList: typeList,
+        lastUpdateChapter: lastUpdateChapter,
+      );
     }).toList(growable: false);
   }
 
@@ -94,7 +94,6 @@ class ManhuaguiHtmlParser {
         .querySelectorAll('li')
         .map((el) => _getChapter(el, index--))
         .toList(growable: false);
-
 
     return Manga.fromMangaInfoRequest(
         authors: authors,

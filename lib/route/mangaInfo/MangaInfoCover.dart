@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:maxga/Utils/DateUtils.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
+import 'package:maxga/model/maxga/ReadMangaStatus.dart';
 import 'package:maxga/route/search/search-result-page.dart';
 
 typedef CoverImageBuilder = Widget Function(BuildContext context);
 
 class MangaInfoCover extends StatelessWidget {
-  final SimpleMangaInfo manga;
+  final ReadMangaStatus manga;
   final MangaSource source;
   final bool loadEnd;
   final CoverImageBuilder coverImageBuilder;
