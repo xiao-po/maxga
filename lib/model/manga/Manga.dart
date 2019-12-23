@@ -48,6 +48,28 @@ class SimpleMangaInfo extends MangaBase {
     lastUpdateChapter = Chapter.fromJson(json['lastUpdateChapter']);
   }
 
+  SimpleMangaInfo.fromMangaRepo({
+    @required String sourceKey,
+    List<String> author,
+    @required int id,
+    @required String infoUrl,
+    String status, // "连载中" "已完结"
+    @required String coverImgUrl,
+    @required String title,
+    List<String> typeList,
+    Chapter lastUpdateChapter,
+  }) {
+    this.sourceKey = sourceKey;
+    this.author = author;
+    this.id = id;
+    this.infoUrl = infoUrl;
+    this.status = status;
+    this.coverImgUrl = coverImgUrl;
+    this.title = title;
+    this.typeList = typeList;
+    this.lastUpdateChapter = lastUpdateChapter;
+  }
+
   Map<String, dynamic> toJson() => {
         'sourceKey': sourceKey,
         'author': author,
