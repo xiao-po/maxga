@@ -56,20 +56,18 @@ class DmzjLatestUpdateManga {
 
   /// 用于 动漫之家 列表拿到的接口返回的数据
   SimpleMangaInfo convertToSimpleMangaInfoForLatestUpdate() {
-    final SimpleMangaInfo manga = SimpleMangaInfo();
-
     final Chapter latestChapter = Chapter();
     latestChapter.id = lastUpdateChapterId;
     latestChapter.title = lastUpdateChapterName;
     latestChapter.updateTime = lastUpdatetime * 1000;
-    manga.lastUpdateChapter = latestChapter;
-    manga.infoUrl = 'http://v3api.dmzj.com/comic/comic_$id.json';
-    manga.author = authors.split('/');
-    manga.coverImgUrl = cover;
-    manga.title = title;
-    manga.id = id;
-    manga.typeList = types.split('/');
-    manga.sourceKey = DmzjMangaSource.key;
-    return manga;
+    return SimpleMangaInfo.fromMangaRepo(
+        sourceKey: DmzjMangaSource.key,
+        id: id,
+        infoUrl: 'http://v3api.dmzj.com/comic/comic_$id.json',
+        coverImgUrl: cover,
+        title: title,
+        typeList: types.split('/'),
+        author: authors.split('/'),
+        lastUpdateChapter: latestChapter);
   }
 }
