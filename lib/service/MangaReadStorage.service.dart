@@ -4,18 +4,17 @@ import 'package:maxga/model/manga/Chapter.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/maxga/ReadMangaStatus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-/// TODO: 准备作废
+
 class MangaReadStorageService {
   static final String _key = 'manga_process_';
+  static List<ReadMangaStatus> _readMangaStatusList;
+
 
   static Future<ReadMangaStatus> getMangaStatus(Manga manga) async {
     final allReadManga = await _getAllReadManga();
-    final index = allReadManga.indexWhere((el) => el.id == manga.id && manga.sourceKey == el.sourceKey);
+    final index = allReadManga.indexWhere((el) => el.infoUrl == manga.infoUrl);
     if (index != -1) {
       final mangaReadProcess = allReadManga[index]..chapterList.forEach((item) => item.isCollectionLatestUpdate = false);
-      final testChpater = Chapter();
-      testChpater.title = 'test';
-      mangaReadProcess.chapterList.add(testChpater);
       return mangaReadProcess;
     } else {
       return ReadMangaStatus.fromManga(manga);
@@ -24,28 +23,28 @@ class MangaReadStorageService {
 
   static Future<List<ReadMangaStatus>> getAllCollectedManga() async {
     final allReadManga = await _getAllReadManga();
-    allReadManga.removeWhere((el) => el.collected == false);
+    allReadManga.removeWhere((el) => el.isCollected == false);
     return allReadManga;
   }
 
   static Future<void> setMangaStatus(ReadMangaStatus process) async {
     final allReadManga = await _getAllReadManga();
-    allReadManga.removeWhere((el) => el.id == process.id);
+    allReadManga..removeWhere((el) => el.id == process.id)..add(process);
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_key, [
-      ...allReadManga?.map((el) => json.encode(el)) ?? [],
-      json.encode(process)
-    ]);
+    await prefs.setStringList(_key, allReadManga?.map((el) => json.encode(el))?.toList(growable: false) ?? []);
   }
 
   static Future<List<ReadMangaStatus>> _getAllReadManga() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (MangaReadStorageService._readMangaStatusList == null) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      MangaReadStorageService._readMangaStatusList = prefs
+          .getStringList(_key)
+          ?.map((el) => ReadMangaStatus.fromJson(json.decode(el)))
+          ?.toList() ??
+          [];
+    }
+    return MangaReadStorageService._readMangaStatusList;
 
-    return prefs
-            .getStringList(_key)
-            ?.map((el) => ReadMangaStatus.fromJson(json.decode(el)))
-            ?.toList() ??
-        [];
   }
 
   static Future<void> clearStatus() async {

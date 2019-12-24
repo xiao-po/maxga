@@ -41,15 +41,20 @@ class CollectionProvider extends BaseProvider {
     }
   }
 
-  Future<bool> updateAction() async {
-    return Future.value(true);
-  }
-
-  Future<bool> addAction(ReadMangaStatus manga) async {
+  Future<bool> addAndUpdateAction(ReadMangaStatus manga) async {
     try {
+
       final status = ReadMangaStatus.fromManga(manga);
-      await this._addToDb(status);
-      this._collectedMangaList.add(status);
+      status.isCollected = true;
+      final isSuccess = await this._updateDb(status);
+      if (!isSuccess) {
+        return false;
+      }
+
+      if (manga.isCollected) {
+        // update
+        this._collectedMangaList.add(status);
+      }
       return true;
     } catch (e) {
       print(e);
@@ -59,10 +64,16 @@ class CollectionProvider extends BaseProvider {
 
   Future<bool> deleteAction(ReadMangaStatus manga) async {
     try {
-      await this._addToDb(manga);
+
+      final status = ReadMangaStatus.fromManga(manga);
+      status.isCollected = false;
+      final isSuccess = await this._updateDb(status);
+      if (!isSuccess) {
+        return false;
+      }
       this
           ._collectedMangaList
-          .removeWhere((item) => manga.infoUrl == item.infoUrl);
+          .removeWhere((item) => status.infoUrl == item.infoUrl);
       return true;
     } catch (e) {
       print(e);
@@ -70,9 +81,8 @@ class CollectionProvider extends BaseProvider {
     }
   }
 
-  Future<bool> _addToDb(ReadMangaStatus manga) {
-    // TODO: storage add
-    return Future.value(true);
+  Future<bool> _updateDb(ReadMangaStatus manga) {
+    return MangaReadStorageService.setMangaStatus(manga);
   }
 
   @override
@@ -80,9 +90,10 @@ class CollectionProvider extends BaseProvider {
     super.dispose();
   }
 
-  getMangaFromInfoUrl(String infoUrl) {
+  ReadMangaStatus getMangaFromInfoUrl(String infoUrl) {
     return this
         ._collectedMangaList
         .firstWhere((item) => item.infoUrl == infoUrl);
   }
+
 }

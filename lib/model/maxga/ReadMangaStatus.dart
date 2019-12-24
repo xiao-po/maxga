@@ -4,7 +4,7 @@ import '../manga/Manga.dart';
 class ReadMangaStatus extends Manga {
   int readChapterId;
   int readImageIndex;
-  bool collected = false;
+  bool isCollected = false;
   bool isReadAfterUpdate;
   Chapter lastUpdateChapter;
   List<Chapter> chapterList;
@@ -31,7 +31,7 @@ class ReadMangaStatus extends Manga {
   }
 
   ReadMangaStatus.fromJson(Map<String, dynamic> json) : super.fromJson(json) {
-    collected = json['collected'];
+    isCollected = json['collected'];
     readImageIndex = json['readImageIndex'];
     isReadAfterUpdate = json['isReadAfterUpdate'];
     readChapterId = json['readChapterId'];
@@ -50,7 +50,7 @@ class ReadMangaStatus extends Manga {
         'readImageIndex': readImageIndex,
         'readChapterId': readChapterId,
         'isReadAfterUpdate': isReadAfterUpdate,
-        'collected': collected,
+        'collected': isCollected,
         'typeList': typeList,
         'chapterList': chapterList,
         'lastUpdateChapter': lastUpdateChapter

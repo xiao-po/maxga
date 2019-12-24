@@ -68,15 +68,52 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
       _initInfo(
           url: widget.manga.infoUrl,
           sourceKey: widget.manga.sourceKey,
-          filter: (curr) {
+          filter: (curr) async {
 
-            final preReadMangaStatus = Provider.of<CollectionProvider>(context).getMangaFromInfoUrl(curr.infoUrl);
-
+            print('filter in');
+            CollectionProvider collectionProvider =
+                Provider.of<CollectionProvider>(context);
+            final preReadMangaStatus =
+                collectionProvider.getMangaFromInfoUrl(curr.infoUrl);
+            if (preReadMangaStatus.chapterList.length !=
+                curr.chapterList.length) {
+              final index = curr.chapterList.indexWhere((item) =>
+                  preReadMangaStatus.chapterList.first.url == item.url);
+              for (var i = 0; i < curr.chapterList.length; i++) {
+                final item = curr.chapterList[i];
+                item.isCollectionLatestUpdate = i < index;
+                print(item.title);
+              }
+            }
+            collectionProvider.addAndUpdateAction(curr);
             return curr;
-          }
-      );
+          });
     } else {
-      _initInfo(url: widget.infoUrl, sourceKey: widget.sourceKey);
+      _initInfo(
+          url: widget.infoUrl,
+          sourceKey: widget.sourceKey,
+          filter: (curr) async {
+            print('filter in');
+            final preReadMangaStatus =
+                await MangaReadStorageService.getMangaStatus(curr);
+            if (preReadMangaStatus != null ) {
+              final testChpater = Chapter();
+              testChpater.title = 'test';
+              curr.chapterList = [testChpater]..addAll(curr.chapterList);
+            }
+            if (preReadMangaStatus.chapterList.length !=
+                curr.chapterList.length) {
+              final index = curr.chapterList.indexWhere((item) =>
+                  preReadMangaStatus.chapterList.first.url == item.url);
+              for (var i = 0; i < curr.chapterList.length; i++) {
+                final item = curr.chapterList[i];
+                item.isCollectionLatestUpdate = i < index;
+                print(item.title);
+              }
+            }
+            print(curr.chapterList.length);
+            return curr;
+          });
     }
     source = MangaRepoPool.getInstance()
         .getMangaSourceByKey(widget.sourceKey ?? widget.manga.sourceKey);
@@ -101,7 +138,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
           mangaInfoBottomBar = MangaInfoBottomBar(
             onResume: () => onResumeProcess(),
             readed: readMangaStatus.readChapterId != null,
-            collected: readMangaStatus.collected,
+            collected: readMangaStatus.isCollected,
             onCollect: () => collectManga(),
           );
           break;
@@ -188,7 +225,8 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   Future<void> _initInfo(
       {@required String sourceKey,
       @required String url,
-        ReadMangaStatus Function(ReadMangaStatus currentState) filter}) async {
+      Future<ReadMangaStatus> Function(ReadMangaStatus currentState)
+          filter}) async {
     MaxgaDataHttpRepo repo =
         MangaRepoPool.getInstance().getRepo(key: sourceKey);
     await Future.wait<dynamic>([
@@ -196,20 +234,11 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
         try {
           final manga = await repo.getMangaInfo(url);
           final currentReadMangaStatus = ReadMangaStatus.fromManga(manga);
-          readMangaStatus = filter != null ? filter(currentReadMangaStatus) : currentReadMangaStatus;
-//          readMangaStatus = await MangaReadStorageService.getMangaStatus(manga);
-//          final hasUpdate =
-//              manga.chapterList.length != readMangaStatus.chapterList.length;
-//          if (hasUpdate) {
-//            readMangaStatus.isReadAfterUpdate = false;
-//            readMangaStatus.chapterList = manga.chapterList
-//              ..forEach((item) {
-//                final isExist = readMangaStatus.chapterList
-//                        .indexWhere((chapter) => chapter.title == item.title) !=
-//                    -1;
-//                item.isCollectionLatestUpdate = !isExist;
-//              });
-//          }
+          readMangaStatus = filter != null
+              ? await filter(currentReadMangaStatus)
+              : currentReadMangaStatus;
+          print('filter over');
+          print(readMangaStatus.chapterList.length);
           introduce = manga.introduce;
           chapterList = readMangaStatus.chapterList;
           loading = _MangaInfoPageStatus.over;
@@ -291,13 +320,15 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
 
   collectManga() async {
     bool isSuccess = false;
-    if (readMangaStatus.collected) {
-      isSuccess = await Provider.of<CollectionProvider>(context).deleteAction(readMangaStatus);
+    if (readMangaStatus.isCollected) {
+      isSuccess = await Provider.of<CollectionProvider>(context)
+          .deleteAction(readMangaStatus);
     } else {
-      isSuccess = await Provider.of<CollectionProvider>(context).addAction(readMangaStatus);
+      isSuccess = await Provider.of<CollectionProvider>(context)
+          .addAndUpdateAction(readMangaStatus);
     }
     if (isSuccess) {
-      readMangaStatus.collected = !readMangaStatus.collected;
+      readMangaStatus.isCollected = !readMangaStatus.isCollected;
       if (mounted) setState(() {});
     } else {
       Scaffold.of(context).showSnackBar(SnackBar(
