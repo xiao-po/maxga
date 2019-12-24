@@ -46,10 +46,7 @@ class CollectionProvider extends BaseProvider {
 
       final status = ReadMangaStatus.fromManga(manga);
       status.isCollected = true;
-      final isSuccess = await this._updateDb(status);
-      if (!isSuccess) {
-        return false;
-      }
+      await MangaReadStorageService.setMangaStatus(status);
 
       if (manga.isCollected) {
         // update
@@ -67,10 +64,7 @@ class CollectionProvider extends BaseProvider {
 
       final status = ReadMangaStatus.fromManga(manga);
       status.isCollected = false;
-      final isSuccess = await this._updateDb(status);
-      if (!isSuccess) {
-        return false;
-      }
+      await MangaReadStorageService.setMangaStatus(status);
       this
           ._collectedMangaList
           .removeWhere((item) => status.infoUrl == item.infoUrl);
@@ -81,9 +75,6 @@ class CollectionProvider extends BaseProvider {
     }
   }
 
-  Future<bool> _updateDb(ReadMangaStatus manga) {
-    return MangaReadStorageService.setMangaStatus(manga);
-  }
 
   @override
   void dispose() {

@@ -69,54 +69,55 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
           url: widget.manga.infoUrl,
           sourceKey: widget.manga.sourceKey,
           filter: (curr) async {
-
             print('filter in');
             CollectionProvider collectionProvider =
                 Provider.of<CollectionProvider>(context);
             final preReadMangaStatus =
                 collectionProvider.getMangaFromInfoUrl(curr.infoUrl);
-            if (preReadMangaStatus.chapterList.length !=
-                curr.chapterList.length) {
-              final index = curr.chapterList.indexWhere((item) =>
-                  preReadMangaStatus.chapterList.first.url == item.url);
-              for (var i = 0; i < curr.chapterList.length; i++) {
-                final item = curr.chapterList[i];
-                item.isCollectionLatestUpdate = i < index;
-                print(item.title);
-              }
+            if (curr.chapterList.length != preReadMangaStatus.chapterList.length) {
+              final mergedMangaStatus = mergeMangaReadStatus(curr, preReadMangaStatus);
+              return mergedMangaStatus;
+            } else {
+              return preReadMangaStatus;
             }
-            collectionProvider.addAndUpdateAction(curr);
-            return curr;
           });
     } else {
       _initInfo(
           url: widget.infoUrl,
           sourceKey: widget.sourceKey,
           filter: (curr) async {
-            print('filter in');
-            final preReadMangaStatus =
+            ReadMangaStatus preReadMangaStatus =
                 await MangaReadStorageService.getMangaStatus(curr);
-            if (preReadMangaStatus != null ) {
-              final testChpater = Chapter();
-              testChpater.title = 'test';
-              curr.chapterList = [testChpater]..addAll(curr.chapterList);
+            bool hasCache = preReadMangaStatus != null;
+            if (!hasCache) {
+              return ReadMangaStatus.fromManga(curr);
+            } else {
+              return mergeMangaReadStatus(curr, preReadMangaStatus);
             }
-            if (preReadMangaStatus.chapterList.length !=
-                curr.chapterList.length) {
-              final index = curr.chapterList.indexWhere((item) =>
-                  preReadMangaStatus.chapterList.first.url == item.url);
-              for (var i = 0; i < curr.chapterList.length; i++) {
-                final item = curr.chapterList[i];
-                item.isCollectionLatestUpdate = i < index;
-                print(item.title);
-              }
-            }
-            print(curr.chapterList.length);
-            return curr;
+
           });
     }
     source = MangaRepoPool.getInstance()
         .getMangaSourceByKey(widget.sourceKey ?? widget.manga.sourceKey);
+  }
+
+  ReadMangaStatus mergeMangaReadStatus(ReadMangaStatus curr, ReadMangaStatus preReadMangaStatus) {
+    final status = ReadMangaStatus.fromManga(curr);
+    status.readChapterId = preReadMangaStatus.readChapterId;
+    status.readImageIndex = preReadMangaStatus.readImageIndex;
+    if (preReadMangaStatus.chapterList.length !=
+        status.chapterList.length) {
+      status.chapterList
+          .forEach((item) => item.isCollectionLatestUpdate = true);
+      var list = status.chapterList
+          .where((currChapter) =>
+      preReadMangaStatus.chapterList.indexWhere(
+              (preChapter) => preChapter.url == currChapter.url) !=
+          -1)
+          .toList();
+      list.forEach((item) => item.isCollectionLatestUpdate = false);
+    }
+    return status;
   }
 
   @override
@@ -165,7 +166,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
       default:
         {}
     }
-    final body = Scaffold(
+    return Scaffold(
         body: MangaInfoWrapper(
       title: readMangaStatus?.title ?? '',
       appbarActions: <Widget>[
@@ -188,10 +189,6 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
       ],
       bottomBar: mangaInfoBottomBar ?? Container(),
     ));
-    return WillPopScope(
-      onWillPop: () => onPop(),
-      child: body,
-    );
   }
 
   Row buildChapterLoading() {
@@ -337,12 +334,4 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     }
   }
 
-  Future<bool> onPop() {
-    if (this.loading == _MangaInfoPageStatus.over) {
-      Navigator.pop<ReadMangaStatus>(context, readMangaStatus);
-      return Future.value(false);
-    } else {
-      return Future.value(true);
-    }
-  }
 }

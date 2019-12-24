@@ -5,7 +5,7 @@ class ReadMangaStatus extends Manga {
   int readChapterId;
   int readImageIndex;
   bool isCollected = false;
-  bool isReadAfterUpdate;
+//  bool isReadAfterUpdate;
   Chapter lastUpdateChapter;
   List<Chapter> chapterList;
 
@@ -23,7 +23,7 @@ class ReadMangaStatus extends Manga {
           chapterList: manga.chapterList,
         ) {
     introduce = manga.introduce;
-    isReadAfterUpdate = true;
+//    isReadAfterUpdate = true;
     chapterList = manga.chapterList.toList(growable: true)
       ..sort((a, b) => b.order - a.order)
       ..forEach((item) => item.isCollectionLatestUpdate = false);
@@ -33,7 +33,7 @@ class ReadMangaStatus extends Manga {
   ReadMangaStatus.fromJson(Map<String, dynamic> json) : super.fromJson(json) {
     isCollected = json['collected'];
     readImageIndex = json['readImageIndex'];
-    isReadAfterUpdate = json['isReadAfterUpdate'];
+//    isReadAfterUpdate = json['isReadAfterUpdate'];
     readChapterId = json['readChapterId'];
     lastUpdateChapter = Chapter.fromJson(json['lastUpdateChapter']);
   }
@@ -49,7 +49,7 @@ class ReadMangaStatus extends Manga {
         'introduce': introduce,
         'readImageIndex': readImageIndex,
         'readChapterId': readChapterId,
-        'isReadAfterUpdate': isReadAfterUpdate,
+//        'isReadAfterUpdate': isReadAfterUpdate,
         'collected': isCollected,
         'typeList': typeList,
         'chapterList': chapterList,

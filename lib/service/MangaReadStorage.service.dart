@@ -13,25 +13,25 @@ class MangaReadStorageService {
   static Future<ReadMangaStatus> getMangaStatus(Manga manga) async {
     final allReadManga = await _getAllReadManga();
     final index = allReadManga.indexWhere((el) => el.infoUrl == manga.infoUrl);
-    if (index != -1) {
-      final mangaReadProcess = allReadManga[index]..chapterList.forEach((item) => item.isCollectionLatestUpdate = false);
-      return mangaReadProcess;
-    } else {
-      return ReadMangaStatus.fromManga(manga);
+    if (index == -1) {
+      return null;
     }
+    final mangaReadProcess = allReadManga[index]..chapterList.forEach((item) => item.isCollectionLatestUpdate = false);
+    return mangaReadProcess;
   }
 
   static Future<List<ReadMangaStatus>> getAllCollectedManga() async {
     final allReadManga = await _getAllReadManga();
     allReadManga.removeWhere((el) => el.isCollected == false);
-    return allReadManga;
+    return allReadManga.toList();
   }
 
-  static Future<void> setMangaStatus(ReadMangaStatus process) async {
+  static Future<bool> setMangaStatus(ReadMangaStatus process) async {
     final allReadManga = await _getAllReadManga();
     allReadManga..removeWhere((el) => el.id == process.id)..add(process);
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(_key, allReadManga?.map((el) => json.encode(el))?.toList(growable: false) ?? []);
+    return true;
   }
 
   static Future<List<ReadMangaStatus>> _getAllReadManga() async {
@@ -43,7 +43,7 @@ class MangaReadStorageService {
           ?.toList() ??
           [];
     }
-    return MangaReadStorageService._readMangaStatusList;
+    return MangaReadStorageService._readMangaStatusList.toList();
 
   }
 
