@@ -11,28 +11,31 @@ class MangaImage extends StatefulWidget {
 
   final MangaSource source;
 
-  const MangaImage({Key key, this.url, this.index,  this.source}) : super(key: key);
+  const MangaImage({Key key, this.url, this.index, this.source})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MangaImageState();
-
 }
 
-class _MangaImageState extends State<MangaImage> with SingleTickerProviderStateMixin  {
+class _MangaImageState extends State<MangaImage>
+    with SingleTickerProviderStateMixin {
   MangaImageAnimationListener _animationListener;
   AnimationController _animationController;
   Animation _animation;
   List<double> doubleTapScales = [1, 1.5];
   ExtendedImageGesturePageView view;
+
   @override
   void initState() {
     super.initState();
     _animationController =
         AnimationController(duration: Duration(milliseconds: 200), vsync: this);
   }
+
   @override
   Widget build(BuildContext context) {
-    return  ExtendedImage.network(
+    return ExtendedImage.network(
       widget.url,
       height: double.infinity,
       width: double.infinity,
@@ -58,36 +61,36 @@ class _MangaImageState extends State<MangaImage> with SingleTickerProviderStateM
   }
 
   Widget buildMangeImage(ExtendedImageState state) {
-      switch (state.extendedImageLoadState) {
-        case LoadState.loading:
-          return buildPlaceHolder();
+    switch (state.extendedImageLoadState) {
+      case LoadState.loading:
+        return buildPlaceHolder();
 
-        case LoadState.completed:
-          return ExtendedImageGesture(
-            state, null
-          );
-        case LoadState.failed:
-          return buildFailedPlaceHolder(state);
-        default:
-          throw Error();
-
-      }
+      case LoadState.completed:
+        return ExtendedImageGesture(state, null);
+      case LoadState.failed:
+        return buildFailedPlaceHolder(state);
+      default:
+        throw Error();
     }
+  }
 
   GestureDetector buildFailedPlaceHolder(ExtendedImageState state) {
     return GestureDetector(
-          child: Stack(
-            fit: StackFit.expand,
-            children: <Widget>[
-              Align(
-                child: Text('加载图片失败，点击重试', style: TextStyle(color: Colors.white),),
-              )
-            ],
-          ),
-          onTap: () {
-            state.reLoadImage();
-          },
-        );
+      child: Stack(
+        fit: StackFit.expand,
+        children: <Widget>[
+          Align(
+            child: Text(
+              '加载图片失败，点击重试',
+              style: TextStyle(color: Colors.white),
+            ),
+          )
+        ],
+      ),
+      onTap: () {
+        state.reLoadImage();
+      },
+    );
   }
 
   Widget buildPlaceHolder() {
@@ -96,10 +99,7 @@ class _MangaImageState extends State<MangaImage> with SingleTickerProviderStateM
       children: <Widget>[
         Text(
           '${widget.index}',
-          style: TextStyle(
-              color: Colors.white38,
-              fontSize: 40
-          ),
+          style: TextStyle(color: Colors.white38, fontSize: 40),
         ),
         Padding(
           padding: EdgeInsets.only(top: 20),
@@ -109,12 +109,9 @@ class _MangaImageState extends State<MangaImage> with SingleTickerProviderStateM
             child: CircularProgressIndicator(strokeWidth: 3),
           ),
         )
-
       ],
     );
   }
-
-
 
   zoomImage(ExtendedImageGestureState state) {
     var pointerDownPosition = state.pointerDownPosition;
@@ -138,10 +135,10 @@ class _MangaImageState extends State<MangaImage> with SingleTickerProviderStateM
 
     _animationListener = () {
       state.handleDoubleTap(
-          scale: _animation.value,
-          doubleTapPosition: pointerDownPosition);
+          scale: _animation.value, doubleTapPosition: pointerDownPosition);
     };
-    _animation = _animationController.drive(Tween<double>(begin: begin, end: end));
+    _animation =
+        _animationController.drive(Tween<double>(begin: begin, end: end));
 
     _animation.addListener(_animationListener);
 

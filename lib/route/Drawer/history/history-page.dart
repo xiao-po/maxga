@@ -40,9 +40,9 @@ class _HistToryPageState extends State<HistoryPage> {
               children: mangaHistoryList.map((item) {
               MangaSource source = MangaRepoPool.getInstance()
                   .getMangaSourceByKey(item.sourceKey);
-              return MangaCard(
+              return MangaListTile(
                 title: Text(item.title),
-                extra: MangaInfoCardExtra(
+                extra: MangaListTileExtra(
                   manga: item,
                   source: source,
                 ),

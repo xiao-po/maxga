@@ -162,7 +162,9 @@ class _MangaViewerState extends State<MangaViewer> {
         {
           appbar = AppBar(
             backgroundColor: Colors.transparent,
-            leading: BackButton(color: Colors.white,),
+            leading: BackButton(
+              color: Colors.white,
+            ),
           );
           body = buildLoadingPage();
           break;
@@ -303,8 +305,8 @@ class _MangaViewerState extends State<MangaViewer> {
   changePage(int index) async {
     if (index < 0 && preChapter == null) {
       toastMessage('已经是第一页了');
-      return ;
-    } else if (index > (imagePageUrlList.length - 1) && nextChapter == null)  {
+      return;
+    } else if (index > (imagePageUrlList.length - 1) && nextChapter == null) {
       toastMessage('已经是最后一页了', TextAlign.right);
       return;
     }

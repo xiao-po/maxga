@@ -21,19 +21,16 @@ class ManhuaduiHtmlParser {
 
   List<SimpleMangaInfo> getMangaListFromLatestUpdate(String html) {
     var document = parse(html);
-    var listComicNodeList = document
-        .querySelector('.list_con_li.clearfix')
-        .querySelectorAll('.list-comic');
+    var listComicNodeList = document.querySelectorAll('.UpdateList>.itemBox');
     final list = listComicNodeList
-        .map((comicNode) => _parseMangaFromListComicNode(comicNode))
+        .map((comicNode) => _parseMangaFromUpdate(comicNode))
         .toList();
     return list;
   }
 
   List<SimpleMangaInfo> getMangaListFromSearch(String html) {
     var document = parse(html);
-    var listComicNodeList =
-    document.querySelector('.update_con').querySelectorAll('.list-comic');
+    var listComicNodeList = document.querySelectorAll('.UpdateList>.itemBox');
     final list = listComicNodeList
         .map((comicNode) => _parseMangaFromSearchComicNode(comicNode))
         .toList();
@@ -57,10 +54,10 @@ class ManhuaduiHtmlParser {
         imageKeyScript.innerHtml.indexOf('chapterImages = "') + 17,
         imageKeyScript.innerHtml.indexOf('";'));
     final jsonResult =
-    json.decode(ManhuaduiCrypto.decrypt(imageListEncryptText)) as List;
+        json.decode(ManhuaduiCrypto.decrypt(imageListEncryptText)) as List;
 
     List<String> imageList =
-    jsonResult.map((str) => '$str').toList(growable: false);
+        jsonResult.map((str) => '$str').toList(growable: false);
     if (imagePath == "") {
       return imageList
           .map((url) => 'https://mhcdn.manhuazj.com/showImage.php?url=$url')
@@ -84,151 +81,126 @@ class ManhuaduiHtmlParser {
     return imagePath;
   }
 
-  SimpleMangaInfo _parseMangaFromListComicNode(Element el) {
-    final comicId = el.attributes['data-key'];
-    final imageNode = el.querySelector('.comic_img').querySelector('img');
-    final mangaInfoUrl = el
-        .querySelector('.comic_img')
-        .attributes['href'];
-    final mangaCoverUrl = imageNode.attributes['src'];
-    final mangaTitle = imageNode.attributes['alt'];
-
-    final mangaIntroNode = el.querySelectorAll('.comic_list_det p');
-    final mangaAuthor = mangaIntroNode[0].innerHtml.replaceAll('作者：', '');
-    final mangaTag = mangaIntroNode[1].innerHtml.replaceAll('类型：', '');
-    final mangaExistStatus = mangaIntroNode[2].innerHtml.replaceAll('状态：', '');
-    final lastChapterTitle = mangaIntroNode[3]
-        .querySelector('a')
-        .innerHtml;
-
-    Chapter lastChapter = Chapter();
-    lastChapter.title = lastChapterTitle;
-
-    return SimpleMangaInfo.fromMangaRepo(
-      sourceKey: ManhuaduiMangaSource.key,
-      id: int.parse(comicId),
-      infoUrl: mangaInfoUrl,
-      coverImgUrl: mangaCoverUrl,
-      title: mangaTitle,
-      typeList: mangaTag.split('/'),
-      author: mangaAuthor.split(','),
-      status: mangaExistStatus,
-      lastUpdateChapter: lastChapter,
-    );
-  }
+//  SimpleMangaInfo _parseMangaFromListComicNode(Element el) {
+//    final comicId = el.attributes['data-key'];
+//    final imageNode = el.querySelector('.comic_img').querySelector('img');
+//    final mangaInfoUrl = el.querySelector('.comic_img').attributes['href'];
+//    final mangaCoverUrl = imageNode.attributes['src'];
+//    final mangaTitle = imageNode.attributes['alt'];
+//
+//    final mangaIntroNode = el.querySelectorAll('.comic_list_det p');
+//    final mangaAuthor = mangaIntroNode[0].innerHtml.replaceAll('作者：', '');
+//    final mangaTag = mangaIntroNode[1].innerHtml.replaceAll('类型：', '');
+//    final mangaExistStatus = mangaIntroNode[2].innerHtml.replaceAll('状态：', '');
+//    final lastChapterTitle = mangaIntroNode[3].querySelector('a').innerHtml;
+//
+//    Chapter lastChapter = Chapter();
+//    lastChapter.title = lastChapterTitle;
+//
+//    return SimpleMangaInfo.fromMangaRepo(
+//      sourceKey: ManhuaduiMangaSource.key,
+//      id: int.parse(comicId),
+//      infoUrl: mangaInfoUrl,
+//      coverImgUrl: mangaCoverUrl,
+//      title: mangaTitle,
+//      typeList: mangaTag.split('/'),
+//      author: mangaAuthor.split(','),
+//      status: mangaExistStatus,
+//      lastUpdateChapter: lastChapter,
+//    );
+//  }
 
   SimpleMangaInfo _parseMangaFromSearchComicNode(Element el) {
-    final comicId = el.attributes['data-key'];
-    final imageNode = el.querySelector('.image-link').querySelector('img');
-    final mangaInfoUrl = el
-        .querySelector('.image-link')
-        .attributes['href'];
-    final mangaCoverUrl = imageNode.attributes['src'];
-    final mangaTitle = el
-        .querySelector('.image-link')
-        .attributes['title'];
+    final mangaLinkNode = el.children[0].children[0];
+    final String mangaInfoUrl = mangaLinkNode.attributes['href'];
+    String mangaCoverUrl = mangaLinkNode.children[0].attributes['src'];
+    if (mangaCoverUrl[0] == '/') {
+      mangaCoverUrl = 'https:$mangaCoverUrl';
+    }
+    final mangaInfoNode = el.children[1];
+    final title = mangaInfoNode.children[0].innerHtml;
+    final List<String> authors =
+        mangaInfoNode.children[1].text.trim().split(',');
+    final List<String> types = mangaInfoNode.children[2].text.trim().split('|');
+    final String timeString = mangaInfoNode.children[3].text.trim();
+    final int timestamp =
+        DateUtils.convertTimeStringToTimestamp(timeString, 'yyyy-MM-dd hh:mm');
 
-    final mangaAuthor = el
-        .querySelector('.auth')
-        .innerHtml;
-    final lastChapterTitle = el
-        .querySelector('.newPage')
-        .innerHtml;
-
-
-    Chapter lastChapter = Chapter();
-    lastChapter.title = lastChapterTitle;
-
+    final lastChapterName = el.children[2].text;
+    final lastChapter = Chapter()..title = lastChapterName;
     return SimpleMangaInfo.fromMangaRepo(
-      sourceKey: ManhuaduiMangaSource.key,
-      id: int.parse(comicId),
-      infoUrl: mangaInfoUrl,
-      coverImgUrl: mangaCoverUrl,
-      title: mangaTitle,
-      typeList: null,
-      author: mangaAuthor.split(','),
-      status: null,
-      lastUpdateChapter: lastChapter,
-    );
-  }
-
-  Manga _parseMangaFromInfoPage(Document document) {
-    var introNode = document.querySelector('.wrap_intro_l_comic');
-    final mangaCoverUrl = introNode
-        .querySelector('.comic_i_img')
-        .querySelector('img')
-        .attributes['src'];
-
-    var mangaInfoNode = introNode.querySelector('.comic_deCon');
-    final mangaTitle = mangaInfoNode
-        .querySelector('h1')
-        .innerHtml;
-    final mangaIntroString =
-    mangaInfoNode
-        .querySelector('.comic_deCon_d')
-        .innerHtml
-        .trim();
-
-    var mangaMoreInfoNodeList =
-        mangaInfoNode
-            .querySelector('.comic_deCon_liO')
-            .children;
-    final mangaAuthor = mangaMoreInfoNodeList[0]
-        .querySelector('a')
-        .innerHtml;
-    final mangaTag = mangaMoreInfoNodeList[3]
-        .querySelector('a')
-        .innerHtml;
-    final mangaExistStatus = mangaMoreInfoNodeList[1]
-        .querySelector('a')
-        .innerHtml
-        .replaceAll('状态：', '');
-
-    var mangaChapterListNode = document.querySelectorAll('.zj_list')[1];
-    // ignore: unused_local_variable
-    final updateTime = mangaChapterListNode
-        .querySelector('.zj_list_head')
-        .querySelector('.zj_list_head_dat')
-        .innerHtml
-        .replaceAll('[ 更新时间：', '')
-        .replaceAll(']', '')
-        .trim();
-
-    var mangaChapterNodeList = mangaChapterListNode
-        .querySelector('.zj_list_con')
-        .querySelectorAll('li')
-        .toList();
-
-    var chapterIndex = 0;
-    List<Chapter> chapterList = mangaChapterNodeList.map((node) {
-      final chapter = Chapter();
-      chapter.title = node
-          .querySelector('a')
-          .attributes['title'];
-      var url = node
-          .querySelector('a')
-          .attributes['href'];
-      var id = _getIdFromUrl(url);
-      chapter.id = int.parse(id);
-      chapter.order = chapterIndex;
-      chapterIndex++;
-      chapter.url = url;
-      return chapter;
-    }).toList();
-    chapterList.sort((a, b) => b.order - a.order);
-
-    return Manga.fromMangaInfoRequest(
-        authors: mangaAuthor.split(','),
-        types: mangaTag.split(' | '),
-        introduce: mangaIntroString,
-        title: mangaTitle,
-        id: 0,
-        infoUrl: '',
-        status: mangaExistStatus,
-        coverImgUrl: mangaCoverUrl,
         sourceKey: ManhuaduiMangaSource.key,
-        chapterList: chapterList);
+        id: null,
+        author: authors,
+        infoUrl: mangaInfoUrl,
+        typeList: types,
+        coverImgUrl: mangaCoverUrl,
+        title: title,
+        lastUpdateChapter: lastChapter);
   }
+
+//  Manga _parseMangaFromInfoPage(Document document) {
+//    var introNode = document.querySelector('.wrap_intro_l_comic');
+//    final mangaCoverUrl = introNode
+//        .querySelector('.comic_i_img')
+//        .querySelector('img')
+//        .attributes['src'];
+//
+//    var mangaInfoNode = introNode.querySelector('.comic_deCon');
+//    final mangaTitle = mangaInfoNode.querySelector('h1').innerHtml;
+//    final mangaIntroString =
+//        mangaInfoNode.querySelector('.comic_deCon_d').innerHtml.trim();
+//
+//    var mangaMoreInfoNodeList =
+//        mangaInfoNode.querySelector('.comic_deCon_liO').children;
+//    final mangaAuthor = mangaMoreInfoNodeList[0].querySelector('a').innerHtml;
+//    final mangaTag = mangaMoreInfoNodeList[3].querySelector('a').innerHtml;
+//    final mangaExistStatus = mangaMoreInfoNodeList[1]
+//        .querySelector('a')
+//        .innerHtml
+//        .replaceAll('状态：', '');
+//
+//    var mangaChapterListNode = document.querySelectorAll('.zj_list')[1];
+//    // ignore: unused_local_variable
+//    final updateTime = mangaChapterListNode
+//        .querySelector('.zj_list_head')
+//        .querySelector('.zj_list_head_dat')
+//        .innerHtml
+//        .replaceAll('[ 更新时间：', '')
+//        .replaceAll(']', '')
+//        .trim();
+//
+//    var mangaChapterNodeList = mangaChapterListNode
+//        .querySelector('.zj_list_con')
+//        .querySelectorAll('li')
+//        .toList();
+//
+//    var chapterIndex = 0;
+//    List<Chapter> chapterList = mangaChapterNodeList.map((node) {
+//      final chapter = Chapter();
+//      chapter.title = node.querySelector('a').attributes['title'];
+//      var url = node.querySelector('a').attributes['href'];
+//      var id = _getIdFromUrl(url);
+//      chapter.id = int.parse(id);
+//      chapter.order = chapterIndex;
+//      chapterIndex++;
+//      chapter.url = url;
+//      return chapter;
+//    }).toList();
+//    chapterList.sort((a, b) => b.order - a.order);
+//
+//    return Manga.fromMangaInfoRequest(
+//        authors: mangaAuthor.split(','),
+//        types: mangaTag.split(' | '),
+//        introduce: mangaIntroString,
+//        title: mangaTitle,
+//        id: 0,
+//        infoUrl: '',
+//        status: mangaExistStatus,
+//        coverImgUrl: mangaCoverUrl,
+//        sourceKey: ManhuaduiMangaSource.key,
+//        chapterList: chapterList);
+//  }
 
   List<SimpleMangaInfo> getMangaListFromRank(String body) {
     var document = parse(body);
@@ -239,10 +211,7 @@ class ManhuaduiHtmlParser {
         .map((Element el) {
       final mangaId = el.attributes['data-key'];
       final mangaCoverUrl =
-      el
-          .querySelector('.itemImg')
-          .querySelector('img')
-          .attributes['src'];
+          el.querySelector('.itemImg').querySelector('img').attributes['src'];
       final infoNode = el.querySelector('.itemTxt');
       final titleNode = infoNode.querySelector('.title');
       final mangaTitle = titleNode.innerHtml;
@@ -250,16 +219,12 @@ class ManhuaduiHtmlParser {
       final mangaAuthors = infoNode.children[1].text.split(',');
       final mangaTypeList = infoNode.children[2].text.split('|');
       final mangaUpdateTime = DateUtils.convertTimeStringToTimestamp(
-          infoNode.children[3]
-              .querySelector('.date')
-              .innerHtml,
+          infoNode.children[3].querySelector('.date').innerHtml,
           'yyyy-MM-dd hh:mm');
-
 
       Chapter lastChapter = Chapter();
       lastChapter.title = '';
       lastChapter.updateTime = mangaUpdateTime;
-
 
       return SimpleMangaInfo.fromMangaRepo(
         sourceKey: ManhuaduiMangaSource.key,
@@ -277,6 +242,84 @@ class ManhuaduiHtmlParser {
 
   String _getIdFromUrl(String url) {
     return url.substring(url.lastIndexOf('/') + 1, url.lastIndexOf('.'));
+  }
+
+  Manga _parseMangaFromInfoPage(Document document) {
+    final bodyEl = document.querySelector('.Introduct');
+    final title = bodyEl.querySelector('#comicName').innerHtml;
+    final otherInfoMainEl = bodyEl.querySelector('.Introduct_Sub');
+    final coverImageUrl = otherInfoMainEl
+        .querySelector('.pic')
+        .querySelector('img')
+        .attributes['href'];
+    final otherInfoEl = otherInfoMainEl.querySelector('.sub_r');
+
+    final authors = otherInfoEl.children[0].text.trim().split(',');
+    final types = otherInfoEl.children[1].text.trim().split(' | ');
+    final statusString = otherInfoEl.children[2].text.trim();
+    final status = statusString.substring(statusString.lastIndexOf(' ') + 1);
+    final time = DateUtils.convertTimeStringToTimestamp(
+        otherInfoEl.children[4].children[1].innerHtml, 'yyyy-MM-dd hh:mm');
+
+    final intro = bodyEl.querySelector('.txtDesc').innerHtml;
+    final chapterListEl = bodyEl
+        .querySelector('#list_block')
+        .querySelector('#chapter-list-1')
+        .children
+        .map((el) => el.children[0]);
+    var index = 1000;
+    final List<Chapter> chapterList = chapterListEl.map((el) {
+      Chapter chapter = Chapter();
+      chapter.url = el.attributes['href'];
+      chapter.title = el.children[0].innerHtml;
+      chapter.id = int.parse(chapter.url.substring(
+        chapter.url.lastIndexOf('/') + 1,
+        chapter.url.lastIndexOf('.html'),
+      ));
+      chapter.order = index--;
+      return chapter;
+    }).toList(growable: false);
+
+    return Manga.fromMangaInfoRequest(
+        authors: authors,
+        types: types,
+        introduce: intro,
+        title: title,
+        id: null,
+        infoUrl: null,
+        status: status,
+        coverImgUrl: coverImageUrl,
+        sourceKey: ManhuaduiMangaSource.key,
+        chapterList: chapterList);
+  }
+
+  SimpleMangaInfo _parseMangaFromUpdate(Element comicNode) {
+    final mangaLinkNode = comicNode.children[0].children[0];
+    final String mangaInfoUrl = mangaLinkNode.attributes['href'];
+    String mangaCoverUrl = mangaLinkNode.children[0].attributes['src'];
+    if (mangaCoverUrl[0] == '/') {
+      mangaCoverUrl = 'https:$mangaCoverUrl';
+    }
+    final mangaInfoNode = comicNode.children[1];
+    final title = mangaInfoNode.children[0].innerHtml;
+    final List<String> authors =
+        mangaInfoNode.children[1].text.trim().split(',');
+    final List<String> types = mangaInfoNode.children[2].text.trim().split('|');
+    final String timeString = mangaInfoNode.children[3].text.trim();
+    final int timestamp =
+        DateUtils.convertTimeStringToTimestamp(timeString, 'yyyy-MM-dd hh:mm');
+
+    final lastChapterName = comicNode.children[2].text;
+    final lastChapter = Chapter()..title = lastChapterName;
+    return SimpleMangaInfo.fromMangaRepo(
+        sourceKey: ManhuaduiMangaSource.key,
+        id: null,
+        author: authors,
+        infoUrl: mangaInfoUrl,
+        typeList: types,
+        coverImgUrl: mangaCoverUrl,
+        title: title,
+        lastUpdateChapter: lastChapter);
   }
 }
 
@@ -323,48 +366,52 @@ class ManhuaduiHtmlParser {
 //
 //  }
 //
-//  Manga getMangaInfo(String body) {
-//    final document = parse(body);
-//    final bodyEl = document.querySelector('.Introduct');
-//    final title = bodyEl.querySelector('#comicName').innerHtml;
-//    final otherInfoMainEl = bodyEl.querySelector('.Introduct_Sub');
-//    final coverImageUrl = otherInfoMainEl.querySelector('.pic').querySelector('img').attributes['href'];
-//    final otherInfoEl = otherInfoMainEl.querySelector('.sub_r');
-//
-//    final authors = otherInfoEl.children[0].text.split(',');
-//    final types = otherInfoEl.children[1].text.split(' | ');
-//    final status = otherInfoEl.children[2].text.split(' ')[2];
-//    final time = DateUtils.convertTimeStringToTimestamp(
-//        otherInfoEl.children[4].children[1].innerHtml
-//        , 'yyyy-MM-dd hh:mm'
-//    );
-//
-//    final intro = bodyEl.querySelector('.txtDesc').innerHtml;
-//    final chapterListEl = bodyEl.querySelector('#list_block').querySelector('#chapter-list-1').children.map((el) => el.children[0]);
-//    var index = 1000;
-//    final List<Chapter> chapterList = chapterListEl.map((el) {
-//      Chapter chapter = Chapter();
-//      chapter.url = el.attributes['href'];
-//      chapter.title = el.children[0].innerHtml;
-//      chapter.id = int.parse(
-//          chapter.url.substring(
-//            chapter.url.lastIndexOf('/') + 1,
-//            chapter.url.lastIndexOf('.html'),
-//          )
-//      );
-//      chapter.order = index--;
-//      return chapter;
-//    }).toList(growable: false);
-//
-//    final Manga manga = Manga();
-//    manga.title = title;
-//    manga.coverImgUrl = coverImageUrl;
-//    manga.author = authors;
-//    manga.typeList = types;
-//    manga.status = status;
-//    manga.introduce = intro;
-//    manga.chapterList = chapterList;
-//    return manga;
-//
-//  }
+Manga getMangaInfo(String body) {
+  final document = parse(body);
+  final bodyEl = document.querySelector('.Introduct');
+  final title = bodyEl.querySelector('#comicName').innerHtml;
+  final otherInfoMainEl = bodyEl.querySelector('.Introduct_Sub');
+  final coverImageUrl = otherInfoMainEl
+      .querySelector('.pic')
+      .querySelector('img')
+      .attributes['href'];
+  final otherInfoEl = otherInfoMainEl.querySelector('.sub_r');
+
+  final authors = otherInfoEl.children[0].text.split(',');
+  final types = otherInfoEl.children[1].text.split(' | ');
+  final status = otherInfoEl.children[2].text.split(' ')[2];
+  final time = DateUtils.convertTimeStringToTimestamp(
+      otherInfoEl.children[4].children[1].innerHtml, 'yyyy-MM-dd hh:mm');
+
+  final intro = bodyEl.querySelector('.txtDesc').innerHtml;
+  final chapterListEl = bodyEl
+      .querySelector('#list_block')
+      .querySelector('#chapter-list-1')
+      .children
+      .map((el) => el.children[0]);
+  var index = 1000;
+  final List<Chapter> chapterList = chapterListEl.map((el) {
+    Chapter chapter = Chapter();
+    chapter.url = el.attributes['href'];
+    chapter.title = el.children[0].innerHtml;
+    chapter.id = int.parse(chapter.url.substring(
+      chapter.url.lastIndexOf('/') + 1,
+      chapter.url.lastIndexOf('.html'),
+    ));
+    chapter.order = index--;
+    return chapter;
+  }).toList(growable: false);
+
+  return Manga.fromMangaInfoRequest(
+      authors: authors,
+      types: types,
+      introduce: intro,
+      title: title,
+      id: null,
+      infoUrl: null,
+      status: status,
+      coverImgUrl: coverImageUrl,
+      sourceKey: ManhuaduiMangaSource.key,
+      chapterList: chapterList);
+}
 //}

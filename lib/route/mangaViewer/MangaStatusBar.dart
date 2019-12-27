@@ -49,7 +49,7 @@ class _MangaStatusBarState extends State<MangaStatusBar> {
           children: <Widget>[
             Container(
                 padding:
-                EdgeInsets.only(left: 10, right: 20, top: 7, bottom: 4),
+                    EdgeInsets.only(left: 10, right: 20, top: 7, bottom: 4),
                 decoration: BoxDecoration(color: Color(0xff263238)),
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -64,7 +64,7 @@ class _MangaStatusBarState extends State<MangaStatusBar> {
                       ),
                       Text(
                         ' $index/${widget.currentChapter.imgUrlList.length} '
-                            ' ${currentTime.hour}:${currentTime.minute}  $currentBattery%',
+                        ' ${currentTime.hour}:${currentTime.minute}  $currentBattery%',
                         style: defaultTextStyle,
                       ),
                     ]))

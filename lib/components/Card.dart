@@ -5,7 +5,7 @@ import 'package:maxga/model/manga/MangaSource.dart';
 
 typedef CoverBuilder = Widget Function(BuildContext context);
 
-class MangaCard extends StatelessWidget {
+class MangaListTile extends StatelessWidget {
   final GestureTapCallback onTap;
   final GestureLongPressCallback onLongPress;
   final Widget cover;
@@ -14,7 +14,7 @@ class MangaCard extends StatelessWidget {
   final CoverBuilder coverBuilder;
   final Widget extra;
 
-  MangaCard(
+  MangaListTile(
       {this.onTap,
       this.cover,
       this.coverBuilder,
@@ -27,29 +27,29 @@ class MangaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final EdgeInsetsGeometry cardPadding = EdgeInsets.only(
+    final EdgeInsetsGeometry itemPadding = EdgeInsets.only(
       left: 0,
       right: 10,
       top: 10,
       bottom: 10,
     );
-    final double cardHeight = 120;
+    final double itemHeight = 120;
     final double coverWidth = 100;
-    final double coverHorizonPadding = (cardHeight - coverWidth) / 2;
+    final double coverHorizonPadding = (itemHeight - coverWidth) / 2;
     var edgeInsets = EdgeInsets.only(top: 0, left: 10);
     var bodyColumn = <Widget>[title];
     if (labels != null && labels.length > 0) {
       bodyColumn.addAll(labels);
     }
     Widget body = Container(
-      height: cardHeight,
-      padding: cardPadding,
+      height: itemHeight,
+      padding: itemPadding,
       decoration: BoxDecoration(),
       child: Row(
         children: <Widget>[
           Center(
             child: Container(
-              height: cardHeight,
+              height: itemHeight,
               width: coverWidth,
               padding: EdgeInsets.only(
                   left: coverHorizonPadding,
@@ -82,7 +82,7 @@ class MangaCard extends StatelessWidget {
         ),
       );
     }
-    return Card(child: body);
+    return body;
   }
 
   Container buildMangaTitle(String title) {
@@ -160,12 +160,12 @@ class MangaExtra extends StatelessWidget {
   }
 }
 
-class MangaInfoCardExtra extends StatelessWidget {
+class MangaListTileExtra extends StatelessWidget {
   final SimpleMangaInfo manga;
   final MangaSource source;
   final Color textColor;
 
-  const MangaInfoCardExtra({
+  const MangaListTileExtra({
     Key key,
     this.manga,
     this.textColor,

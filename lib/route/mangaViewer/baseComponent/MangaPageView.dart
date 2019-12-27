@@ -1,10 +1,11 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
+
 final PageController _defaultPageController = PageController();
 const PageScrollPhysics _kPagePhysics = PageScrollPhysics();
-class MangaPageView extends StatefulWidget {
 
+class MangaPageView extends StatefulWidget {
   /// Creates a scrollable list that works page by page from an explicit [List]
   /// of widgets.
   ///
@@ -23,7 +24,7 @@ class MangaPageView extends StatefulWidget {
     this.onPageChanged,
     List<Widget> children = const <Widget>[],
     this.dragStartBehavior = DragStartBehavior.start,
-  }) : controller = controller ?? _defaultPageController,
+  })  : controller = controller ?? _defaultPageController,
         childrenDelegate = SliverChildListDelegate(children),
         super(key: key);
 
@@ -55,8 +56,9 @@ class MangaPageView extends StatefulWidget {
     @required IndexedWidgetBuilder itemBuilder,
     int itemCount,
     this.dragStartBehavior = DragStartBehavior.start,
-  }) : controller = controller ?? _defaultPageController,
-        childrenDelegate = SliverChildBuilderDelegate(itemBuilder, childCount: itemCount),
+  })  : controller = controller ?? _defaultPageController,
+        childrenDelegate =
+            SliverChildBuilderDelegate(itemBuilder, childCount: itemCount),
         super(key: key);
 
   /// Creates a scrollable list that works page by page with a custom child
@@ -150,7 +152,7 @@ class MangaPageView extends StatefulWidget {
     this.preloadPageCount,
     @required this.childrenDelegate,
     this.dragStartBehavior = DragStartBehavior.start,
-  }) : assert(childrenDelegate != null),
+  })  : assert(childrenDelegate != null),
         controller = controller ?? _defaultPageController,
         super(key: key);
 
@@ -205,8 +207,6 @@ class MangaPageView extends StatefulWidget {
   /// {@macro flutter.widgets.scrollable.dragStartBehavior}
   final DragStartBehavior dragStartBehavior;
 
-
-
   final int preloadPageCount;
 
   @override
@@ -227,8 +227,11 @@ class _MangaPageViewState extends State<MangaPageView> {
       case Axis.horizontal:
         assert(debugCheckHasDirectionality(context));
         final TextDirection textDirection = Directionality.of(context);
-        final AxisDirection axisDirection = textDirectionToAxisDirection(textDirection);
-        return widget.reverse ? flipAxisDirection(axisDirection) : axisDirection;
+        final AxisDirection axisDirection =
+            textDirectionToAxisDirection(textDirection);
+        return widget.reverse
+            ? flipAxisDirection(axisDirection)
+            : axisDirection;
       case Axis.vertical:
         return widget.reverse ? AxisDirection.up : AxisDirection.down;
     }
@@ -244,7 +247,9 @@ class _MangaPageViewState extends State<MangaPageView> {
 
     return NotificationListener<ScrollNotification>(
       onNotification: (ScrollNotification notification) {
-        if (notification.depth == 0 && widget.onPageChanged != null && notification is ScrollUpdateNotification) {
+        if (notification.depth == 0 &&
+            widget.onPageChanged != null &&
+            notification is ScrollUpdateNotification) {
           final PageMetrics metrics = notification.metrics;
           final int currentPage = metrics.page.round();
           if (currentPage != _lastReportedPage) {
@@ -279,18 +284,25 @@ class _MangaPageViewState extends State<MangaPageView> {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder description) {
     super.debugFillProperties(description);
-    description.add(EnumProperty<Axis>('scrollDirection', widget.scrollDirection));
-    description.add(FlagProperty('reverse', value: widget.reverse, ifTrue: 'reversed'));
-    description.add(DiagnosticsProperty<PageController>('controller', widget.controller, showName: false));
-    description.add(DiagnosticsProperty<ScrollPhysics>('physics', widget.physics, showName: false));
-    description.add(FlagProperty('pageSnapping', value: widget.pageSnapping, ifFalse: 'snapping disabled'));
+    description
+        .add(EnumProperty<Axis>('scrollDirection', widget.scrollDirection));
+    description.add(
+        FlagProperty('reverse', value: widget.reverse, ifTrue: 'reversed'));
+    description.add(DiagnosticsProperty<PageController>(
+        'controller', widget.controller,
+        showName: false));
+    description.add(DiagnosticsProperty<ScrollPhysics>(
+        'physics', widget.physics,
+        showName: false));
+    description.add(FlagProperty('pageSnapping',
+        value: widget.pageSnapping, ifFalse: 'snapping disabled'));
   }
 
   double getPreloadCacheExtent(BuildContext context) {
     if (widget.preloadPageCount == null || widget.preloadPageCount <= 0) {
       return 0.0;
     } else {
-      if(widget.scrollDirection == Axis.vertical) {
+      if (widget.scrollDirection == Axis.vertical) {
         final height = MediaQuery.of(context).size.height;
         return height * widget.preloadPageCount - 1;
       } else {
@@ -300,4 +312,3 @@ class _MangaPageViewState extends State<MangaPageView> {
     }
   }
 }
-

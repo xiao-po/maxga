@@ -5,6 +5,7 @@ final DmzjMangaSource = MangaSource(
     name: '动漫之家',
     key: 'dmzj',
     domain: 'https://v3api.dmzj.com',
+    iconUrl: 'http://dmzj.com/favicon.ico',
     headers: {
       'referer': 'http://m.dmzj.com/latest.html',
     });

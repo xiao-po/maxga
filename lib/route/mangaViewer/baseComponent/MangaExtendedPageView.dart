@@ -4,16 +4,17 @@ import 'package:flutter/gestures.dart';
 
 import 'MangaPageView.dart';
 import 'package:flutter/widgets.dart';
+
 final PageController _defaultPageController = PageController();
 const ScrollPhysics _defaultScrollPhysics = NeverScrollableScrollPhysics();
 
 /// whether should move page
-  bool _defaultCanMovePage(GestureDetails gestureDetails) => true;
+bool _defaultCanMovePage(GestureDetails gestureDetails) => true;
 
-  class MangaExtendedPageView extends ExtendedImageGesturePageView {
+class MangaExtendedPageView extends ExtendedImageGesturePageView {
   MangaExtendedPageView({
-  Key key,
-  this.scrollDirection = Axis.horizontal,
+    Key key,
+    this.scrollDirection = Axis.horizontal,
     this.reverse = false,
     PageController controller,
     ScrollPhysics physics,
@@ -54,7 +55,7 @@ const ScrollPhysics _defaultScrollPhysics = NeverScrollableScrollPhysics();
     CanMovePage canMovePage,
   })  : controller = controller ?? _defaultPageController,
         childrenDelegate =
-        SliverChildBuilderDelegate(itemBuilder, childCount: itemCount),
+            SliverChildBuilderDelegate(itemBuilder, childCount: itemCount),
         physics = physics != null
             ? _defaultScrollPhysics.applyTo(physics)
             : _defaultScrollPhysics,
@@ -76,7 +77,8 @@ const ScrollPhysics _defaultScrollPhysics = NeverScrollableScrollPhysics();
   })  : assert(childrenDelegate != null),
         controller = controller ?? _defaultPageController,
         canMovePage = canMovePage ?? _defaultCanMovePage,
-        super(key: key); final CanMovePage canMovePage;
+        super(key: key);
+  final CanMovePage canMovePage;
 
   /// The axis along which the page view scrolls.
   ///
@@ -132,8 +134,10 @@ const ScrollPhysics _defaultScrollPhysics = NeverScrollableScrollPhysics();
   }
 }
 
-class _MangaExtendedPageViewState extends ExtendedImageGesturePageViewState with TickerProviderStateMixin {
-  Map<Type, GestureRecognizerFactory> _gestureRecognizers = const <Type, GestureRecognizerFactory>{};
+class _MangaExtendedPageViewState extends ExtendedImageGesturePageViewState
+    with TickerProviderStateMixin {
+  Map<Type, GestureRecognizerFactory> _gestureRecognizers =
+      const <Type, GestureRecognizerFactory>{};
 
   Drag _drag;
   ScrollHoldController _hold;
@@ -156,8 +160,8 @@ class _MangaExtendedPageViewState extends ExtendedImageGesturePageViewState with
         _gestureRecognizers = <Type, GestureRecognizerFactory>{
           VerticalDragGestureRecognizer: GestureRecognizerFactoryWithHandlers<
               VerticalDragGestureRecognizer>(
-                () => VerticalDragGestureRecognizer(),
-                (VerticalDragGestureRecognizer instance) {
+            () => VerticalDragGestureRecognizer(),
+            (VerticalDragGestureRecognizer instance) {
               instance
                 ..onDown = _handleDragDown
                 ..onStart = _handleDragStart
@@ -175,8 +179,8 @@ class _MangaExtendedPageViewState extends ExtendedImageGesturePageViewState with
         _gestureRecognizers = <Type, GestureRecognizerFactory>{
           HorizontalDragGestureRecognizer: GestureRecognizerFactoryWithHandlers<
               HorizontalDragGestureRecognizer>(
-                () => HorizontalDragGestureRecognizer(),
-                (HorizontalDragGestureRecognizer instance) {
+            () => HorizontalDragGestureRecognizer(),
+            (HorizontalDragGestureRecognizer instance) {
               instance
                 ..onDown = _handleDragDown
                 ..onStart = _handleDragStart
@@ -270,7 +274,7 @@ class _MangaExtendedPageViewState extends ExtendedImageGesturePageViewState with
 //        }
 
         if ((gestureDetails.movePage(delta) ||
-            (currentPage != pageController.page)) &&
+                (currentPage != pageController.page)) &&
             widget.canMovePage(gestureDetails)) {
           _drag?.update(details);
         } else {

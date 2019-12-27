@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -29,7 +31,9 @@ class CollectionPageState extends State<CollectionPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        color: Theme.of(context).scaffoldBackgroundColor,
+        color: Theme
+            .of(context)
+            .scaffoldBackgroundColor,
         child: Column(
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
@@ -56,17 +60,22 @@ class CollectionPageState extends State<CollectionPage> {
     } else if (provider.loadOver && provider.isEmpty) {
       return ErrorPage('您没有收藏的漫画');
     } else {
-      double screenWith = MediaQuery.of(context).size.width;
+      double screenWith = MediaQuery
+          .of(context)
+          .size
+          .width;
       double itemMaxWidth = 140;
       double radio = screenWith / itemMaxWidth;
-      final double itemWidth = radio.floor() > 3 ? itemMaxWidth : screenWith / 3;
+      final double itemWidth = radio.floor() > 3 ? itemMaxWidth : screenWith /
+          3;
       final double height = (itemWidth + 20) / 13 * 15 + 40;
       var gridView = GridView.count(
-            crossAxisCount: radio.floor() > 3 ? radio.floor() : 3,
-            childAspectRatio: itemWidth / height,
-            children: provider.collectionMangaList
-                .map(
-                  (el) => Material(
+        crossAxisCount: radio.floor() > 3 ? radio.floor() : 3,
+        childAspectRatio: itemWidth / height,
+        children: provider.collectionMangaList
+            .map(
+              (el) =>
+              Material(
                   color: Colors.transparent,
                   child: InkWell(
                       onTap: () => this.startRead(el),
@@ -76,17 +85,14 @@ class CollectionPageState extends State<CollectionPage> {
                         source: MangaRepoPool.getInstance()
                             .getMangaSourceByKey(el.sourceKey),
                       ))),
-            )
-                .toList(growable: false),
-          );
+        )
+            .toList(growable: false),
+      );
       return MediaQuery.removePadding(
           context: context,
           removeTop: true,
           child: RefreshIndicator(
-            onRefresh: () {
-              this.updateCollectedManga();
-              return Future.delayed(Duration(seconds: 3));
-            },
+            onRefresh: () => this.updateCollectedManga(),
             child: gridView,
           ));
     }
@@ -97,21 +103,37 @@ class CollectionPageState extends State<CollectionPage> {
     Provider.of<CollectionProvider>(context).updateCollectionAction(item);
     await Navigator.push(context, MaterialPageRoute(builder: (context) {
       return MangaInfoPage.fromCollection(
-          coverImageBuilder: (context) => MangaCoverImage(
-                source: MangaRepoPool.getInstance()
-                    .getMangaSourceByKey(item.sourceKey),
-                url: item.coverImgUrl,
-                tagPrefix: widget.name,
-                fit: BoxFit.cover,
-              ),
-          manga: item,);
+        coverImageBuilder: (context) =>
+            MangaCoverImage(
+              source: MangaRepoPool.getInstance()
+                  .getMangaSourceByKey(item.sourceKey),
+              url: item.coverImgUrl,
+              tagPrefix: widget.name,
+              fit: BoxFit.cover,
+            ),
+        manga: item,);
     }));
   }
 
 
+  updateCollectedManga() {
+    final c = new Completer<bool>();
+    updateCollectionAction().then((v) {
+      if (!c.isCompleted) {
+        c.complete(true);
+      }
+    });
+    Future.delayed(Duration(seconds: 3)).then((v) {
+      if (!c.isCompleted) {
+        c.complete(true);
+      }
+    });
+    return c.future;
+  }
 
-  updateCollectedManga() async {
-    final CollectionProvider collectionState = Provider.of<CollectionProvider>(context);
+  Future updateCollectionAction() async {
+    final CollectionProvider collectionState = Provider.of<CollectionProvider>(
+        context);
     final result = await collectionState.checkAndUpdateCollectManga();
     if (result != null) {
       Scaffold.of(context).showSnackBar(SnackBar(

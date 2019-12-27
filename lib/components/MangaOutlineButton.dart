@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 typedef VoidCallback = void Function();
@@ -13,7 +12,9 @@ class MangaOutlineButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activeColor = Theme.of(context).accentColor;
+    final activeColor = Theme
+        .of(context)
+        .accentColor;
     final disabledColor = Colors.black38;
     if (active) {
       return FlatButton(
@@ -29,7 +30,7 @@ class MangaOutlineButton extends StatelessWidget {
         onPressed: onPressed,
       );
     } else {
-      return OutlineButton(
+      var body = OutlineButton(
         padding: EdgeInsets.all(0),
         textColor: disabledColor,
         borderSide: BorderSide(
@@ -43,7 +44,12 @@ class MangaOutlineButton extends StatelessWidget {
         ),
         onPressed: onPressed,
       );
+
+      return body;
     }
+
+
+
 
   }
 }

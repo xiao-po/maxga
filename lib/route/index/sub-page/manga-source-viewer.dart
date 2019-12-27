@@ -220,8 +220,9 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
   }
 
   ListView buildMangaListView(MangaSourceViewerPage state) {
-    return ListView.builder(
+    return ListView.separated(
       controller: state.controller,
+        separatorBuilder: (context, index) => Divider(),
       itemBuilder: (context, index) {
         if (index == state.mangaList.length) {
           if (state.isLast) {
@@ -251,7 +252,7 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
     );
   }
 
-  MangaCard buildMangaCard(SimpleMangaInfo mangaInfo,
+  MangaListTile buildMangaCard(SimpleMangaInfo mangaInfo,
       {String tagPrefix, int rank}) {
     final Color grayFontColor = Color(0xff9e9e9e);
     MangaSource source =
@@ -264,9 +265,9 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
     if (rank != null) {
       mangaCoverImage = rankedCoverImage(mangaCoverImage, rank);
     }
-    return MangaCard(
+    return MangaListTile(
       title: Text(mangaInfo.title),
-      extra: MangaInfoCardExtra(
+      extra: MangaListTileExtra(
           manga: mangaInfo, textColor: grayFontColor, source: source),
       cover: mangaCoverImage,
       onTap: () => this.goMangaInfoPage(mangaInfo, tagPrefix: tagPrefix),

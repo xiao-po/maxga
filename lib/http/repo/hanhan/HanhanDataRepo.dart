@@ -11,6 +11,7 @@ final HanhanMangaSource = MangaSource(
     name: '汗汗漫画',
     key: 'hanhan',
     proxyDomain: 'http://hanhan.xiaopo.moe',
+    iconUrl: 'http://hanhan.xiaopo.moe/favicon.ico',
     domain: 'http://hanhan.xiaopo.moe',
     headers: {
       'Accept-Encoding': 'gzip, deflate',

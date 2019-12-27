@@ -9,7 +9,8 @@ import '../MaxgaDataHttpRepo.dart';
 final ManhuaduiMangaSource = MangaSource(
   name: '漫画堆',
   key: 'manhuadui',
-  domain: 'https://www.manhuadui.com',
+  domain: 'https://m.manhuadui.com',
+  iconUrl: 'https://m.manhuadui.com/favicon.ico',
 );
 
 class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
@@ -32,7 +33,7 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
   @override
   Future<List<SimpleMangaInfo>> getLatestUpdate(int page) async {
     return _httpUtils.requestApi<List<SimpleMangaInfo>>(
-        '${_source.domain}/list/riben/update/$page/',
+        '${_source.domain}/update/?page=${page + 1}',
         parser: (res) => parser.getMangaListFromLatestUpdate(res.data)
           ..forEach((manga) => manga.sourceKey = _source.key));
   }

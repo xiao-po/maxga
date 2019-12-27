@@ -136,10 +136,16 @@ class _SearchResultPageState extends State<SearchResultPage> {
                 headerBuilder: (context, isExpand) =>
                     buildExpansionPanelHeader(item),
                 body: item.mangaList.length > 0
-                    ? ListView(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        children: buildMangaCardList(item.mangaList),
+                    ? Container(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          itemCount: item.mangaList.length,
+                          separatorBuilder: (context, index) => Divider(),
+                          physics: NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) =>
+                              buildMangaTile(item.mangaList[index]),
+                        ),
                       )
                     : Container(),
               ),
@@ -225,9 +231,6 @@ class _SearchResultPageState extends State<SearchResultPage> {
     }
     final useMaxgaProxy = Provider.of<SettingProvider>(context)
         .getBoolItemValue(MaxgaSettingItemType.useMaxgaProxy);
-    final domain = useMaxgaProxy && item.source.proxyDomain != null
-        ? item.source.proxyDomain
-        : item.source.domain;
     var body = Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -238,7 +241,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
               height: 20,
               width: 20,
               child: CachedNetworkImage(
-                imageUrl: '$domain/favicon.ico',
+                imageUrl: item.source.iconUrl,
               ),
             ),
             sourceName,
@@ -257,24 +260,22 @@ class _SearchResultPageState extends State<SearchResultPage> {
     );
   }
 
-  List<MangaCard> buildMangaCardList(List<MangaBase> mangaList) {
-    return mangaList.map((item) {
-      MangaSource source =
-          MangaRepoPool.getInstance().getMangaSourceByKey(item.sourceKey);
-      return MangaCard(
-        title: Text(item.title),
-        extra: MangaInfoCardExtra(
-          manga: item,
-          source: source,
-        ),
-        cover: MangaCoverImage(
-          source: source,
-          url: item.coverImgUrl,
-          tagPrefix: '${widget.name}${searchTime.toIso8601String()}',
-        ),
-        onTap: () => this.goMangaInfoPage(item),
-      );
-    }).toList();
+  MangaListTile buildMangaTile(MangaBase item) {
+    MangaSource source =
+        MangaRepoPool.getInstance().getMangaSourceByKey(item.sourceKey);
+    return MangaListTile(
+      title: Text(item.title),
+      extra: MangaListTileExtra(
+        manga: item,
+        source: source,
+      ),
+      cover: MangaCoverImage(
+        source: source,
+        url: item.coverImgUrl,
+        tagPrefix: '${widget.name}${searchTime.toIso8601String()}',
+      ),
+      onTap: () => this.goMangaInfoPage(item),
+    );
   }
 
   unCollapseAll() {
