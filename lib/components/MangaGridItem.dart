@@ -3,6 +3,7 @@ import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/model/maxga/ReadMangaStatus.dart';
 
 import 'MangaCoverImage.dart';
+import 'dart:math' as math;
 
 class MangaGridItem extends StatelessWidget {
   final ReadMangaStatus manga;
@@ -21,7 +22,12 @@ class MangaGridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future.microtask(() => print('${context.size.height}  ${context.size.width}'));
+    Future.microtask(
+        () => print('${context.size.height}  ${context.size.width}'));
+    var gridCover = buildCover();
+    if (manga.hasUpdate) {
+      gridCover = Stack(fit: StackFit.expand,children: <Widget>[gridCover, buildHasUpdateIcon()]);
+    }
     return Container(
       margin: EdgeInsets.only(top: 10, bottom: 10, left: 5, right: 5),
       child: Column(
@@ -33,12 +39,7 @@ class MangaGridItem extends StatelessWidget {
               margin: EdgeInsets.only(bottom: 5),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(5.0),
-                child: MangaCoverImage(
-                  url: manga.coverImgUrl,
-                  source: source,
-                  fit: BoxFit.fitWidth,
-                  tagPrefix: tagPrefix,
-                ),
+                child: gridCover,
               )),
           SizedBox(
             height: 20,
@@ -51,29 +52,65 @@ class MangaGridItem extends StatelessWidget {
                   style: TextStyle(fontSize: 14)),
             ),
           ),
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Expanded(
-                  child: Text(manga.lastUpdateChapter.title,
-                      textAlign: TextAlign.left,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          fontSize: 12,
-                          textBaseline: TextBaseline.alphabetic,
-                          color: Colors.black45)),
-                ),
-                Text(source.name,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Expanded(
+                child: Text(manga.lastUpdateChapter.title,
                     textAlign: TextAlign.left,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                         fontSize: 12,
                         textBaseline: TextBaseline.alphabetic,
-                        color: Colors.black45))
-              ],
-            ),
-          )
+                        color: Colors.black45)),
+              ),
+              Text(source.name,
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                      fontSize: 12,
+                      textBaseline: TextBaseline.alphabetic,
+                      color: Colors.black45))
+            ],
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget buildCover() {
+    return MangaCoverImage(
+      url: manga.coverImgUrl,
+      source: source,
+      fit: BoxFit.fitWidth,
+      tagPrefix: tagPrefix,
+    );
+  }
+
+  Widget buildHasUpdateIcon() {
+    const body = const Positioned(
+      child: const Text('NEW'),
+    );
+    return Positioned(
+      right: -22,
+      top: 5,
+      child: Transform.rotate(
+        angle: math.pi / 4,
+        child: Container(
+          height: 14,
+          width: 70,
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(blurRadius: 5.0, color: const Color(0xffdbdbdb))
+            ],
+            color: Colors.redAccent,
+          ),
+          child: const Text(
+            'NEW',
+            textAlign: TextAlign.center,
+            style:
+                const TextStyle(height: 1.5, color: Colors.white, fontSize: 8),
+          ),
+        ),
       ),
     );
   }

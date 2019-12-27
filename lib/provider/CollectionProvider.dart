@@ -83,14 +83,14 @@ class CollectionProvider extends BaseProvider {
         MangaRepoPool.getInstance().getRepo(key: sourceKey);
     Manga manga = await httpRepo.getMangaInfo(infoUrl);
     /// 测试代码
-//    Chapter test = Chapter();
-//    test.title = 'test';
-//    test.url = 'test';
-//    test.order = -1;
-//    manga.chapterList = [
-//      test,
-//      ...manga.chapterList,
-//    ];
+    Chapter test = Chapter();
+    test.title = 'test';
+    test.url = 'test';
+    test.order = -1;
+    manga.chapterList = [
+      test,
+      ...manga.chapterList,
+    ];
 
     final currentMangaInfo =
         ReadMangaStatus.fromManga(manga);
