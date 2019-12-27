@@ -9,7 +9,6 @@ import 'package:maxga/model/maxga/ReadMangaStatus.dart';
 import 'package:maxga/provider/CollectionProvider.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
-import 'package:maxga/service/MangaReadStorage.service.dart';
 import 'package:provider/provider.dart';
 
 
@@ -62,10 +61,7 @@ class CollectionPageState extends State<CollectionPage> {
       double radio = screenWith / itemMaxWidth;
       final double itemWidth = radio.floor() > 3 ? itemMaxWidth : screenWith / 3;
       final double height = (itemWidth + 20) / 13 * 15 + 40;
-      return MediaQuery.removePadding(
-          context: context,
-          removeTop: true,
-          child: GridView.count(
+      var gridView = GridView.count(
             crossAxisCount: radio.floor() > 3 ? radio.floor() : 3,
             childAspectRatio: itemWidth / height,
             children: provider.collectionMangaList
@@ -82,11 +78,23 @@ class CollectionPageState extends State<CollectionPage> {
                       ))),
             )
                 .toList(growable: false),
+          );
+      return MediaQuery.removePadding(
+          context: context,
+          removeTop: true,
+          child: RefreshIndicator(
+            onRefresh: () {
+              this.updateCollectedManga();
+              return Future.delayed(Duration(seconds: 3));
+            },
+            child: gridView,
           ));
     }
   }
 
   startRead(ReadMangaStatus item) async {
+    item.hasUpdate = false;
+    Provider.of<CollectionProvider>(context).updateCollectionAction(item);
     await Navigator.push(context, MaterialPageRoute(builder: (context) {
       return MangaInfoPage.fromCollection(
           coverImageBuilder: (context) => MangaCoverImage(
@@ -95,11 +103,20 @@ class CollectionPageState extends State<CollectionPage> {
                 url: item.coverImgUrl,
                 tagPrefix: widget.name,
                 fit: BoxFit.cover,
-
               ),
           manga: item,);
     }));
   }
 
-  refreshCollections() {}
+
+
+  updateCollectedManga() async {
+    final CollectionProvider collectionState = Provider.of<CollectionProvider>(context);
+    final result = await collectionState.checkAndUpdateCollectManga();
+    if (result != null) {
+      Scaffold.of(context).showSnackBar(SnackBar(
+        content: Text('收藏漫画已经更新结束'),
+      ));
+    }
+  }
 }

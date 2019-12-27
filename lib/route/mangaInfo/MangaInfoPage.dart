@@ -7,6 +7,7 @@ import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/model/maxga/ReadMangaStatus.dart';
 import 'package:maxga/model/maxga/MangaViewerPopResult.dart';
+import 'package:maxga/model/maxga/utils/ReadMangaStatusUtils.dart';
 import 'package:maxga/provider/CollectionProvider.dart';
 import 'package:maxga/provider/HistoryProvider.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
@@ -69,13 +70,12 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
           url: widget.manga.infoUrl,
           sourceKey: widget.manga.sourceKey,
           filter: (curr) async {
-            print('filter in');
             CollectionProvider collectionProvider =
                 Provider.of<CollectionProvider>(context);
             final preReadMangaStatus =
                 collectionProvider.getMangaFromInfoUrl(curr.infoUrl);
             if (curr.chapterList.length != preReadMangaStatus.chapterList.length) {
-              final mergedMangaStatus = mergeMangaReadStatus(curr, preReadMangaStatus);
+              final mergedMangaStatus = ReadMangaStatusUtils.mergeMangaReadStatus(curr, preReadMangaStatus);
               return mergedMangaStatus;
             } else {
               return preReadMangaStatus;
@@ -92,7 +92,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
             if (!hasCache) {
               return ReadMangaStatus.fromManga(curr);
             } else {
-              return mergeMangaReadStatus(curr, preReadMangaStatus);
+              return ReadMangaStatusUtils.mergeMangaReadStatus(curr, preReadMangaStatus);
             }
 
           });
@@ -101,24 +101,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
         .getMangaSourceByKey(widget.sourceKey ?? widget.manga.sourceKey);
   }
 
-  ReadMangaStatus mergeMangaReadStatus(ReadMangaStatus curr, ReadMangaStatus preReadMangaStatus) {
-    final status = ReadMangaStatus.fromManga(curr);
-    status.readChapterId = preReadMangaStatus.readChapterId;
-    status.readImageIndex = preReadMangaStatus.readImageIndex;
-    if (preReadMangaStatus.chapterList.length !=
-        status.chapterList.length) {
-      status.chapterList
-          .forEach((item) => item.isCollectionLatestUpdate = true);
-      var list = status.chapterList
-          .where((currChapter) =>
-      preReadMangaStatus.chapterList.indexWhere(
-              (preChapter) => preChapter.url == currChapter.url) !=
-          -1)
-          .toList();
-      list.forEach((item) => item.isCollectionLatestUpdate = false);
-    }
-    return status;
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -319,10 +302,10 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     bool isSuccess = false;
     if (readMangaStatus.isCollected) {
       isSuccess = await Provider.of<CollectionProvider>(context)
-          .deleteAction(readMangaStatus);
+          .deleteCollectionAction(readMangaStatus);
     } else {
       isSuccess = await Provider.of<CollectionProvider>(context)
-          .addAndUpdateAction(readMangaStatus);
+          .addCollectionAction(readMangaStatus);
     }
     if (isSuccess) {
       readMangaStatus.isCollected = !readMangaStatus.isCollected;

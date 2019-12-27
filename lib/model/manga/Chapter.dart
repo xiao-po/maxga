@@ -4,7 +4,7 @@ class Chapter {
   int comicId;
   String title;
   int updateTime;
-  bool isCollectionLatestUpdate;
+  bool isLatestUpdate;
   String url;
   List<String> imgUrlList;
 
@@ -20,7 +20,7 @@ class Chapter {
     title = json['title'];
     order = json['order'];
     updateTime = json['updateTime'];
-    isCollectionLatestUpdate = json['isCollectionLatestUpdate'];
+    isLatestUpdate = json['isCollectionLatestUpdate'];
     comicId = json['comicId'];
     url = json['url'];
     imgUrlList = json['imgUrlList']?.cast<String>() ?? [];
@@ -31,7 +31,7 @@ class Chapter {
         'id': id,
         'title': title,
         'order': order,
-        'isCollectionLatestUpdate': isCollectionLatestUpdate,
+        'isCollectionLatestUpdate': isLatestUpdate,
         'updateTime': updateTime,
         'comicId': comicId,
         'url': url,
