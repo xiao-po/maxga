@@ -235,6 +235,17 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   }
 
   void enjoyMangaContent(Chapter chapter, {int imagePage = 0}) async {
+    Provider.of<HistoryProvider>(context).addToHistory(
+        SimpleMangaInfo.fromMangaInfo(
+            sourceKey: readMangaStatus.sourceKey,
+            author: readMangaStatus.author,
+            id: readMangaStatus.id,
+            infoUrl: readMangaStatus.infoUrl,
+            status: readMangaStatus.status,
+            coverImgUrl: readMangaStatus.coverImgUrl,
+            title: readMangaStatus.title,
+            typeList: readMangaStatus.typeList,
+            lastUpdateChapter: readMangaStatus.lastUpdateChapter));
     var result = await Navigator.push<MangaViewerPopResult>(
         context,
         MaterialPageRoute(
@@ -249,17 +260,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
       readMangaStatus.readImageIndex = result.mangaImageIndex;
       await Future.wait([
         MangaReadStorageService.setMangaStatus(readMangaStatus),
-        Provider.of<HistoryProvider>(context).addToHistory(
-            SimpleMangaInfo.fromMangaInfo(
-                sourceKey: readMangaStatus.sourceKey,
-                author: readMangaStatus.author,
-                id: readMangaStatus.id,
-                infoUrl: readMangaStatus.infoUrl,
-                status: readMangaStatus.status,
-                coverImgUrl: readMangaStatus.coverImgUrl,
-                title: readMangaStatus.title,
-                typeList: readMangaStatus.typeList,
-                lastUpdateChapter: readMangaStatus.lastUpdateChapter))
+
       ]);
       if (mounted) setState(() {});
     }

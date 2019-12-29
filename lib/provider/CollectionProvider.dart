@@ -82,15 +82,16 @@ class CollectionProvider extends BaseProvider {
     final MaxgaDataHttpRepo httpRepo =
         MangaRepoPool.getInstance().getRepo(key: sourceKey);
     Manga manga = await httpRepo.getMangaInfo(infoUrl);
-    /// 测试代码
-    Chapter test = Chapter();
-    test.title = 'test';
-    test.url = 'test';
-    test.order = -1;
-    manga.chapterList = [
-      test,
-      ...manga.chapterList,
-    ];
+    /// 测试代码 --------------------------------
+//    Chapter test = Chapter();
+//    test.title = 'test';
+//    test.url = 'test';
+//    test.order = -1;
+//    manga.chapterList = [
+//      test,
+//      ...manga.chapterList,
+//    ];
+    /// 测试代码 --------------------------------
 
     final currentMangaInfo =
         ReadMangaStatus.fromManga(manga);

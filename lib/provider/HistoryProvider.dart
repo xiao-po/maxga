@@ -7,6 +7,7 @@ import 'package:maxga/service/LocalStorage.service.dart';
 
 class HistoryProvider extends BaseProvider {
   List<SimpleMangaInfo> _items;
+
   List<SimpleMangaInfo> get historyMangaList => _items;
   final String _key = 'mangaHistroy_';
 
@@ -19,15 +20,15 @@ class HistoryProvider extends BaseProvider {
     return _instance;
   }
 
-
-
   HistoryProvider() {
     this.init();
   }
 
   Future<bool> init() async {
-    await LocalStorage.clearItem(_key);
-    final List<SimpleMangaInfo>  value = (await LocalStorage.getStringList(_key))?.map((el) => SimpleMangaInfo.fromJson(json.decode(el)))?.toList() ?? [];
+    final valueList = await LocalStorage.getStringList(_key);
+    final List<SimpleMangaInfo> value = valueList
+            ?.map((el) => SimpleMangaInfo.fromJson(json.decode(el)))
+            ?.toList();
 
     _items = value ?? [];
 
@@ -39,13 +40,12 @@ class HistoryProvider extends BaseProvider {
     final list = _items
       ..removeWhere((el) => el.id == manga.id)
       ..insert(0, manga);
-    await LocalStorage.setStringList(_key, list.map((item) => json.encode(item)).toList(growable: false));
-
+    final isSuccess = await LocalStorage.setStringList(
+        _key, list.map((item) => json.encode(item)).toList());
 
     notifyListeners();
-    return true;
+    return isSuccess;
   }
-
 
   Future<void> clearHistory() async {
     await LocalStorage.clearItem(_key);
@@ -53,5 +53,4 @@ class HistoryProvider extends BaseProvider {
 
     notifyListeners();
   }
-
 }
