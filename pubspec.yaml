@@ -26,7 +26,7 @@ dependencies:
   package_info: ^0.4.0+6
   html: ^0.14.0+3
   http: ^0.12.0+2
-  sqflite: ^1.1.7
+  sqflite: ^1.2.0
   shared_preferences: ^0.5.3+4
   cached_network_image: ^2.0.0-rc
   extended_image: ^0.6.8
