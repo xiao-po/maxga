@@ -84,18 +84,6 @@ class SimpleMangaInfo extends MangaBase {
     this.typeList = typeList;
     this.lastUpdateChapter = lastUpdateChapter;
   }
-  SimpleMangaInfo.fromJson(Map<String, dynamic> json) {
-    sourceKey = json['sourceKey'];
-    author = json['author'].cast<String>();
-    id = json['id'];
-    infoUrl = json['infoUrl'];
-    status = json['status'];
-    coverImgUrl = json['coverImgUrl'];
-    title = json['title'];
-    introduce = json['introduce'];
-    typeList = json['typeList'].cast<String>();
-    lastUpdateChapter = Chapter.fromJson(json['lastUpdateChapter']);
-  }
 
   SimpleMangaInfo.fromMangaRepo({
     @required String sourceKey,
@@ -119,6 +107,20 @@ class SimpleMangaInfo extends MangaBase {
     this.lastUpdateChapter = lastUpdateChapter;
   }
 
+
+  SimpleMangaInfo.fromJson(Map<String, dynamic> json) {
+    sourceKey = json['sourceKey'];
+    author = json['author'].cast<String>();
+    id = json['id'];
+    infoUrl = json['infoUrl'];
+    status = json['status'];
+    coverImgUrl = json['coverImgUrl'];
+    title = json['title'];
+    introduce = json['introduce'];
+    typeList = json['typeList'].cast<String>();
+    lastUpdateChapter = Chapter.fromJson(json['lastUpdateChapter']);
+  }
+
   Map<String, dynamic> toJson() => {
         'sourceKey': sourceKey,
         'author': author,
@@ -133,7 +135,7 @@ class SimpleMangaInfo extends MangaBase {
       };
 }
 
-class MangaBase {
+abstract class MangaBase {
   String sourceKey;
   List<String> author;
   int id;

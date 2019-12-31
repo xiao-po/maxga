@@ -1,66 +1,52 @@
+import 'package:maxga/base/error/MaxgaSqlError.dart';
 import 'package:sqflite/sqflite.dart';
 
+typedef DatabaseGetterAction<T> = Future<T> Function(Database database);
+typedef DatabaseSetterAction = Future<bool> Function(Database database);
+
+
+
 class MaxgaDataBaseUtils {
-  static initDataBase() async {
-    final databasePath = await getDatabasesPath();
-    Database database;
+  static Future<T> openSearchTransaction<T>({
+    DatabaseGetterAction<T> action,
+    Database database,
+  }) async {
+    bool isEarlyOpen = database == null;
+    final db = isEarlyOpen ? await _openDatabase() : database;
     try {
-      database = await openDatabase(
-        '$databasePath/maxga.db',
-        version: 1,
-        onCreate: (db, version) => {},
-        onUpgrade: (db, oldVersion, newVersion) => MaxgaDataBaseUtils.onUpdate(db, oldVersion),
-      );
-    }catch(e) {
-      
+      return await action(db);
+    } catch (e) {
+      throw MaxgaSqlError();
     } finally {
-      database.close();
-      
+      if (!isEarlyOpen) {
+        database.close();
+      }
     }
   }
 
-  static onUpdate(Database database, int oldVersion) {
-    switch(oldVersion) {
-
+  static Future<bool> openUpdateTransaction({
+    DatabaseSetterAction action,
+    Database database,
+  }) async {
+    bool isEarlyOpen = database == null;
+    final db = isEarlyOpen ? await _openDatabase() : database;
+    try {
+      await action(database);
+      return true;
+    } catch (e) {
+      throw MaxgaSqlError();
+    } finally {
+      if (!isEarlyOpen) {
+        database.close();
+      }
     }
   }
 
-  static onCreate(Database db,int  version) {
-    if (!db.isOpen) {
-      return null;
-    }
-    switch(version) {
-      case 1:
 
-        break;
-    }
-  }
-}
 
-class _MaxgaDataBaseFirstVersionHelper {
-  static initTable(Database db) async {
-
-    await db.execute('create table manga_status ('
-        'sourceKey text,'
-        'author text,'
-        'id integer,'
-        'infoUrl text,'
-        'status text,'
-        'coverImageUrl text,'
-        'title text,'
-        'intorduce text,'
-        'typeList text,'
-        'lastReadDate TEXT'
-        'lastReadChapterId integer,'
-        'lastReadImageIndex integer,'
-        'hasUpdate integer,'
-        'chapterList text,'
-        ')');
-
-    await db.execute('create table collect_manga ('
-        'isCollect INTEGER'
-        'infoUrl'
-        ')');
-
+  static Future<Database> _openDatabase() async {
+    final databasePath = await getDatabasesPath();
+    return await openDatabase('$databasePath/maxga.db');
   }
 }
+

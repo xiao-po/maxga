@@ -9,6 +9,8 @@ class MangaReadStorageService {
   static final String _key = 'manga_process_';
   static List<ReadMangaStatus> _readMangaStatusList;
 
+  static List<ReadMangaStatus> _onDbReadMangaStatusList;
+
 
   static Future<ReadMangaStatus> getMangaStatus(Manga manga) async {
     final allReadManga = (await _getAllReadManga()).toList();
