@@ -57,6 +57,7 @@ class CollectionProvider extends BaseProvider {
       var i = index++;
       Manga currentMangaInfo = await _getCurrentMangaStatus(sourceKey, infoUrl);
       if (currentMangaInfo.chapterList.length != manga.chapterList.length) {
+        currentMangaInfo.hasUpdate = true;
         await MangaStorageService.saveManga(currentMangaInfo);
         this._collectedMangaList[i] = currentMangaInfo;
         notifyListeners();
@@ -85,6 +86,12 @@ class CollectionProvider extends BaseProvider {
     /// 测试代码 --------------------------------
 
     return manga;
+  }
+
+  Future<bool> setMangaNoUpdate(Manga manga) async {
+    manga.hasUpdate = false;
+    await MangaStorageService.saveManga(manga);
+    return true;
   }
 
   Future<bool> setMangaCollectStatus(Manga manga, {isCollected = true}) async {

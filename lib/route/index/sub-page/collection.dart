@@ -100,7 +100,7 @@ class CollectionPageState extends State<CollectionPage> {
   }
 
   startRead(Manga item) async {
-    item.hasUpdate = false;
+    Provider.of<CollectionProvider>(context).setMangaNoUpdate(item);
     await Navigator.push(context, MaterialPageRoute(builder: (context) {
       return MangaInfoPage(
         infoUrl: item.infoUrl,
