@@ -46,7 +46,7 @@ class MaxgaDebuggerDeleteCacheButton extends StatelessWidget {
       ),
       onPressed: () async {
         await Future.wait([
-          MangaReadStorageService.clearStatus(),
+          MangaStorageService.clearStatus(),
           Provider.of<HistoryProvider>(context).clearHistory()
         ]);
         Scaffold.of(context).showSnackBar(SnackBar(content: const Text('删除完毕')));

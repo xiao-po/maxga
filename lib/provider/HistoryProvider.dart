@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/provider/base/BaseProvider.dart';
 import 'package:maxga/service/LocalStorage.service.dart';
+import 'package:maxga/service/MangaReadStorage.service.dart';
 
 class HistoryProvider extends BaseProvider {
   List<SimpleMangaInfo> _items;
@@ -20,15 +20,23 @@ class HistoryProvider extends BaseProvider {
     return _instance;
   }
 
-  HistoryProvider() {
-    this.init();
-  }
+  HistoryProvider();
 
   Future<bool> init() async {
-    final valueList = await LocalStorage.getStringList(_key);
-    final List<SimpleMangaInfo> value = valueList
-            ?.map((el) => SimpleMangaInfo.fromJson(json.decode(el)))
-            ?.toList();
+    final List<Manga> valueList = await LocalStorage.getStringList(_key)
+        .then((list) => MangaStorageService.getMangaByUrlList(list));
+    final List<SimpleMangaInfo> value = valueList != null ? valueList
+        .map((manga) => SimpleMangaInfo.fromMangaInfo(
+            sourceKey: manga.sourceKey,
+            author: manga.authors,
+            id: manga.id,
+            infoUrl: manga.infoUrl,
+            status: manga.status,
+            coverImgUrl: manga.status,
+            title: manga.title,
+            typeList: manga.typeList,
+            lastUpdateChapter: manga.chapterList.first))
+        .toList() : [];
 
     _items = value ?? [];
 
@@ -41,7 +49,7 @@ class HistoryProvider extends BaseProvider {
       ..removeWhere((el) => el.id == manga.id)
       ..insert(0, manga);
     final isSuccess = await LocalStorage.setStringList(
-        _key, list.map((item) => json.encode(item)).toList());
+        _key, list.map((item) => item.infoUrl).toList());
 
     notifyListeners();
     return isSuccess;

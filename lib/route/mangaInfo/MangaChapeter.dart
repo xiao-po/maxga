@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maxga/components/MangaOutlineButton.dart';
 import 'package:maxga/constant/SortValue.dart';
 import 'package:maxga/model/manga/Chapter.dart';
+import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/maxga/ReadMangaStatus.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -11,10 +12,11 @@ class MangaInfoChapter extends StatefulWidget {
   final List<Chapter> chapterList;
 
   final EnjoyMangaCallback onClickChapter;
+  final Manga manga;
   final ReadMangaStatus readStatus;
 
   const MangaInfoChapter(
-      {Key key, this.onClickChapter, this.readStatus, this.chapterList})
+      {Key key, this.onClickChapter, this.manga, this.chapterList, this.readStatus})
       : super(key: key);
 
   @override
@@ -44,7 +46,7 @@ class _MangaInfoChapterState extends State<MangaInfoChapter> {
           Padding(
             padding: EdgeInsets.only(left: 20, right: 10),
             child: buildChapterStatus(
-              status: widget.readStatus.status,
+              status: widget.manga.status,
             ),
           ),
           _MangaChapterGrid(

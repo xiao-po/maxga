@@ -24,9 +24,7 @@ class SettingProvider extends BaseProvider {
     return _instance;
   }
 
-  SettingProvider() {
-    this.init();
-  }
+  SettingProvider();
 
   MaxgaSettingItem getItem(MaxgaSettingItemType type) {
     return this._items.firstWhere((el) => el.key == type);

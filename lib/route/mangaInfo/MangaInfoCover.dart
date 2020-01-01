@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maxga/Utils/DateUtils.dart';
+import 'package:maxga/model/manga/Chapter.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/model/maxga/ReadMangaStatus.dart';
@@ -8,18 +9,17 @@ import 'package:maxga/route/search/search-result-page.dart';
 typedef CoverImageBuilder = Widget Function(BuildContext context);
 
 class MangaInfoCover extends StatelessWidget {
-  final ReadMangaStatus manga;
+  final Manga manga;
   final MangaSource source;
   final bool loadEnd;
+  final Chapter lastUpdateChapter;
   final CoverImageBuilder coverImageBuilder;
 
-  final int updateTime;
 
   const MangaInfoCover({Key key,
     this.manga,
-    this.updateTime,
     this.loadEnd,
-    this.coverImageBuilder, @required this.source})
+    this.coverImageBuilder, @required this.source, this.lastUpdateChapter})
       : super(key: key);
 
   @override
@@ -69,8 +69,8 @@ class MangaInfoCover extends StatelessWidget {
       textAlign: TextAlign.left,
     );
     var mangaUpdateTime = Text(
-        '${manga.lastUpdateChapter.updateTime != null ? DateUtils.formatTime(
-            timestamp: manga.lastUpdateChapter.updateTime,
+        '${lastUpdateChapter.updateTime != null ? DateUtils.formatTime(
+            timestamp: lastUpdateChapter.updateTime,
             template: "yyyy-MM-dd") : ''}',
         style: TextStyle(color: coverStringColor, fontSize: subtitleTextSize),
         textAlign: TextAlign.left);
@@ -116,7 +116,7 @@ class MangaInfoCover extends StatelessWidget {
                                   child: Wrap(
                                     direction: Axis.horizontal,
                                     children:
-                                    manga.author.map((text) =>
+                                    manga.authors.map((text) =>
                                         CoverMessageTag(
                                           onTap: () => searchTag(text, context),
                                           child: Text(

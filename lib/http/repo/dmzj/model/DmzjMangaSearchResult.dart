@@ -82,7 +82,7 @@ class DmzjMangaSearchResult {
     final Chapter latestChapter = Chapter();
     latestChapter.title = lastName;
     return SimpleMangaInfo.fromMangaRepo(sourceKey: DmzjMangaSource.key,
-        author: authors.split('/'),
+        authors: authors.split('/'),
         id: id,
         infoUrl: '${DmzjMangaSource.domain}/comic/comic_$id.json',
         coverImgUrl: cover,

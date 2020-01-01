@@ -1,57 +1,31 @@
+import 'package:flutter/cupertino.dart';
+
 import '../manga/Chapter.dart';
 import '../manga/Manga.dart';
 
-class ReadMangaStatus extends Manga {
+class ReadMangaStatus {
+  String infoUrl;
   int readChapterId;
   int readImageIndex;
-  bool isCollected = false;
-  bool hasUpdate = false;
-  Chapter lastUpdateChapter;
-  List<Chapter> chapterList;
+  bool isCollect;
+  ReadMangaStatus({
+    @required this.infoUrl,
+    this.readImageIndex,
+    this.readChapterId,
+    this.isCollect = false,
+});
 
-  ReadMangaStatus.fromManga(Manga manga)
-      : super.fromMangaInfoRequest(
-          id: manga.id,
-          sourceKey: manga.sourceKey,
-          authors: manga.author,
-          infoUrl: manga.infoUrl,
-          status: manga.status,
-          coverImgUrl: manga.coverImgUrl,
-          title: manga.title,
-          types: manga.typeList,
-          introduce: manga.introduce,
-          chapterList: manga.chapterList,
-        ) {
-    introduce = manga.introduce;
-    chapterList = manga.chapterList.toList(growable: true)
-      ..sort((a, b) => b.order - a.order)
-      ..forEach((item) => item.isLatestUpdate = false);
-    lastUpdateChapter = chapterList.first;
-  }
-
-  ReadMangaStatus.fromJson(Map<String, dynamic> json) : super.fromJson(json) {
-    isCollected = json['collected'];
+  ReadMangaStatus.fromJson(Map<String, dynamic> json) {
+    isCollect = json['isCollect'];
+    infoUrl = json['infoUrl'];
     readImageIndex = json['readImageIndex'];
-    hasUpdate = json['hasUpdate'];
     readChapterId = json['readChapterId'];
-    lastUpdateChapter = Chapter.fromJson(json['lastUpdateChapter']);
   }
 
   Map<String, dynamic> toJson() => {
-        'sourceKey': sourceKey,
-        'author': author,
-        'id': id,
         'infoUrl': infoUrl,
-        'status': status,
-        'coverImgUrl': coverImgUrl,
-        'title': title,
-        'introduce': introduce,
         'readImageIndex': readImageIndex,
         'readChapterId': readChapterId,
-        'hasUpdate': hasUpdate,
-        'collected': isCollected,
-        'typeList': typeList,
-        'chapterList': chapterList,
-        'lastUpdateChapter': lastUpdateChapter
+        'isCollect': isCollect,
       };
 }

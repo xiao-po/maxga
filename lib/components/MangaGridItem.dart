@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/model/maxga/ReadMangaStatus.dart';
 
@@ -6,7 +7,7 @@ import 'MangaCoverImage.dart';
 import 'dart:math' as math;
 
 class MangaGridItem extends StatelessWidget {
-  final ReadMangaStatus manga;
+  final Manga manga;
   final String tagPrefix;
   final double width;
 
@@ -56,7 +57,7 @@ class MangaGridItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Expanded(
-                child: Text(manga.lastUpdateChapter.title,
+                child: Text(manga.chapterList[0].title,
                     textAlign: TextAlign.left,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(

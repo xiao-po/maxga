@@ -2,10 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:maxga/MangaRepoPool.dart';
-import 'package:maxga/Utils/MaxgaUtils.dart';
 import 'package:maxga/base/drawer/menu-item.dart';
-import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/components/dialog.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
@@ -13,7 +10,6 @@ import 'package:maxga/model/maxga/MaxgaReleaseInfo.dart';
 import 'package:maxga/route/Drawer/Drawer.dart';
 import 'package:maxga/route/index/sub-page/collection.dart';
 import 'package:maxga/route/index/sub-page/manga-source-viewer.dart';
-import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:maxga/route/search/search-page.dart';
 import 'package:maxga/service/UpdateService.dart';
 import 'package:provider/provider.dart';

@@ -66,7 +66,7 @@ class DmzjRankedMangaInfo {
         id:  int.parse(comicId),
         infoUrl: 'http://v3api.dmzj.com/comic/comic_$comicId.json',
         coverImgUrl: cover,
-        author: authors.split('/'),
+        authors: authors.split('/'),
         typeList: types.split('/'),
         title: title,
         lastUpdateChapter: latestChapter);

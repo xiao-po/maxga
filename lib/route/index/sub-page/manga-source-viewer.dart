@@ -177,6 +177,7 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
   List<Widget> buildAppBarActions() {
     return <Widget>[
       MaxgaSearchButton(),
+      IconButton(icon: Icon(Icons.sync_problem), onPressed: () => this.test()),
       PopupMenuButton<MangaSource>(
         itemBuilder: (context) =>
             allMangaSource
@@ -404,10 +405,15 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
   }
 
   deleteUserData() {
-    MangaReadStorageService.clearStatus();
+    MangaStorageService.clearStatus();
 //    Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
 //      return TestPage();
 //    }));
+  }
+
+  test() async {
+    final data = await MangaStorageService.getMangaStatusByUrl('http://v3api.dmzj.com/comic/comic_12393.json');
+    print(data.readChapterId);
   }
 }
 

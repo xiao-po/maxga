@@ -1,19 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
-import 'package:maxga/model/manga/Chapter.dart';
 import 'package:maxga/model/manga/Manga.dart';
-import 'package:maxga/model/maxga/ReadMangaStatus.dart';
-import 'package:maxga/model/maxga/utils/ReadMangaStatusUtils.dart';
 import 'package:maxga/provider/base/BaseProvider.dart';
 import 'package:maxga/service/MangaReadStorage.service.dart';
 
 enum CollectionLoadingState { loading, over, error, empty }
 
 class CollectionProvider extends BaseProvider {
-  List<ReadMangaStatus> _collectedMangaList;
+  List<Manga> _collectedMangaList;
 
-  List<ReadMangaStatus> get collectionMangaList => _collectedMangaList;
+  List<Manga> get collectionMangaList => _collectedMangaList;
 
   bool get loadOver => this._collectedMangaList != null;
 
@@ -31,14 +28,11 @@ class CollectionProvider extends BaseProvider {
     return _instance;
   }
 
-  CollectionProvider() {
-    this.initAction();
-  }
+  CollectionProvider();
 
-  initAction() async {
+  Future<void> init() async {
     try {
-      final collectedMangaList =
-          await MangaReadStorageService.getAllCollectedManga();
+      final collectedMangaList = await MangaStorageService.getCollectedManga();
       this._collectedMangaList = collectedMangaList;
     } catch (e) {
       this._collectedMangaList = [];
@@ -61,27 +55,24 @@ class CollectionProvider extends BaseProvider {
       var sourceKey = manga.sourceKey;
       var infoUrl = manga.infoUrl;
       var i = index++;
-      ReadMangaStatus currentMangaInfo =
-          await _getCurrentMangaStatus(sourceKey, infoUrl);
-      final resultStatus =
-          ReadMangaStatusUtils.mergeMangaReadStatus(currentMangaInfo, manga);
+      Manga currentMangaInfo = await _getCurrentMangaStatus(sourceKey, infoUrl);
       if (currentMangaInfo.chapterList.length != manga.chapterList.length) {
-        await this.updateCollectionAction(resultStatus);
+        await MangaStorageService.saveManga(currentMangaInfo);
+        this._collectedMangaList[i] = currentMangaInfo;
+        notifyListeners();
       }
-      this._collectedMangaList[i] = resultStatus;
-      notifyListeners();
-      return resultStatus;
+      return currentMangaInfo;
     }));
 
     this._isOnUpdate = false;
     return result;
   }
 
-  Future<ReadMangaStatus> _getCurrentMangaStatus(
-      String sourceKey, String infoUrl) async {
+  Future<Manga> _getCurrentMangaStatus(String sourceKey, String infoUrl) async {
     final MaxgaDataHttpRepo httpRepo =
         MangaRepoPool.getInstance().getRepo(key: sourceKey);
     Manga manga = await httpRepo.getMangaInfo(infoUrl);
+
     /// 测试代码 --------------------------------
 //    Chapter test = Chapter();
 //    test.title = 'test';
@@ -93,53 +84,19 @@ class CollectionProvider extends BaseProvider {
 //    ];
     /// 测试代码 --------------------------------
 
-    final currentMangaInfo =
-        ReadMangaStatus.fromManga(manga);
-
-    return currentMangaInfo;
+    return manga;
   }
 
-  Future<bool> addCollectionAction(ReadMangaStatus manga) async {
+  Future<bool> setMangaCollectStatus(Manga manga, {isCollected = true}) async {
     try {
-      final status = ReadMangaStatus.fromManga(manga);
-      status.isCollected = true;
-      await MangaReadStorageService.setMangaStatus(status);
-
-      if (status.isCollected) {
-        // update
-        this._collectedMangaList.add(status);
+      final isSuccess = await MangaStorageService.setMangaCollectedStatus(manga,
+          isCollect: isCollected);
+      if (isCollected) {
+        this._collectedMangaList.add(manga);
+      } else {
+        this._collectedMangaList.removeWhere((item) => item.infoUrl == manga.infoUrl);
       }
       notifyListeners();
-      return true;
-    } catch (e) {
-      print(e);
-      return false;
-    }
-  }
-
-  Future<bool> updateCollectionAction(ReadMangaStatus manga) async {
-    try {
-      await MangaReadStorageService.setMangaStatus(manga);
-
-      final index = this._collectedMangaList.indexWhere((item) => item.infoUrl == manga.infoUrl);
-      this._collectedMangaList[index] = manga;
-      notifyListeners();
-      return true;
-    } catch (e) {
-      print(e);
-      return false;
-    }
-  }
-
-
-  Future<bool> deleteCollectionAction(ReadMangaStatus manga) async {
-    try {
-      final status = ReadMangaStatus.fromManga(manga);
-      status.isCollected = false;
-      await MangaReadStorageService.setMangaStatus(status);
-      this
-          ._collectedMangaList
-          .removeWhere((item) => status.infoUrl == item.infoUrl);
       return true;
     } catch (e) {
       print(e);
@@ -152,7 +109,7 @@ class CollectionProvider extends BaseProvider {
     super.dispose();
   }
 
-  ReadMangaStatus getMangaFromInfoUrl(String infoUrl) {
+  Manga getMangaFromInfoUrl(String infoUrl) {
     return this
         ._collectedMangaList
         .firstWhere((item) => item.infoUrl == infoUrl);

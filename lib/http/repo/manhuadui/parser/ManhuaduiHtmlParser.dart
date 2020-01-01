@@ -131,7 +131,7 @@ class ManhuaduiHtmlParser {
     return SimpleMangaInfo.fromMangaRepo(
         sourceKey: ManhuaduiMangaSource.key,
         id: null,
-        author: authors,
+        authors: authors,
         infoUrl: mangaInfoUrl,
         typeList: types,
         coverImgUrl: mangaCoverUrl,
@@ -233,7 +233,7 @@ class ManhuaduiHtmlParser {
         coverImgUrl: mangaCoverUrl,
         title: mangaTitle,
         typeList: mangaTypeList,
-        author: mangaAuthors,
+        authors: mangaAuthors,
         status: null,
         lastUpdateChapter: lastChapter,
       );
@@ -314,7 +314,7 @@ class ManhuaduiHtmlParser {
     return SimpleMangaInfo.fromMangaRepo(
         sourceKey: ManhuaduiMangaSource.key,
         id: null,
-        author: authors,
+        authors: authors,
         infoUrl: mangaInfoUrl,
         typeList: types,
         coverImgUrl: mangaCoverUrl,

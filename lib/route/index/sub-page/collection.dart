@@ -7,6 +7,7 @@ import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/components/MangaGridItem.dart';
 import 'package:maxga/components/MaxgaButton.dart';
+import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/maxga/ReadMangaStatus.dart';
 import 'package:maxga/provider/CollectionProvider.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
@@ -98,11 +99,12 @@ class CollectionPageState extends State<CollectionPage> {
     }
   }
 
-  startRead(ReadMangaStatus item) async {
+  startRead(Manga item) async {
     item.hasUpdate = false;
-    Provider.of<CollectionProvider>(context).updateCollectionAction(item);
     await Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return MangaInfoPage.fromCollection(
+      return MangaInfoPage(
+        infoUrl: item.infoUrl,
+        sourceKey: item.sourceKey,
         coverImageBuilder: (context) =>
             MangaCoverImage(
               source: MangaRepoPool.getInstance()
@@ -110,8 +112,7 @@ class CollectionPageState extends State<CollectionPage> {
               url: item.coverImgUrl,
               tagPrefix: widget.name,
               fit: BoxFit.cover,
-            ),
-        manga: item,);
+            ));
     }));
   }
 

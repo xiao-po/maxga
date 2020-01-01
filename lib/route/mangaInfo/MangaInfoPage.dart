@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/Utils/MaxgaUtils.dart';
+import 'package:maxga/database/mangaData.repo.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/manga/Chapter.dart';
 import 'package:maxga/model/manga/Manga.dart';
@@ -28,8 +29,6 @@ enum _MangaInfoPageStatus {
 }
 
 class MangaInfoPage extends StatefulWidget {
-  final ReadMangaStatus manga;
-
   final String sourceKey;
   final String infoUrl;
   final CoverImageBuilder coverImageBuilder;
@@ -38,17 +37,9 @@ class MangaInfoPage extends StatefulWidget {
       {Key key,
       @required this.coverImageBuilder,
       @required this.sourceKey,
-      @required this.infoUrl})
-      : manga = null,
+      @required this.infoUrl}):
         super(key: key);
 
-  MangaInfoPage.fromCollection(
-      {Key key, @required this.coverImageBuilder, @required this.manga})
-      : infoUrl = null,
-        this.sourceKey = null,
-        super(key: key);
-
-  bool get isFromCollection => manga != null;
 
   @override
   State<StatefulWidget> createState() => _MangaInfoPageState();
@@ -57,48 +48,18 @@ class MangaInfoPage extends StatefulWidget {
 class _MangaInfoPageState extends State<MangaInfoPage> {
   _MangaInfoPageStatus loading = _MangaInfoPageStatus.loading;
   ReadMangaStatus readMangaStatus;
+  Manga manga;
   MangaSource source;
   List<Chapter> chapterList = [];
-
-  String introduce;
 
   @override
   void initState() {
     super.initState();
-    if (widget.isFromCollection) {
-      _initInfo(
-          url: widget.manga.infoUrl,
-          sourceKey: widget.manga.sourceKey,
-          filter: (curr) async {
-            CollectionProvider collectionProvider =
-                Provider.of<CollectionProvider>(context);
-            final preReadMangaStatus =
-                collectionProvider.getMangaFromInfoUrl(curr.infoUrl);
-            if (curr.chapterList.length != preReadMangaStatus.chapterList.length) {
-              final mergedMangaStatus = ReadMangaStatusUtils.mergeMangaReadStatus(curr, preReadMangaStatus);
-              return mergedMangaStatus;
-            } else {
-              return preReadMangaStatus;
-            }
-          });
-    } else {
-      _initInfo(
-          url: widget.infoUrl,
-          sourceKey: widget.sourceKey,
-          filter: (curr) async {
-            ReadMangaStatus preReadMangaStatus =
-                await MangaReadStorageService.getMangaStatus(curr);
-            bool hasCache = preReadMangaStatus != null;
-            if (!hasCache) {
-              return ReadMangaStatus.fromManga(curr);
-            } else {
-              return ReadMangaStatusUtils.mergeMangaReadStatus(curr, preReadMangaStatus);
-            }
-
-          });
-    }
+    _initInfo(
+        url: widget.infoUrl,
+        sourceKey: widget.sourceKey,);
     source = MangaRepoPool.getInstance()
-        .getMangaSourceByKey(widget.sourceKey ?? widget.manga.sourceKey);
+        .getMangaSourceByKey(widget.sourceKey);
   }
 
 
@@ -112,9 +73,10 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     switch (loading) {
       case _MangaInfoPageStatus.over:
         {
-          mangaInfoIntro = MangaInfoIntro(intro: introduce);
+          mangaInfoIntro = MangaInfoIntro(intro: manga.introduce);
           mangaInfoChapter = MangaInfoChapter(
             chapterList: chapterList,
+            manga: manga,
             readStatus: readMangaStatus,
             onClickChapter: (chapter) => enjoyMangaContent(chapter),
           );
@@ -122,7 +84,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
           mangaInfoBottomBar = MangaInfoBottomBar(
             onResume: () => onResumeProcess(),
             readed: readMangaStatus.readChapterId != null,
-            collected: readMangaStatus.isCollected,
+            collected: readMangaStatus.isCollect,
             onCollect: () => collectManga(),
           );
           break;
@@ -151,7 +113,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     }
     return Scaffold(
         body: MangaInfoWrapper(
-      title: readMangaStatus?.title ?? '',
+      title: manga?.title ?? '',
       appbarActions: <Widget>[
         IconButton(
           icon: Icon(Icons.share, color: Colors.white),
@@ -162,8 +124,9 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
       ],
       children: [
         MangaInfoCover(
-          manga: readMangaStatus,
+          manga: manga,
           loadEnd: loadOver,
+          lastUpdateChapter: manga?.chapterList?.first ?? Chapter(),
           source: source,
           coverImageBuilder: widget.coverImageBuilder,
         ),
@@ -204,24 +167,26 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
 
   Future<void> _initInfo(
       {@required String sourceKey,
-      @required String url,
-      Future<ReadMangaStatus> Function(ReadMangaStatus currentState)
-          filter}) async {
+      @required String url}) async {
     MaxgaDataHttpRepo repo =
         MangaRepoPool.getInstance().getRepo(key: sourceKey);
     await Future.wait<dynamic>([
       Future.microtask(() async {
         try {
-          final manga = await repo.getMangaInfo(url);
-          final currentReadMangaStatus = ReadMangaStatus.fromManga(manga);
-          readMangaStatus = filter != null
-              ? await filter(currentReadMangaStatus)
-              : currentReadMangaStatus;
-          print('filter over');
-          print(readMangaStatus.chapterList.length);
-          introduce = manga.introduce;
-          chapterList = readMangaStatus.chapterList;
+          final Manga manga = await repo.getMangaInfo(url);
+          final Manga preMangaData = (await MangaStorageService.getMangaByUrl(url)) ?? manga;
+          final ReadMangaStatus readMangaStatus = await MangaStorageService.getMangaStatusByUrl(url);
+          // todo: 合并 chapter list
+          final Manga resultMangaData = manga;
+          chapterList = resultMangaData.chapterList;
+          await MangaStorageService.saveManga(resultMangaData);
+          // -----------
+          //  await MangaDataRepository.insert(manga);
+          //  Manga test = await MangaDataRepository.findByUrl(manga.infoUrl);
+          // ------------
           loading = _MangaInfoPageStatus.over;
+          this.manga = manga;
+          this.readMangaStatus = readMangaStatus;
         } catch (e) {
           print(e);
           loading = _MangaInfoPageStatus.error;
@@ -237,20 +202,21 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   void enjoyMangaContent(Chapter chapter, {int imagePage = 0}) async {
     Provider.of<HistoryProvider>(context).addToHistory(
         SimpleMangaInfo.fromMangaInfo(
-            sourceKey: readMangaStatus.sourceKey,
-            author: readMangaStatus.author,
-            id: readMangaStatus.id,
-            infoUrl: readMangaStatus.infoUrl,
-            status: readMangaStatus.status,
-            coverImgUrl: readMangaStatus.coverImgUrl,
-            title: readMangaStatus.title,
-            typeList: readMangaStatus.typeList,
-            lastUpdateChapter: readMangaStatus.lastUpdateChapter));
+            sourceKey: manga.sourceKey,
+            author: manga.authors,
+            id: manga.id,
+            infoUrl: manga.infoUrl,
+            status: manga.status,
+            coverImgUrl: manga.coverImgUrl,
+            title: manga.title,
+            typeList: manga.typeList,
+            lastUpdateChapter: chapterList[0])
+    );
     var result = await Navigator.push<MangaViewerPopResult>(
         context,
         MaterialPageRoute(
             builder: (context) => MangaViewer(
-                  manga: readMangaStatus,
+                  manga: manga,
                   currentChapter: chapter,
                   chapterList: chapterList,
                   initIndex: imagePage,
@@ -259,7 +225,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
       readMangaStatus.readChapterId = result.chapterId;
       readMangaStatus.readImageIndex = result.mangaImageIndex;
       await Future.wait([
-        MangaReadStorageService.setMangaStatus(readMangaStatus),
+        MangaStorageService.saveMangaStatus(readMangaStatus),
 
       ]);
       if (mounted) setState(() {});
@@ -300,22 +266,20 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   }
 
   collectManga() async {
-    bool isSuccess = false;
-    if (readMangaStatus.isCollected) {
-      isSuccess = await Provider.of<CollectionProvider>(context)
-          .deleteCollectionAction(readMangaStatus);
-    } else {
-      isSuccess = await Provider.of<CollectionProvider>(context)
-          .addCollectionAction(readMangaStatus);
-    }
-    if (isSuccess) {
-      readMangaStatus.isCollected = !readMangaStatus.isCollected;
+    try {
+      await Future.wait([
+        CollectionProvider.getInstance()
+            .setMangaCollectStatus(manga, isCollected: !readMangaStatus.isCollect),
+      ]);
+      readMangaStatus.isCollect = !readMangaStatus.isCollect;
       if (mounted) setState(() {});
-    } else {
+    } catch (e) {
+      print(e);
       Scaffold.of(context).showSnackBar(SnackBar(
         content: const Text('发生错误，收藏失败'),
       ));
     }
+
   }
 
 }

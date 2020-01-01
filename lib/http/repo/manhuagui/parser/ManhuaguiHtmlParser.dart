@@ -61,7 +61,7 @@ class ManhuaguiHtmlParser {
         infoUrl: url,
         coverImgUrl: coverImageUrl,
         title: title,
-        author: authors,
+        authors: authors,
         typeList: typeList,
         lastUpdateChapter: lastUpdateChapter,
       );

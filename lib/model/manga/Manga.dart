@@ -4,14 +4,16 @@ import 'Chapter.dart';
 
 class Manga extends MangaBase {
   List<Chapter> chapterList;
+  bool hasUpdate = false;
 
   Map<String, dynamic> toJson() => {
         'sourceKey': sourceKey,
-        'author': author,
+        'authors': authors,
         'id': id,
         'infoUrl': infoUrl,
         'status': status,
         'coverImgUrl': coverImgUrl,
+        'hasUpdate': hasUpdate,
         'title': title,
         'introduce': introduce,
         'typeList': typeList,
@@ -20,7 +22,8 @@ class Manga extends MangaBase {
 
   Manga.fromJson(Map<String, dynamic> json) {
     sourceKey = json['sourceKey'];
-    author = json['author'].cast<String>();
+    hasUpdate = json['hasUpdate'];
+    authors = json['authors'].cast<String>();
     id = json['id'];
     infoUrl = json['infoUrl'];
     status = json['status'];
@@ -47,7 +50,7 @@ class Manga extends MangaBase {
     @required List<Chapter> chapterList,
   }) {
     this.infoUrl = infoUrl;
-    this.author = authors;
+    this.authors = authors;
     this.introduce = introduce;
     this.typeList = types;
     this.title = title;
@@ -75,7 +78,7 @@ class SimpleMangaInfo extends MangaBase {
     @required Chapter lastUpdateChapter,
   }) {
     this.sourceKey = sourceKey;
-    this.author = author;
+    this.authors = author;
     this.id = id;
     this.infoUrl = infoUrl;
     this.status = status;
@@ -87,7 +90,7 @@ class SimpleMangaInfo extends MangaBase {
 
   SimpleMangaInfo.fromMangaRepo({
     @required String sourceKey,
-    List<String> author,
+    List<String> authors,
     @required int id,
     @required String infoUrl,
     String status, // "连载中" "已完结"
@@ -97,7 +100,7 @@ class SimpleMangaInfo extends MangaBase {
     Chapter lastUpdateChapter,
   }) {
     this.sourceKey = sourceKey;
-    this.author = author;
+    this.authors = authors;
     this.id = id;
     this.infoUrl = infoUrl;
     this.status = status;
@@ -107,10 +110,9 @@ class SimpleMangaInfo extends MangaBase {
     this.lastUpdateChapter = lastUpdateChapter;
   }
 
-
   SimpleMangaInfo.fromJson(Map<String, dynamic> json) {
     sourceKey = json['sourceKey'];
-    author = json['author'].cast<String>();
+    authors = json['authors'].cast<String>();
     id = json['id'];
     infoUrl = json['infoUrl'];
     status = json['status'];
@@ -123,7 +125,7 @@ class SimpleMangaInfo extends MangaBase {
 
   Map<String, dynamic> toJson() => {
         'sourceKey': sourceKey,
-        'author': author,
+        'authors': authors,
         'id': id,
         'infoUrl': infoUrl,
         'status': status,
@@ -137,7 +139,7 @@ class SimpleMangaInfo extends MangaBase {
 
 abstract class MangaBase {
   String sourceKey;
-  List<String> author;
+  List<String> authors;
   int id;
   String infoUrl;
   String status; // "连载中" "已完结"

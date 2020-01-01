@@ -67,7 +67,7 @@ class DmzjLatestUpdateManga {
         coverImgUrl: cover,
         title: title,
         typeList: types.split('/'),
-        author: authors.split('/'),
+        authors: authors.split('/'),
         lastUpdateChapter: latestChapter);
   }
 }
