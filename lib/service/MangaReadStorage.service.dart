@@ -53,6 +53,9 @@ class MangaStorageService {
   }
 
   static Future<List<Manga>> getMangaByUrlList(List<String> urlList)  {
+    if (urlList == null || urlList.isEmpty) {
+      return Future.value([]);
+    }
     return MangaDataRepository.findByUrlList(urlList);
   }
 
