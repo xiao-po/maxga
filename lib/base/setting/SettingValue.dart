@@ -63,14 +63,14 @@ final List<MaxgaSettingItem> SettingItemList = [
     value: '0',
     category: MaxgaSettingCategoryType.application,
   ),
-  MaxgaSettingItem(
-    key: MaxgaSettingItemType.useMaxgaProxy,
-    title: '使用内置代理',
-    type: MaxgaSettingListTileType.checkbox,
-    subTitle: '针对部分网站加入代理加速 (不包括图片)',
-    value: '0',
-    category: MaxgaSettingCategoryType.network,
-  ),
+//  MaxgaSettingItem(
+//    key: MaxgaSettingItemType.useMaxgaProxy,
+//    title: '使用内置代理',
+//    type: MaxgaSettingListTileType.checkbox,
+//    subTitle: '针对部分网站加入代理加速 (不包括图片)',
+//    value: '0',
+//    category: MaxgaSettingCategoryType.network,
+//  ),
   MaxgaSettingItem(
     key: MaxgaSettingItemType.timeoutLimit,
     type: MaxgaSettingListTileType.select,

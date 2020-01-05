@@ -84,7 +84,7 @@ class DmzjMangaSearchResult {
     return SimpleMangaInfo.fromMangaRepo(sourceKey: DmzjMangaSource.key,
         authors: authors.split('/'),
         id: id,
-        infoUrl: '${DmzjMangaSource.domain}/comic/comic_$id.json',
+        infoUrl: '${DmzjMangaSource.apiDomain}/comic/comic_$id.json',
         coverImgUrl: cover,
         title: lastName,
         lastUpdateChapter: latestChapter,

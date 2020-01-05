@@ -116,7 +116,7 @@ class DmzjMangaInfo {
       chapterList: chapters.singleWhere((item) => item.title == '连载').data
         ..forEach((chapter) {
           chapter.url =
-              '${DmzjMangaSource.domain}/chapter/$id/${chapter.id}.json';
+              '${DmzjMangaSource.apiDomain}/chapter/$id/${chapter.id}.json';
         }),
       id: id,
       title: title,

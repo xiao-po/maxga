@@ -10,6 +10,7 @@ final ManhuaduiMangaSource = MangaSource(
   name: '漫画堆',
   key: 'manhuadui',
   domain: 'https://m.manhuadui.com',
+  apiDomain: 'https://m.manhuadui.com',
   iconUrl: 'https://m.manhuadui.com/favicon.ico',
 );
 
@@ -26,14 +27,14 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<List<String>> getChapterImageList(String url) async {
-    return _httpUtils.requestApi<List<String>>('${_source.domain}$url',
+    return _httpUtils.requestApi<List<String>>('${_source.apiDomain}$url',
         parser: (res) => parser.getMangaImageListFromMangaPage(res.data));
   }
 
   @override
   Future<List<SimpleMangaInfo>> getLatestUpdate(int page) async {
     return _httpUtils.requestApi<List<SimpleMangaInfo>>(
-        '${_source.domain}/update/?page=${page + 1}',
+        '${_source.apiDomain}/update/?page=${page + 1}',
         parser: (res) => parser.getMangaListFromLatestUpdate(res.data)
           ..forEach((manga) => manga.sourceKey = _source.key));
   }
@@ -48,7 +49,7 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
   @override
   Future<List<SimpleMangaInfo>> getSearchManga(String keywords) async {
     return _httpUtils.requestApi<List<SimpleMangaInfo>>(
-        '${_source.domain}/search/?keywords=$keywords',
+        '${_source.apiDomain}/search/?keywords=$keywords',
         parser: (res) => parser.getMangaListFromSearch(res.data)
           ..forEach((item) => item.sourceKey = _source.key));
   }
@@ -66,5 +67,9 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
         'https://m.manhuadui.com/rank/click/',
         parser: (res) => parser.getMangaListFromRank(res.data)
           ..forEach((el) => el.sourceKey = _source.key));
+  }
+  @override
+  Future<String> generateShareLink(Manga manga) {
+    return Future.value(manga.infoUrl);
   }
 }

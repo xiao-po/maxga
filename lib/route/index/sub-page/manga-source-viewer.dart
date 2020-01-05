@@ -12,6 +12,7 @@ import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/route/index/base/IndexSliverAppBarDelegate.dart';
+import 'package:maxga/route/index/base/MangaListTabView.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:maxga/route/mangaViewer/baseComponent/MangaPageView.dart';
 import 'package:maxga/service/MangaReadStorage.service.dart';
@@ -69,11 +70,9 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
     with SingleTickerProviderStateMixin {
   _SourceViewType pageType = _SourceViewType.latestUpdate;
   TabController tabController;
-  ScrollController scrollController = ScrollController();
   bool isPageCanChanged = true;
   bool isTabChange = true;
 
-  PageController pageController = PageController(initialPage: 0);
   List<MangaSourceViewerPage> tabs;
   List<MangaSource> allMangaSource;
 
@@ -88,16 +87,6 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
     setMangaSource(source);
 
     tabController = TabController(vsync: this, length: 2, initialIndex: 0);
-    tabController.addListener(() {
-      if (tabController.indexIsChanging) {
-        //判断TabBar是否切换
-        if (isTabChange) {
-          onPageChange(tabController.index, pageController);
-        } else {
-          isTabChange = true;
-        }
-      }
-    });
     allMangaSource = MangaRepoPool
         .getInstance()
         ?.allDataSource;
@@ -107,7 +96,6 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
   void dispose() {
     super.dispose();
     tabController.dispose();
-    pageController.dispose();
     tabs.forEach((state) => state.controller.dispose());
   }
 
@@ -150,11 +138,8 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
           pinned: true,
         ),
       ],
-      body: MangaPageView(
-        controller: pageController,
-        preloadPageCount: 1,
-        onPageChanged: (index) =>
-        isPageCanChanged ? this.onPageChange(index) : null,
+      body: MangaListTabBarView(
+        controller: this.tabController,
         children: tabs
             .map((state) =>
             RefreshIndicator(
@@ -177,7 +162,6 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
   List<Widget> buildAppBarActions() {
     return <Widget>[
       MaxgaSearchButton(),
-      IconButton(icon: Icon(Icons.sync_problem), onPressed: () => this.test()),
       PopupMenuButton<MangaSource>(
         itemBuilder: (context) =>
             allMangaSource
@@ -223,7 +207,7 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
   ListView buildMangaListView(MangaSourceViewerPage state) {
     return ListView.separated(
       controller: state.controller,
-        separatorBuilder: (context, index) => Divider(),
+      separatorBuilder: (context, index) => Divider(),
       itemBuilder: (context, index) {
         if (index == state.mangaList.length) {
           if (state.isLast) {
@@ -324,19 +308,6 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
   }
 
   DateTime pageChangeDebounceTime = DateTime.now();
-
-  void onPageChange(int index, [PageController pageController]) async {
-    if (pageController == null) {
-      isTabChange = false;
-      tabController.animateTo(index);
-    } else if (isTabChange) {
-      isPageCanChanged = false;
-      await pageController.animateToPage(index,
-          duration: Duration(milliseconds: 500), curve: Curves.ease);
-      isPageCanChanged = true;
-      isTabChange = true;
-    }
-  }
 
   refreshPage(MangaSourceViewerPage state) =>
       this.getMangaList(state, isRefresh: true);

@@ -50,7 +50,7 @@ class MangaReadStatusRepository {
   static Future<bool> update(ReadMangaStatus status, {Database database}) {
     return MaxgaDataBaseUtils.openUpdateTransaction(
       action: (db) async {
-        await db.update(MaxgaDatabaseTableValue.mangaReadStatus, ReadMangaStatusUtils.toMangaReadStatusTableEntity(status));
+        await db.update(MaxgaDatabaseTableValue.mangaReadStatus, ReadMangaStatusUtils.toMangaReadStatusTableEntity(status),where: '${MaxgaDatabaseMangaReadStatusTableValue.infoUrl} = ?',whereArgs: [status.infoUrl] );
         return true;
       },
       database: database,
@@ -67,5 +67,4 @@ class MangaReadStatusRepository {
       database: database,
     );
   }
-
 }

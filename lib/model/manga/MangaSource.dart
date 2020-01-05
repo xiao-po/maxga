@@ -7,6 +7,7 @@ typedef MangaSourceProxyReplaceCallback = String Function(String url);
 class MangaSource {
   String name;
   String domain;
+  String apiDomain;
   String key;
   String proxyDomain;
   String iconUrl;
@@ -23,5 +24,5 @@ class MangaSource {
         this.proxyDomain,
       this.headers,
       proxyReplaceCallback,
-      @required this.domain});
+      @required this.apiDomain, @required this.domain});
 }

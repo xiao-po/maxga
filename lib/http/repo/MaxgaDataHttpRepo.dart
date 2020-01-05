@@ -15,5 +15,7 @@ abstract class MaxgaDataHttpRepo {
 
   Future<List<SimpleMangaInfo>> getSearchManga(String keywords);
 
+  Future<String> generateShareLink(Manga manga);
+
   MangaSource get mangaSource;
 }

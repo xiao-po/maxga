@@ -76,6 +76,7 @@ class _MangaImageState extends State<MangaImage>
 
   GestureDetector buildFailedPlaceHolder(ExtendedImageState state) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       child: Stack(
         fit: StackFit.expand,
         children: <Widget>[

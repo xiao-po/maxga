@@ -11,6 +11,7 @@ final ManhuaguiMangaSource = MangaSource(
     name: '漫画柜',
     key: 'manhuagui',
     domain: 'https://m.manhuagui.com/',
+    apiDomain: 'https://m.manhuagui.com/',
     iconUrl: 'https://m.manhuagui.com/favicon.ico',
     headers: {'Referer': 'https://m.manhuagui.com/'});
 
@@ -31,10 +32,10 @@ class ManhuaguiDataRepo extends MaxgaDataHttpRepo {
   @override
   Future<List<SimpleMangaInfo>> getLatestUpdate(int page) async {
     return _httpUtils.requestApi<List<SimpleMangaInfo>>(
-        '${_source.domain}update/?page=${page + 1}&ajax=1&order=1',
+        '${_source.apiDomain}update/?page=${page + 1}&ajax=1&order=1',
         parser: (res) => parser.getSimpleMangaInfoListFromUpdatePage(res.data)
           ..forEach((manga) {
-            manga.infoUrl = '${_source.domain}${manga.infoUrl.substring(1)}';
+            manga.infoUrl = '${_source.apiDomain}${manga.infoUrl.substring(1)}';
             manga.sourceKey = _source.key;
           }));
   }
@@ -45,7 +46,7 @@ class ManhuaguiDataRepo extends MaxgaDataHttpRepo {
         parser: (res) => parser.getMangaInfo(res.data)
           ..infoUrl = url
           ..chapterList.forEach((chapter) {
-            chapter.url = '${_source.domain}${chapter.url.substring(1)}';
+            chapter.url = '${_source.apiDomain}${chapter.url.substring(1)}';
           }));
   }
 
@@ -55,7 +56,7 @@ class ManhuaguiDataRepo extends MaxgaDataHttpRepo {
         'https://m.manhuagui.com/s/$keywords.html',
         parser: (res) => parser.getSimpleMangaInfoFromSearch(res.data)
           ..forEach((manga) {
-            manga.infoUrl = '${_source.domain}${manga.infoUrl.substring(1)}';
+            manga.infoUrl = '${_source.apiDomain}${manga.infoUrl.substring(1)}';
             manga.sourceKey = _source.key;
           }));
   }
@@ -72,11 +73,15 @@ class ManhuaguiDataRepo extends MaxgaDataHttpRepo {
   @override
   Future<List<SimpleMangaInfo>> getRankedManga(int page) async {
     return _httpUtils.requestApi<List<SimpleMangaInfo>>(
-        '${_source.domain}rank/?page=${page + 1}&ajax=1&order=1',
+        '${_source.apiDomain}rank/?page=${page + 1}&ajax=1&order=1',
         parser: (res) => parser.getSimpleMangaInfoListFromUpdatePage(res.data)
           ..forEach((manga) {
-            manga.infoUrl = '${_source.domain}${manga.infoUrl.substring(1)}';
+            manga.infoUrl = '${_source.apiDomain}${manga.infoUrl.substring(1)}';
             manga.sourceKey = _source.key;
           }));
+  }
+  @override
+  Future<String> generateShareLink(Manga manga) {
+    return Future.value(manga.infoUrl);
   }
 }

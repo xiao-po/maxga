@@ -1,7 +1,7 @@
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart';
 import 'package:maxga/Utils/DateUtils.dart';
-import 'package:maxga/http/repo/hanhan/HanhanDataRepo.dart';
+import 'package:maxga/http/repo/hanhan/constant/HanhanRepoValue.dart';
 import 'package:maxga/http/repo/hanhan/crypto/HanhanCrypto.dart';
 import 'package:maxga/model/manga/Chapter.dart';
 import 'package:maxga/model/manga/Manga.dart';
@@ -140,7 +140,7 @@ class HanhanHtmlParser {
         sourceKey: null,
         id: id,
         authors: authors,
-        infoUrl: '${HanhanMangaSource.domain}/comic/18$id/',
+        infoUrl: '${HanhanMangaSource.apiDomain}/comic/18$id/',
         coverImgUrl: coverImageUrl,
         typeList: type,
         lastUpdateChapter: lastChapter,

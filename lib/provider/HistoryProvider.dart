@@ -32,7 +32,7 @@ class HistoryProvider extends BaseProvider {
             id: manga.id,
             infoUrl: manga.infoUrl,
             status: manga.status,
-            coverImgUrl: manga.status,
+            coverImgUrl: manga.coverImgUrl,
             title: manga.title,
             typeList: manga.typeList,
             lastUpdateChapter: manga.chapterList.first))
