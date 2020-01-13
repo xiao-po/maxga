@@ -7,8 +7,8 @@ class DateUtils {
       }
       var result = template;
       result = result.replaceAll('yyyy', '${resultTime.year}');
-      result = result.replaceAll('MM', '${resultTime.month}');
-      result = result.replaceAll('dd', '${resultTime.day}');
+      result = result.replaceAll('MM', '${resultTime.month < 10 ? '0${resultTime.month}' : resultTime.month}');
+      result = result.replaceAll('dd', '${resultTime.day < 10 ? '0${resultTime.day}' : resultTime.day}');
       result = result.replaceAll('hh', '${resultTime.hour}');
       result = result.replaceAll('mm', '${resultTime.minute}');
       result = result.replaceAll('ss', '${resultTime.second}');

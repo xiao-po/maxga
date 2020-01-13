@@ -11,6 +11,7 @@ import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/maxga/ReadMangaStatus.dart';
 import 'package:maxga/provider/CollectionProvider.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
+import 'package:maxga/route/error-page/test-page.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:provider/provider.dart';
 
@@ -45,6 +46,11 @@ class CollectionPageState extends State<CollectionPage> {
                   onPressed: () => Scaffold.of(context).openDrawer()),
               actions: <Widget>[
                 MaxgaSearchButton(),
+                IconButton(icon: Icon(Icons.title), onPressed: () {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (c) => TestPage())
+                  );
+                }),
               ],
             ),
             Expanded(

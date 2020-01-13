@@ -251,7 +251,7 @@ class ManhuaduiHtmlParser {
     final coverImageUrl = otherInfoMainEl
         .querySelector('.pic')
         .querySelector('img')
-        .attributes['href'];
+        .attributes['src'];
     final otherInfoEl = otherInfoMainEl.querySelector('.sub_r');
 
     final authors = otherInfoEl.children[0].text.trim().split(',');
@@ -267,7 +267,7 @@ class ManhuaduiHtmlParser {
         .querySelector('#chapter-list-1')
         .children
         .map((el) => el.children[0]);
-    var index = 1000;
+    var index = 0;
     final List<Chapter> chapterList = chapterListEl.map((el) {
       Chapter chapter = Chapter();
       chapter.url = el.attributes['href'];
@@ -276,9 +276,9 @@ class ManhuaduiHtmlParser {
         chapter.url.lastIndexOf('/') + 1,
         chapter.url.lastIndexOf('.html'),
       ));
-      chapter.order = index--;
+      chapter.order = index++;
       return chapter;
-    }).toList(growable: false);
+    }).toList(growable: false)..sort((a, b) => b.order - a.order);
 
     return Manga.fromMangaInfoRequest(
         authors: authors,
@@ -389,7 +389,7 @@ Manga getMangaInfo(String body) {
       .querySelector('#chapter-list-1')
       .children
       .map((el) => el.children[0]);
-  var index = 1000;
+  var index = 0;
   final List<Chapter> chapterList = chapterListEl.map((el) {
     Chapter chapter = Chapter();
     chapter.url = el.attributes['href'];
@@ -398,9 +398,9 @@ Manga getMangaInfo(String body) {
       chapter.url.lastIndexOf('/') + 1,
       chapter.url.lastIndexOf('.html'),
     ));
-    chapter.order = index--;
+    chapter.order = index++;
     return chapter;
-  }).toList(growable: false);
+  }).toList(growable: false)..sort((a, b) => b.order - a.order);
 
   return Manga.fromMangaInfoRequest(
       authors: authors,

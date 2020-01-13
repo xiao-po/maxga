@@ -340,7 +340,7 @@ class _MangaViewerState extends State<MangaViewer> {
         return;
       }
       toastMessage('正在加载上一章节');
-      final simplePreChapterData = getPreChapter(nextChapter);
+      final simplePreChapterData = getPreChapter(preChapter);
       if (mounted) {
         setState(() {
           loadingChapter = true;

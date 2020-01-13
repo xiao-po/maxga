@@ -229,8 +229,8 @@ class _SearchResultPageState extends State<SearchResultPage> {
 //        );
         break;
     }
-    final useMaxgaProxy = Provider.of<SettingProvider>(context)
-        .getBoolItemValue(MaxgaSettingItemType.useMaxgaProxy);
+//    final useMaxgaProxy = Provider.of<SettingProvider>(context)
+//        .getBoolItemValue(MaxgaSettingItemType.useMaxgaProxy);
     var body = Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -19,6 +19,17 @@ class UpdateService {
     }
   }
 
+  static Future<MaxgaReleaseInfo> checkUpdateStatusWithoutIgnore() async {
+    MaxgaReleaseInfo nextVersionInfo = await _getNextVersionInfo();
+    String currentVersion = await getCurrentVersion();
+
+    if (nextVersionInfo.compare(currentVersion)) {
+      return nextVersionInfo;
+    } else {
+      return null;
+    }
+  }
+
 
   static Future<bool> ignoreUpdate(MaxgaReleaseInfo maxgaReleaseInfo) async {
 

@@ -172,14 +172,11 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
               url)) ?? manga;
           final ReadMangaStatus readMangaStatus = await MangaStorageService
               .getMangaStatusByUrl(url);
-          // todo: 合并 chapter list
           final Manga resultMangaData = manga;
           chapterList = resultMangaData.chapterList;
-          await MangaStorageService.saveManga(resultMangaData);
-          // -----------
-          //  await MangaDataRepository.insert(manga);
-          //  Manga test = await MangaDataRepository.findByUrl(manga.infoUrl);
-          // ------------
+          if (manga.chapterList.length > preMangaData.chapterList.length) {
+            await MangaStorageService.saveManga(resultMangaData);
+          }
           loading = _MangaInfoPageStatus.over;
           this.manga = manga;
           this.readMangaStatus = readMangaStatus;

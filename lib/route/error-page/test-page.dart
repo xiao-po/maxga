@@ -1,59 +1,77 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 class TestPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _TestPageState();
-
 }
 
 class _TestPageState extends State<TestPage> {
   bool isFloat = false;
 
+  List<int> contentList = List.generate(24, (index) => index);
+  int currentIndex = 0;
+  ScrollController controller = ScrollController();
+  int topIndex = 20;
+
+  @override
+  void initState() {
+    super.initState();
+    controller.addListener(() {
+      print(controller.offset);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: <Widget>[
-        SliverAppBar(
-          expandedHeight: 200,
-          pinned: true,
-          floating: isFloat,
-          actions: <Widget>[
-            IconButton(icon: Icon(Icons.threesixty),onPressed: () => this.onTap(),)
-          ],
-          flexibleSpace: FlexibleSpaceBar(
-            title: Text('test'),
-            background: Center(
-              child: TextField(
-                decoration: InputDecoration(
-                  prefixIcon: SizedBox(
-                    width: 10,
-                    height: 10,
-                    child: Center(
-                      child: CachedNetworkImage(
-                        imageUrl: 'https://assets.yande.re/assets/logo_small-418e8d5ec0229f274edebe4af43b01aa29ed83b715991ba14bb41ba06b5b57b5.png',
-                      ),
-                    )
-                  ),
-                ),
-              )
-            ),
-          ),
+
+    Key forwardListKey = UniqueKey();
+    Widget forwardList = SliverList(
+      delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+        if (index == topIndex) {
+          Future.delayed(Duration(seconds: 1), () {
+            topIndex += 8;
+            setState(() {       });;
+          });
+          return null;
+        }
+        return Container(
+          color: index % 2 == 0 ? Colors.green : Colors.yellow,
+          child: Text('fordward $index'),
+          height: 100.0,
+        );
+      }),
+      key: forwardListKey,
+    );
+
+    Widget reverseList = SliverList(
+      delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+        return Container(
+          color: index % 2 == 0 ? Colors.green : Colors.yellow,
+          child: Text('reverse $index'),
+          height: 100.0,
+        );
+      }),
+    );
+    return Scaffold(
+        body:Scrollable(
+          controller: controller,
+          viewportBuilder: (BuildContext context, ViewportOffset offset) {
+            return Viewport(
+                offset: offset,
+                center: forwardListKey,
+                slivers: [
+                  reverseList,
+                  forwardList,
+                ]);
+          },
         ),
-        SliverList(
-          delegate: SliverChildListDelegate(List.generate(15, (index) => 'index').map((txt) => Container(child: Text(txt))).toList(growable: false)),
-        )
-      ],
     );
   }
 
   onTap() {
     this.isFloat = !this.isFloat;
-    setState(() {
-
-    });
+    setState(() {});
   }
-
-
 }
