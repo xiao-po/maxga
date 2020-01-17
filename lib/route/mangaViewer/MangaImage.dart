@@ -4,14 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 
 import 'MangaTab.dart';
+import 'components/MangaImagePlaceHolder.dart';
 
 class MangaImage extends StatefulWidget {
   final String url;
   final int index;
 
-  final MangaSource source;
+  final Map<String, String> headers;
 
-  const MangaImage({Key key, this.url, this.index, this.source})
+  const MangaImage({Key key, this.url, this.index, this.headers})
       : super(key: key);
 
   @override
@@ -40,7 +41,7 @@ class _MangaImageState extends State<MangaImage>
       height: double.infinity,
       width: double.infinity,
       mode: ExtendedImageMode.gesture,
-      headers: widget.source.headers,
+      headers: widget.headers,
       alignment: Alignment.center,
       fit: BoxFit.contain,
       onDoubleTap: (state) => zoomImage(state),
@@ -63,7 +64,7 @@ class _MangaImageState extends State<MangaImage>
   Widget buildMangeImage(ExtendedImageState state) {
     switch (state.extendedImageLoadState) {
       case LoadState.loading:
-        return buildPlaceHolder();
+        return MangaImagePlaceHolder(index: widget.index);
 
       case LoadState.completed:
         return ExtendedImageGesture(state, null);
@@ -94,25 +95,6 @@ class _MangaImageState extends State<MangaImage>
     );
   }
 
-  Widget buildPlaceHolder() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Text(
-          '${widget.index}',
-          style: TextStyle(color: Colors.white38, fontSize: 40),
-        ),
-        Padding(
-          padding: EdgeInsets.only(top: 20),
-          child: SizedBox(
-            height: 40,
-            width: 40,
-            child: CircularProgressIndicator(strokeWidth: 3),
-          ),
-        )
-      ],
-    );
-  }
 
   zoomImage(ExtendedImageGestureState state) {
     var pointerDownPosition = state.pointerDownPosition;

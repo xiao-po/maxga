@@ -3,7 +3,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 
-import 'baseComponent/MangaExtendedPageView.dart';
+import 'components/base/MangaExtendedPageView.dart';
 import 'MangaImage.dart';
 
 typedef MangaImageAnimationListener = void Function();
@@ -14,7 +14,7 @@ class MangaTabView extends StatelessWidget {
   final ValueChanged<int> onPageChanged;
   final bool hasPrechapter;
   final CanMovePage canMovePage;
-  final MangaSource source;
+  final Map<String, String> headers;
 
   MangaTabView(
       {Key key,
@@ -23,7 +23,7 @@ class MangaTabView extends StatelessWidget {
       this.onPageChanged,
       this.hasPrechapter,
       this.canMovePage,
-      @required this.source})
+      @required this.headers})
       : super(key: key);
 
   @override
@@ -34,7 +34,7 @@ class MangaTabView extends StatelessWidget {
       imageTab.add(Tab(
         child: MangaImage(
           url: url,
-          source: source,
+          headers: headers,
           index: i + (hasPrechapter ? 0 : 1),
         ),
       ));

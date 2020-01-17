@@ -38,6 +38,7 @@ dependencies:
   provider: ^3.1.0+1
   shimmer: ^1.0.1
   lzstring: ^1.0.1+2
+  flutter_widgets: 0.1.9
 
 dev_dependencies:
   flutter_test:
