@@ -27,11 +27,11 @@ class MangaTabView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return MangaExtendedPageView.custom(
+    return MangaExtendedPageView(
       controller: controller,
       onPageChanged: onPageChanged,
       canMovePage: canMovePage,
-      childrenDelegate: SliverChildListDelegate(children),
+        children: children,
     );
   }
 }
