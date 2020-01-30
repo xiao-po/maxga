@@ -354,7 +354,6 @@ class _MangaViewerState extends State<MangaViewer> {
   }
 
   dispatchTapUpEvent(TapUpDetails details, BuildContext context) {
-    print(pageIndex);
     final width = MediaQuery.of(context).size.width;
 
     if (details.localPosition.dx / width > 0.33 &&
@@ -604,28 +603,22 @@ class _MangaViewerState extends State<MangaViewer> {
     }
   }
 
+
   _ChangeChapterAction checkChapterChange(int min,int max) {
     if (nextChapter == null && max == (imagePageUrlList.length - 1)) {
-      print('最后一张');
       return _ChangeChapterAction.lastImage;
     } else if (preChapter == null && min == 0) {
-      print('第一张');
       return _ChangeChapterAction.firstImage;
     } else if (min < pageOffsetFix) {
-      print('进入上一章');
       return _ChangeChapterAction.goPreviousChapter;
     } else if (min <= (pageOffsetFix) && preChapter != null) {
-      print('加载上一章');
       return _ChangeChapterAction.loadPreviousChapter;
     } else if (max ==
         (pageOffsetFix + currentChapter.imgUrlList.length)) {
-      print('进入下一章');
       return _ChangeChapterAction.goNextChapter;
     } else if (max == (imagePageUrlList.length - 1)) {
-      print('加载下一章');
       return _ChangeChapterAction.loadNextChapter;
     } else {
-      print('none');
       return _ChangeChapterAction.none;
     }
   }

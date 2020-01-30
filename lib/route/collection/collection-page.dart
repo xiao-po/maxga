@@ -53,7 +53,7 @@ class _CollectionPageState extends State<CollectionPage> {
           title: const Text('收藏'),
           actions: <Widget>[
             MaxgaSearchButton(),
-            MaxgaTestButton(),
+//            MaxgaTestButton(),
           ],
         ),
         key: scaffoldKey,

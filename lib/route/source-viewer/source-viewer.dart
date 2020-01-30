@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:maxga/base/drawer/menu-item.dart';
 import 'package:maxga/base/error/MaxgaHttpError.dart';
@@ -8,6 +6,7 @@ import 'package:maxga/components/Card.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/components/MangaListTabView.dart';
 import 'package:maxga/components/MaxgaButton.dart';
+import 'package:maxga/components/TabBar.dart';
 import 'package:maxga/components/dialog.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/manga/Manga.dart';
@@ -17,7 +16,6 @@ import 'package:maxga/route/drawer/drawer.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:maxga/route/search/search-page.dart';
 import 'package:maxga/service/UpdateService.dart';
-import 'package:provider/provider.dart';
 
 import '../../MangaRepoPool.dart';
 import 'error-page/error-page.dart';
@@ -65,7 +63,7 @@ class MangaSourceViewerPage {
 
 
 class SourceViewerPage extends StatefulWidget {
-  final String name = 'index_page';
+  final String name = 'source_viewer';
 
   @override
   State<StatefulWidget> createState() => _SourceViewerPageState();
@@ -90,11 +88,11 @@ class _SourceViewerPageState extends State<SourceViewerPage>  with SingleTickerP
   }
 
 
-  DateTime _lastPressedAt; //上次点击时间
+  DateTime _lastPressedAt; // 上次点击时间
   Future<bool> onBack() async {
     if (_lastPressedAt == null ||
         DateTime.now().difference(_lastPressedAt) > Duration(seconds: 2)) {
-      //两次点击间隔超过1秒则重新计时
+      // 两次点击间隔超过1秒则重新计时
       _lastPressedAt = DateTime.now();
       showSnack('再按一次退出程序');
       return false;
@@ -155,7 +153,6 @@ class _SourceViewerPageState extends State<SourceViewerPage>  with SingleTickerP
   bool isTabChange = true;
 
   List<MangaSourceViewerPage> tabs;
-  List<MangaSource> allMangaSource;
 
   String sourceName;
 
@@ -166,7 +163,6 @@ class _SourceViewerPageState extends State<SourceViewerPage>  with SingleTickerP
     setMangaSource(source);
 
     tabController = TabController(vsync: this, length: 2, initialIndex: 0);
-    allMangaSource = MangaRepoPool.getInstance()?.allDataSource;
   }
 
   @override
@@ -195,15 +191,20 @@ class _SourceViewerPageState extends State<SourceViewerPage>  with SingleTickerP
       appBar: AppBar(
         title: Text(sourceName),
         actions: buildAppBarActions(),
-        bottom:  TabBar(
-          controller: tabController,
-          labelColor: Colors.black87,
-          unselectedLabelColor: Colors.grey,
-          tabs: tabs
-              .map((item) => Tab(
-            text: item.title,
-          ))
-              .toList(growable: false),
+        elevation: 1,
+        bottom:  ColoredTabBar(
+          color: Colors.white,
+          tabBar: TabBar(
+            controller: tabController,
+            labelColor: Colors.black87,
+            indicatorColor: Colors.black38,
+            unselectedLabelColor: Colors.grey,
+            tabs: tabs
+                .map((item) => Tab(
+              text: item.title,
+            ))
+                .toList(growable: false),
+          ),
         ),
       ),
       body: MangaListTabBarView(
@@ -229,14 +230,8 @@ class _SourceViewerPageState extends State<SourceViewerPage>  with SingleTickerP
   List<Widget> buildAppBarActions() {
     return <Widget>[
       MaxgaSearchButton(),
-      PopupMenuButton<MangaSource>(
-        itemBuilder: (context) => allMangaSource
-            .map((el) => PopupMenuItem(
-          value: el,
-          child: Text(el.name),
-        ))
-            .toList(),
-        onSelected: (value) => this.setMangaSource(value),
+      MaxgaSourceSelectButton(
+        onSelect: (source) => this.setMangaSource(source),
       )
     ];
   }

@@ -36,24 +36,28 @@ class _HistToryPageState extends State<HistoryPage> {
         ],
       ),
       body: mangaHistoryList?.length != 0
-          ? ListView(
-              children: mangaHistoryList.map((item) {
-              MangaSource source = MangaRepoPool.getInstance()
-                  .getMangaSourceByKey(item.sourceKey);
-              return MangaListTile(
-                title: Text(item.title),
-                extra: MangaListTileExtra(
-                  manga: item,
-                  source: source,
-                ),
-                cover: MangaCoverImage(
-                  source: source,
-                  url: item.coverImgUrl,
-                  tagPrefix: widget.name,
-                ),
-                onTap: () => this.goMangaInfoPage(item),
-              );
-            }).toList())
+          ? ListView.separated(
+        itemCount: mangaHistoryList.length,
+        itemBuilder: (context, index) {
+          final item = mangaHistoryList[index];
+          MangaSource source = MangaRepoPool.getInstance()
+              .getMangaSourceByKey(item.sourceKey);
+          return MangaListTile(
+            title: Text(item.title),
+            extra: MangaListTileExtra(
+              manga: item,
+              source: source,
+            ),
+            cover: MangaCoverImage(
+              source: source,
+              url: item.coverImgUrl,
+              tagPrefix: widget.name,
+            ),
+            onTap: () => this.goMangaInfoPage(item),
+          );
+        },
+        separatorBuilder: (context, index) => Divider(color: Colors.black38,),
+      )
           : EmptyPage('暂无历史记录'),
     );
   }
