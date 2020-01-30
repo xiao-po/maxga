@@ -200,10 +200,10 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
         } else {
           if (state.type == _SourceViewType.latestUpdate) {
             return buildMangaCard(state.mangaList[index],
-                tagPrefix: '${index}state.title');
+                tagPrefix: '${state.type}${index}state.title');
           } else {
             return buildMangaCard(state.mangaList[index],
-                tagPrefix: '${index}state.title', rank: index + 1);
+                tagPrefix: '${state.type}${index}state.title', rank: index + 1);
           }
         }
       },

@@ -6,7 +6,6 @@ import 'package:maxga/model/manga/Chapter.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/model/maxga/ReadMangaStatus.dart';
-import 'package:maxga/model/maxga/MangaViewerPopResult.dart';
 import 'package:maxga/provider/CollectionProvider.dart';
 import 'package:maxga/provider/HistoryProvider.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
@@ -206,7 +205,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
             typeList: manga.typeList,
             lastUpdateChapter: chapterList[0])
     );
-    var result = await Navigator.push<MangaViewerPopResult>(
+    var result = await Navigator.push<ViewerReadProcess>(
         context,
         MaterialPageRoute(
             builder: (context) =>
@@ -216,9 +215,9 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
                   chapterList: chapterList,
                   initIndex: imagePage,
                 )));
-    if (result.loadOver) {
-      readMangaStatus.readChapterId = result.chapterId;
-      readMangaStatus.readImageIndex = result.mangaImageIndex;
+    if (result != null) {
+      readMangaStatus.readChapterId = result.chapter.id;
+      readMangaStatus.readImageIndex = result.pageIndex;
       await Future.wait([
         MangaStorageService.saveMangaStatus(readMangaStatus),
 
