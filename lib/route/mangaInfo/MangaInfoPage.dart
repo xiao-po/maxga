@@ -34,9 +34,8 @@ class MangaInfoPage extends StatefulWidget {
       {Key key,
       @required this.coverImageBuilder,
       @required this.sourceKey,
-      @required this.infoUrl}):
-        super(key: key);
-
+      @required this.infoUrl})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MangaInfoPageState();
@@ -52,13 +51,23 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   @override
   void initState() {
     super.initState();
-    _initInfo(
-      url: widget.infoUrl,
-      sourceKey: widget.sourceKey,);
-    source = MangaRepoPool.getInstance()
-        .getMangaSourceByKey(widget.sourceKey);
+    _initInfo(url: widget.infoUrl, sourceKey: widget.sourceKey).then((v) {
+      if (v != null) {
+        Provider.of<HistoryProvider>(context).addToHistory(
+            SimpleMangaInfo.fromMangaInfo(
+                sourceKey: manga.sourceKey,
+                author: manga.authors,
+                id: manga.id,
+                infoUrl: manga.infoUrl,
+                status: manga.status,
+                coverImgUrl: manga.coverImgUrl,
+                title: manga.title,
+                typeList: manga.typeList,
+                lastUpdateChapter: chapterList[0]));
+      }
+    });
+    source = MangaRepoPool.getInstance().getMangaSourceByKey(widget.sourceKey);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -109,26 +118,26 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     }
     return Scaffold(
         body: MangaInfoWrapper(
-          title: manga?.title ?? '',
-          appbarActions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.share, color: Colors.white),
-              onPressed: () => this.shareLink(),
-            )
-          ],
-          children: [
-            MangaInfoCover(
-              manga: manga,
-              loadEnd: loadOver,
-              lastUpdateChapter: manga?.chapterList?.first ?? Chapter(),
-              source: source,
-              coverImageBuilder: widget.coverImageBuilder,
-            ),
-            mangaInfoIntro,
-            mangaInfoChapter ?? Container(),
-          ],
-          bottomBar: mangaInfoBottomBar ?? Container(),
-        ));
+      title: manga?.title ?? '',
+      appbarActions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.share, color: Colors.white),
+          onPressed: () => this.shareLink(),
+        )
+      ],
+      children: [
+        MangaInfoCover(
+          manga: manga,
+          loadEnd: loadOver,
+          lastUpdateChapter: manga?.chapterList?.first ?? Chapter(),
+          source: source,
+          coverImageBuilder: widget.coverImageBuilder,
+        ),
+        mangaInfoIntro,
+        mangaInfoChapter ?? Container(),
+      ],
+      bottomBar: mangaInfoBottomBar ?? Container(),
+    ));
   }
 
   Row buildChapterLoading() {
@@ -159,18 +168,19 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     );
   }
 
-  Future<void> _initInfo({@required String sourceKey,
-    @required String url}) async {
+  Future<Manga> _initInfo(
+      {@required String sourceKey, @required String url}) async {
     MaxgaDataHttpRepo repo =
-    MangaRepoPool.getInstance().getRepo(key: sourceKey);
+        MangaRepoPool.getInstance().getRepo(key: sourceKey);
+    Manga manga;
     await Future.wait<dynamic>([
       Future.microtask(() async {
         try {
-          final Manga manga = await repo.getMangaInfo(url);
-          final Manga preMangaData = (await MangaStorageService.getMangaByUrl(
-              url)) ?? manga;
-          final ReadMangaStatus readMangaStatus = await MangaStorageService
-              .getMangaStatusByUrl(url);
+          manga = await repo.getMangaInfo(url);
+          final Manga preMangaData =
+              (await MangaStorageService.getMangaByUrl(url)) ?? manga;
+          final ReadMangaStatus readMangaStatus =
+              await MangaStorageService.getMangaStatusByUrl(url);
           final Manga resultMangaData = manga;
           chapterList = resultMangaData.chapterList;
           if (manga.chapterList.length > preMangaData.chapterList.length) {
@@ -182,6 +192,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
         } catch (e) {
           print(e);
           loading = _MangaInfoPageStatus.error;
+          this.manga = null;
         }
       }),
       Future.delayed(Duration(milliseconds: 500))
@@ -189,27 +200,14 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     if (mounted) {
       setState(() {});
     }
+    return manga;
   }
-  
 
   void enjoyMangaContent(Chapter chapter, {int imagePage = 0}) async {
-    Provider.of<HistoryProvider>(context).addToHistory(
-        SimpleMangaInfo.fromMangaInfo(
-            sourceKey: manga.sourceKey,
-            author: manga.authors,
-            id: manga.id,
-            infoUrl: manga.infoUrl,
-            status: manga.status,
-            coverImgUrl: manga.coverImgUrl,
-            title: manga.title,
-            typeList: manga.typeList,
-            lastUpdateChapter: chapterList[0])
-    );
     var result = await Navigator.push<ViewerReadProcess>(
         context,
         MaterialPageRoute(
-            builder: (context) =>
-                MangaViewer(
+            builder: (context) => MangaViewer(
                   manga: manga,
                   currentChapter: chapter,
                   chapterList: chapterList,
@@ -220,7 +218,6 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
       readMangaStatus.readImageIndex = result.pageIndex;
       await Future.wait([
         MangaStorageService.saveMangaStatus(readMangaStatus),
-
       ]);
       if (mounted) setState(() {});
     }
@@ -262,9 +259,9 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   collectManga() async {
     try {
       await Future.wait([
-        CollectionProvider.getInstance()
-            .setMangaCollectStatus(
-            manga, isCollected: !readMangaStatus.isCollect),
+        MangaStorageService.saveManga(manga),
+        CollectionProvider.getInstance().setMangaCollectStatus(manga,
+            isCollected: !readMangaStatus.isCollect),
       ]);
       readMangaStatus.isCollect = !readMangaStatus.isCollect;
       if (mounted) setState(() {});
@@ -276,10 +273,9 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     }
   }
 
-
   shareLink() async {
     MaxgaDataHttpRepo repo =
-    MangaRepoPool.getInstance().getRepo(key: widget.sourceKey);
+        MangaRepoPool.getInstance().getRepo(key: widget.sourceKey);
     String shareUrl = await repo.generateShareLink(manga);
     MaxgaUtils.shareUrl(shareUrl);
   }

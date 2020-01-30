@@ -1,10 +1,8 @@
 import 'package:extended_image/extended_image.dart';
 
 import 'package:flutter/material.dart';
-import 'package:maxga/model/manga/MangaSource.dart';
 
 import 'components/base/MangaExtendedPageView.dart';
-import 'MangaImage.dart';
 
 typedef MangaImageAnimationListener = void Function();
 

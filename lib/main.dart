@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:maxga/provider/CollectionProvider.dart';
 import 'package:maxga/provider/HistoryProvider.dart';
-import 'package:maxga/provider/IndexPageTypeProvider.dart';
 import 'package:maxga/provider/SettingProvider.dart';
-import 'package:maxga/route/index/IndexPage.dart';
+import 'package:maxga/route/collection/collection-page.dart';
 import 'package:provider/provider.dart';
 
-import 'base/drawer/menu-item.dart';
 import 'database/database-initializr.dart';
 
 void main() {
@@ -54,13 +52,6 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(
           create: (context) => CollectionProvider.getInstance(),
         ),
-//        ChangeNotifierProvider(
-//          builder: (context) => IndexPageTypeProvider(),
-//        ),
-        StreamProvider<MaxgaMenuItemType>(
-          create: (context) =>
-              IndexPageTypeProvider.getInstance().streamController.stream,
-        ),
         ChangeNotifierProvider(
           create: (context) => SettingProvider.getInstance(),
         ),
@@ -70,7 +61,7 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: IndexPage(),
+        home: CollectionPage(),
       ),
     );
   }

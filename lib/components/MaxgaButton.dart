@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:maxga/database/readMangaStatus.repo.dart';
 import 'package:maxga/provider/HistoryProvider.dart';
 import 'package:maxga/route/search/search-page.dart';
 import 'package:maxga/service/MangaReadStorage.service.dart';
@@ -51,6 +52,21 @@ class MaxgaDebuggerDeleteCacheButton extends StatelessWidget {
         ]);
         Scaffold.of(context).showSnackBar(SnackBar(content: const Text('删除完毕')));
 
+      },
+    );
+  }
+}
+
+class MaxgaTestButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: Icon(
+        Icons.details,
+      ),
+      onPressed: () async {
+        final value = await MangaReadStatusRepository.findAll();
+        print(value.length);
       },
     );
   }

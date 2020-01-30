@@ -1,17 +1,13 @@
-import 'dart:convert';
 
 import 'package:maxga/database/mangaData.repo.dart';
 import 'package:maxga/database/readMangaStatus.repo.dart';
-import 'package:maxga/model/manga/Chapter.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/maxga/ReadMangaStatus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MangaStorageService {
   static final String _key = 'manga_process_';
-  static List<ReadMangaStatus> _readMangaStatusList;
 
-  static List<ReadMangaStatus> _onDbReadMangaStatusList;
 
   static Future<bool> saveManga(Manga manga) async {
 
@@ -59,15 +55,15 @@ class MangaStorageService {
     return MangaDataRepository.findByUrlList(urlList);
   }
 
-  static Future<bool> setMangaCollectedStatus(Manga manga, {bool isCollect = true}) async {
+  static Future<bool> setMangaCollectedStatus(Manga manga, {bool isCollected = true}) async {
     ReadMangaStatus readMangaStatus = await MangaReadStatusRepository.findByUrl(manga.infoUrl);
     final isExist = readMangaStatus != null;
     if (isExist) {
-      return MangaReadStatusRepository.update(readMangaStatus..isCollect = isCollect);
+      return MangaReadStatusRepository.update(readMangaStatus..isCollect = isCollected);
     } else {
       return MangaReadStatusRepository.insert(ReadMangaStatus(
         infoUrl: manga.infoUrl,
-        isCollect: isCollect
+        isCollect: isCollected
       ));
     }
 

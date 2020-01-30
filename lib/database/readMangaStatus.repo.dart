@@ -67,4 +67,15 @@ class MangaReadStatusRepository {
       database: database,
     );
   }
+
+  static Future<List<ReadMangaStatus>> findAll({Database database}) async {
+    return MaxgaDataBaseUtils.openSearchTransaction<List<ReadMangaStatus>>(
+      action: (db) async {
+        final List<Map<String, dynamic>> result = await db.query(
+            MaxgaDatabaseTableValue.mangaReadStatus);
+        return result.length != 0 ? result.map((item) => ReadMangaStatusUtils.fromMangaReadStatusTable(item)).toList() : null;
+      },
+      database: database,
+    );
+  }
 }

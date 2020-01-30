@@ -1,21 +1,26 @@
 import 'dart:async';
+import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:maxga/base/drawer/menu-item.dart';
 import 'package:maxga/base/error/MaxgaHttpError.dart';
 import 'package:maxga/components/Card.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
-import 'package:maxga/components/MangaOutlineButton.dart';
+import 'package:maxga/components/MangaListTabView.dart';
 import 'package:maxga/components/MaxgaButton.dart';
+import 'package:maxga/components/dialog.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
-import 'package:maxga/route/error-page/ErrorPage.dart';
-import 'package:maxga/route/index/base/MangaListTabView.dart';
+import 'package:maxga/model/maxga/MaxgaReleaseInfo.dart';
+import 'package:maxga/route/drawer/drawer.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
-import 'package:maxga/service/MangaReadStorage.service.dart';
+import 'package:maxga/route/search/search-page.dart';
+import 'package:maxga/service/UpdateService.dart';
+import 'package:provider/provider.dart';
 
-import '../../../MangaRepoPool.dart';
+import '../../MangaRepoPool.dart';
+import 'error-page/error-page.dart';
 
 enum _SourceViewType {
   latestUpdate,
@@ -23,6 +28,7 @@ enum _SourceViewType {
 }
 
 enum _MangaSourceViewerPageLoadState { none, loading, over, error }
+
 
 class MangaSourceViewerPage {
   final MangaSource source;
@@ -40,7 +46,7 @@ class MangaSourceViewerPage {
 
   Future<List<SimpleMangaInfo>> getMangaList(int page) async {
     MaxgaDataHttpRepo repo =
-        MangaRepoPool.getInstance().getRepo(key: source.key);
+    MangaRepoPool.getInstance().getRepo(key: source.key);
     if (type == _SourceViewType.latestUpdate) {
       final mangaList = await repo.getLatestUpdate(page);
       debugPrint('更新列表已经加载完毕， 数量：${mangaList.length}');
@@ -57,15 +63,92 @@ class MangaSourceViewerPage {
   bool initOver = false;
 }
 
-class MangaSourceViewer extends StatefulWidget {
-  final name = 'MangaSourceViewer';
+
+class SourceViewerPage extends StatefulWidget {
+  final String name = 'index_page';
 
   @override
-  State<StatefulWidget> createState() => MangaSourceViewerState();
+  State<StatefulWidget> createState() => _SourceViewerPageState();
 }
 
-class MangaSourceViewerState extends State<MangaSourceViewer>
-    with SingleTickerProviderStateMixin {
+class _SourceViewerPageState extends State<SourceViewerPage>  with SingleTickerProviderStateMixin {
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
+
+
+  void showSnack(String message) {
+    scaffoldKey.currentState.showSnackBar(SnackBar(
+      content: Text(message),
+      duration: Duration(seconds: 2),
+    ));
+  }
+
+  toSearch() {
+    Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
+      return SearchPage();
+    }));
+  }
+
+
+  DateTime _lastPressedAt; //上次点击时间
+  Future<bool> onBack() async {
+    if (_lastPressedAt == null ||
+        DateTime.now().difference(_lastPressedAt) > Duration(seconds: 2)) {
+      //两次点击间隔超过1秒则重新计时
+      _lastPressedAt = DateTime.now();
+      showSnack('再按一次退出程序');
+      return false;
+    } else {
+      hiddenSnack();
+      await Future.delayed(Duration(milliseconds: 100));
+      return true;
+    }
+  }
+
+  void hiddenSnack() {
+    scaffoldKey.currentState.hideCurrentSnackBar();
+  }
+
+  checkUpdate() async {
+    try {
+      final nextVersion = await UpdateService.checkUpdateStatus();
+      if (nextVersion != null) {
+        final buttonPadding = const EdgeInsets.fromLTRB(15, 5, 15, 5);
+        scaffoldKey.currentState.showSnackBar(SnackBar(
+            duration: Duration(seconds: 3),
+            content: GestureDetector(
+              child: Padding(
+                padding: buttonPadding,
+                child: Text('有新版本更新, 点击查看'),
+              ),
+              onTap: () {
+                hiddenSnack();
+                openUpdateDialog(nextVersion);
+              },
+            ),
+            action: SnackBarAction(
+              label: '忽略',
+              textColor: Colors.greenAccent,
+              onPressed: () {
+                openUpdateDialog(nextVersion);
+              },
+            )));
+      }
+    } catch(e) {
+      debugPrint('检查更新失败');
+    }
+  }
+
+  openUpdateDialog(MaxgaReleaseInfo nextVersion) {
+    showDialog(
+        context: context,
+        builder: (context) => UpdateDialog(
+          text: nextVersion.description,
+          url: nextVersion.url,
+          onIgnore: () => UpdateService.ignoreUpdate(nextVersion),
+        ));
+  }
+
   _SourceViewType pageType = _SourceViewType.latestUpdate;
   TabController tabController;
   bool isPageCanChanged = true;
@@ -104,12 +187,13 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
+    final body  = Scaffold(
+      key: scaffoldKey,
+      drawer: MaxgaDrawer(
+        active: MaxgaMenuItemType.mangaSourceViewer,
+      ),
+      appBar: AppBar(
         title: Text(sourceName),
-        leading: IconButton(
-            icon: Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer()),
         actions: buildAppBarActions(),
         bottom:  TabBar(
           controller: tabController,
@@ -126,14 +210,19 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
         controller: this.tabController,
         children: tabs
             .map((state) => RefreshIndicator(
-                  onRefresh: () => refreshPage(state),
-                  child: Container(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    child: buildIndexBody(state),
-                  ),
-                ))
+          onRefresh: () => refreshPage(state),
+          child: Container(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            child: buildIndexBody(state),
+          ),
+        ))
             .toList(growable: false),
       ),
+    );
+
+    return WillPopScope(
+      child: body,
+      onWillPop: () => onBack(),
     );
   }
 
@@ -143,9 +232,9 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
       PopupMenuButton<MangaSource>(
         itemBuilder: (context) => allMangaSource
             .map((el) => PopupMenuItem(
-                  value: el,
-                  child: Text(el.name),
-                ))
+          value: el,
+          child: Text(el.name),
+        ))
             .toList(),
         onSelected: (value) => this.setMangaSource(value),
       )
@@ -159,12 +248,12 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
         case _MangaSourceViewerPageLoadState.loading:
           return Align(
               child: SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.black26)),
-          ));
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.black26)),
+              ));
           break;
         case _MangaSourceViewerPageLoadState.over:
           return buildMangaListView(state);
@@ -215,7 +304,7 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
       {String tagPrefix, int rank}) {
     final Color grayFontColor = Color(0xff9e9e9e);
     MangaSource source =
-        MangaRepoPool.getInstance().getMangaSourceByKey(mangaInfo.sourceKey);
+    MangaRepoPool.getInstance().getMangaSourceByKey(mangaInfo.sourceKey);
     Widget mangaCoverImage = MangaCoverImage(
       source: source,
       url: mangaInfo.coverImgUrl,
@@ -331,11 +420,10 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
     );
   }
 
-  toSearch() {}
 
   goMangaInfoPage(SimpleMangaInfo item, {String tagPrefix}) {
     MangaSource source =
-        MangaRepoPool.getInstance().getMangaSourceByKey(item.sourceKey);
+    MangaRepoPool.getInstance().getMangaSourceByKey(item.sourceKey);
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return MangaInfoPage(
         coverImageBuilder: (context) => MangaCoverImage(
@@ -350,52 +438,4 @@ class MangaSourceViewerState extends State<MangaSourceViewer>
     }));
   }
 
-  deleteUserData() {
-    MangaStorageService.clearStatus();
-//    Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
-//      return TestPage();
-//    }));
-  }
-
-  test() async {
-    final data = await MangaStorageService.getMangaStatusByUrl(
-        'http://v3api.dmzj.com/comic/comic_12393.json');
-    print(data.readChapterId);
-  }
-}
-
-class MangaSourceViewerErrorPage extends StatelessWidget {
-  final MangaHttpErrorType errorType;
-  final MangaSource source;
-  final VoidCallback onTap;
-
-  MangaSourceViewerErrorPage({this.errorType, this.source, this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    switch (this.errorType) {
-      case MangaHttpErrorType.NULL_PARAM:
-      case MangaHttpErrorType.ERROR_PARAM:
-        return ErrorPage('${source.name}接口参数错误，暂时无法提供服务\n'
-            '请等待更新或者联系作者');
-      case MangaHttpErrorType.RESPONSE_ERROR:
-        return ErrorPage(
-          '${source.name}接口请求失败，点击重试',
-          onTap: this.onTap,
-        );
-      case MangaHttpErrorType.CONNECT_TIMEOUT:
-        return ErrorPage(
-          '${source.name}接口请求超时，点击重试',
-          onTap: this.onTap,
-        );
-      case MangaHttpErrorType.PARSE_ERROR:
-        return ErrorPage(
-          '${source.name}接口解析失败，暂时无法提供服务\n'
-          '请等待更新或者联系作者',
-          onTap: this.onTap,
-        );
-      default:
-        return ErrorPage('未知错误，暂时无法使用');
-    }
-  }
 }

@@ -1,6 +1,4 @@
-import 'dart:convert';
 
-import 'package:maxga/model/manga/Manga.dart';
 
 import '../ReadMangaStatus.dart';
 

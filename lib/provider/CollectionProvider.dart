@@ -17,7 +17,6 @@ class CollectionProvider extends BaseProvider {
   bool get isEmpty => this._collectedMangaList?.length == 0 ?? true;
   bool _isOnUpdate = false;
 
-  final String _key = 'mangaCollectionList_';
 
   static CollectionProvider _instance;
 
@@ -96,13 +95,12 @@ class CollectionProvider extends BaseProvider {
 
   Future<bool> setMangaCollectStatus(Manga manga, {isCollected = true}) async {
     try {
-      final isSuccess = await MangaStorageService.setMangaCollectedStatus(manga,
-          isCollect: isCollected);
       if (isCollected) {
         this._collectedMangaList.add(manga);
       } else {
         this._collectedMangaList.removeWhere((item) => item.infoUrl == manga.infoUrl);
       }
+      await MangaStorageService.setMangaCollectedStatus(manga, isCollected: isCollected);
       notifyListeners();
       return true;
     } catch (e) {

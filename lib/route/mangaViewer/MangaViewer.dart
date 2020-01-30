@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_widgets/flutter_widgets.dart';
 import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/Utils/MaxgaUtils.dart';
 import 'package:maxga/base/setting/SettingValue.dart';
@@ -16,7 +15,6 @@ import 'package:maxga/route/mangaViewer/MangaImage.dart';
 import 'package:maxga/route/mangaViewer/components/base/MangaViewerFutureView.dart';
 import 'package:provider/provider.dart';
 
-import 'MangaImageListViewer.dart';
 import 'MangaStatusBar.dart';
 import 'MangaTab.dart';
 

@@ -45,9 +45,12 @@ class HistoryProvider extends BaseProvider {
   }
 
   Future<bool> addToHistory(SimpleMangaInfo manga) async {
-    final list = _items
+    var list = _items
       ..removeWhere((el) => el.id == manga.id)
       ..insert(0, manga);
+    if (list.length > 30) {
+      list = list.sublist(0, 29);
+    }
     final isSuccess = await LocalStorage.setStringList(
         _key, list.map((item) => item.infoUrl).toList());
 
