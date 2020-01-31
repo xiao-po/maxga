@@ -12,10 +12,9 @@ class MangaOutlineButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activeColor = Theme
-        .of(context)
-        .accentColor;
-    final disabledColor = Colors.black38;
+    var theme = Theme.of(context);
+    final activeColor = theme.accentColor;
+    final textColor = theme.hintColor;
     if (active) {
       return FlatButton(
         padding: EdgeInsets.all(0),
@@ -32,12 +31,12 @@ class MangaOutlineButton extends StatelessWidget {
     } else {
       var body = OutlineButton(
         padding: EdgeInsets.all(0),
-        textColor: disabledColor,
+        textColor: textColor,
         borderSide: BorderSide(
-          color: disabledColor,
+          color: textColor,
         ),
-        shape:
-        RoundedRectangleBorder(borderRadius: new BorderRadius.circular(5.0)),
+        shape: RoundedRectangleBorder(
+            borderRadius: new BorderRadius.circular(5.0)),
         child: SizedBox(
           width: 100,
           child: text,
@@ -47,9 +46,5 @@ class MangaOutlineButton extends StatelessWidget {
 
       return body;
     }
-
-
-
-
   }
 }

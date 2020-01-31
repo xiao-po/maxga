@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maxga/provider/CollectionProvider.dart';
 import 'package:maxga/provider/HistoryProvider.dart';
 import 'package:maxga/provider/SettingProvider.dart';
+import 'package:maxga/provider/ThemeProvider.dart';
 import 'package:maxga/route/collection/collection-page.dart';
 import 'package:provider/provider.dart';
 
@@ -27,6 +28,7 @@ class _MyAppState extends State<MyApp> {
         .then((v) => HistoryProvider.getInstance().init())
         .then((v) => CollectionProvider.getInstance().init())
         .then((v) => SettingProvider.getInstance().init())
+        .then((v) => ThemeProvider.getInstance().init())
         .then((v) {
       this.isInitOver = true;
       setState(() {});
@@ -55,12 +57,27 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(
           create: (context) => SettingProvider.getInstance(),
         ),
-      ],
-      child: MaterialApp(
-        title: 'Maxga First Version',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
+        ChangeNotifierProvider(
+          create: (context) => ThemeProvider.getInstance(),
         ),
+      ],
+      child: MaxGaApp(),
+    );
+  }
+}
+
+class MaxGaApp extends StatelessWidget {
+
+  const MaxGaApp({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) =>  MaterialApp(
+        title: 'Maxga First Version',
+        theme: themeProvider.theme,
         home: CollectionPage(),
       ),
     );

@@ -12,10 +12,12 @@ import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/model/maxga/MaxgaReleaseInfo.dart';
+import 'package:maxga/provider/HistoryProvider.dart';
 import 'package:maxga/route/drawer/drawer.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
 import 'package:maxga/route/search/search-page.dart';
 import 'package:maxga/service/UpdateService.dart';
+import 'package:provider/provider.dart';
 
 import '../../MangaRepoPool.dart';
 import 'error-page/error-page.dart';
@@ -183,6 +185,10 @@ class _SourceViewerPageState extends State<SourceViewerPage>  with SingleTickerP
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    var tabBarLabelColor = theme.brightness == Brightness.dark ? Colors.white : Colors.black87;
+    var tabBarIndicator = theme.brightness == Brightness.dark ? Colors.white24 : Colors.black38;
     final body  = Scaffold(
       key: scaffoldKey,
       drawer: MaxgaDrawer(
@@ -196,8 +202,8 @@ class _SourceViewerPageState extends State<SourceViewerPage>  with SingleTickerP
           color: Colors.white,
           tabBar: TabBar(
             controller: tabController,
-            labelColor: Colors.black87,
-            indicatorColor: Colors.black38,
+            labelColor: tabBarLabelColor,
+            indicatorColor: tabBarIndicator,
             unselectedLabelColor: Colors.grey,
             tabs: tabs
                 .map((item) => Tab(
@@ -416,19 +422,30 @@ class _SourceViewerPageState extends State<SourceViewerPage>  with SingleTickerP
   }
 
 
-  goMangaInfoPage(SimpleMangaInfo item, {String tagPrefix}) {
+  goMangaInfoPage(SimpleMangaInfo manga, {String tagPrefix}) {
+    Provider.of<HistoryProvider>(context).addToHistory(
+        SimpleMangaInfo.fromMangaInfo(
+            sourceKey: manga.sourceKey,
+            author: manga.authors,
+            id: manga.id,
+            infoUrl: manga.infoUrl,
+            status: manga.status,
+            coverImgUrl: manga.coverImgUrl,
+            title: manga.title,
+            typeList: manga.typeList,
+            lastUpdateChapter: manga.lastUpdateChapter));
     MangaSource source =
-    MangaRepoPool.getInstance().getMangaSourceByKey(item.sourceKey);
+    MangaRepoPool.getInstance().getMangaSourceByKey(manga.sourceKey);
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return MangaInfoPage(
         coverImageBuilder: (context) => MangaCoverImage(
           source: source,
-          url: item.coverImgUrl,
+          url: manga.coverImgUrl,
           tagPrefix: '$tagPrefix${widget.name}',
           fit: BoxFit.cover,
         ),
-        infoUrl: item.infoUrl,
-        sourceKey: item.sourceKey,
+        infoUrl: manga.infoUrl,
+        sourceKey: manga.sourceKey,
       );
     }));
   }

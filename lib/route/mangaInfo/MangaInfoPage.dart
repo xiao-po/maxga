@@ -51,21 +51,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   @override
   void initState() {
     super.initState();
-    _initInfo(url: widget.infoUrl, sourceKey: widget.sourceKey).then((v) {
-      if (v != null) {
-        Provider.of<HistoryProvider>(context).addToHistory(
-            SimpleMangaInfo.fromMangaInfo(
-                sourceKey: manga.sourceKey,
-                author: manga.authors,
-                id: manga.id,
-                infoUrl: manga.infoUrl,
-                status: manga.status,
-                coverImgUrl: manga.coverImgUrl,
-                title: manga.title,
-                typeList: manga.typeList,
-                lastUpdateChapter: chapterList[0]));
-      }
-    });
+    _initInfo(url: widget.infoUrl, sourceKey: widget.sourceKey);
     source = MangaRepoPool.getInstance().getMangaSourceByKey(widget.sourceKey);
   }
 

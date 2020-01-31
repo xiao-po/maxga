@@ -27,4 +27,6 @@ class LocalStorage {
     return prefs.remove('$_prefix$key');
   }
 
+
+
 }

@@ -15,33 +15,31 @@ class MangaInfoBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final iconActiveColor = theme.brightness == Brightness.dark ? Colors.orange : Colors.orangeAccent;
     return Container(
       decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(width: 1, color: Color(0xffeaeaea)))),
+          border: Border(top: BorderSide(width: 1, color: theme.dividerColor))),
       padding: EdgeInsets.only(left: 10, top: 2, bottom: 2, right: 30),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           FlatButton.icon(
               onPressed: onCollect,
-              icon: Icon(Icons.star_border, color: collected ? Colors.orangeAccent : Colors.black,),
+              icon: Icon(Icons.star_border, color: collected ? iconActiveColor : theme.hintColor,),
               label: const Text('收藏')),
-          buildResumeButton()
+          FlatButton(
+            onPressed: onResume,
+            textColor: Colors.white,
+            color: theme.accentColor,
+            shape:  RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(25.0)
+            ),
+            child: readed ? Text('  继续阅读  ') : Text('  开始阅读  '),
+          )
         ],
       ),
     );
   }
 
-  FlatButton buildResumeButton() {
-    return FlatButton(
-      onPressed: onResume,
-      textColor: Colors.white,
-      color: Colors.blueAccent,
-      shape:  RoundedRectangleBorder(
-          borderRadius: new BorderRadius.circular(25.0)
-      ),
-      child: readed ? Text('  继续阅读  ') : Text('  开始阅读  '),
-    );
-  }
 }

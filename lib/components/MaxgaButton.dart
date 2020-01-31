@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:maxga/database/readMangaStatus.repo.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/provider/HistoryProvider.dart';
+import 'package:maxga/provider/ThemeProvider.dart';
 import 'package:maxga/route/search/search-page.dart';
 import 'package:maxga/service/MangaReadStorage.service.dart';
 import 'package:provider/provider.dart';
@@ -68,8 +69,11 @@ class MaxgaTestButton extends StatelessWidget {
         Icons.details,
       ),
       onPressed: () async {
-        final value = await MangaReadStatusRepository.findAll();
-        print(value.length);
+        Provider.of<ThemeProvider>(context).changeBrightness();
+        Future.microtask(() {
+
+          print(Theme.of(context).primaryColor);
+        });
       },
     );
   }

@@ -361,9 +361,9 @@ class _MangaViewerState extends State<MangaViewer> {
       updateFutureViewVisitable();
     } else {
       if (details.localPosition.dx / width < 0.33) {
-        changePage(pageIndex - 1);
+        goPreviousPage();
       } else if (details.localPosition.dx / width > 0.66) {
-        changePage(pageIndex + 1);
+        goNextPage();
       }
     }
   }
@@ -394,22 +394,37 @@ class _MangaViewerState extends State<MangaViewer> {
     ));
   }
 
-  changePage(int min, [int max]) async {
-    if (max == null) {
-      max = min;
-    }
-    var action = checkChapterChange(min, max);
+  goNextPage() {
+    int target = pageIndex + 1;
+    var action = checkIndexStatus(pageIndex, pageIndex);
     bool canJump = true;
-    if (action == _ChangeChapterAction.firstImage && min < pageIndex) {
+    if (action == _ChangeChapterAction.lastImage) {
       canJump = false;
-    } else if (action == _ChangeChapterAction.lastImage && max > pageIndex) {
-      canJump = false;
+      toastMessage('已经是最后一页了', TextAlign.right);
     }
     if (canJump) {
+      changePage(target);
+    }
+  }
+  
+  goPreviousPage() {
+    int target = pageIndex - 1;
+    var action = checkIndexStatus(pageIndex, pageIndex);
+    bool canJump = true;
+    if (action == _ChangeChapterAction.firstImage) {
+      canJump = false;
+      toastMessage('已经是第一页了');
+    }
+    if (canJump) {
+      changePage(target);
+    }
+  }
+
+  changePage(int target) async {
+    if (mounted) {
       setState(() {
-        pageIndex = min;
-        pageController.jumpToPage(min);
-//        itemScrollController.jumpTo(index: min);
+        pageIndex = target;
+        pageController.jumpToPage(target);
       });
     }
   }
@@ -446,7 +461,7 @@ class _MangaViewerState extends State<MangaViewer> {
         pageIndex = min;
       });
     }
-    var act = checkChapterChange(min, max);
+    var act = checkIndexStatus(min, max);
     Key fireKey = pageKey;
     switch (act) {
       case _ChangeChapterAction.loadNextChapter:
@@ -604,7 +619,7 @@ class _MangaViewerState extends State<MangaViewer> {
   }
 
 
-  _ChangeChapterAction checkChapterChange(int min,int max) {
+  _ChangeChapterAction checkIndexStatus(int min,int max) {
     if (nextChapter == null && max == (imagePageUrlList.length - 1)) {
       return _ChangeChapterAction.lastImage;
     } else if (preChapter == null && min == 0) {

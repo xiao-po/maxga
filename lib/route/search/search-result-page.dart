@@ -5,6 +5,7 @@ import 'package:maxga/components/Card.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
+import 'package:maxga/provider/HistoryProvider.dart';
 import 'package:maxga/provider/SettingProvider.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoCover.dart';
 import 'package:maxga/route/mangaInfo/MangaInfoPage.dart';
@@ -106,18 +107,29 @@ class _SearchResultPageState extends State<SearchResultPage> {
     );
   }
 
-  goMangaInfoPage(SimpleMangaInfo item) {
+  goMangaInfoPage(SimpleMangaInfo manga) {
+    Provider.of<HistoryProvider>(context).addToHistory(
+        SimpleMangaInfo.fromMangaInfo(
+            sourceKey: manga.sourceKey,
+            author: manga.authors,
+            id: manga.id,
+            infoUrl: manga.infoUrl,
+            status: manga.status,
+            coverImgUrl: manga.coverImgUrl,
+            title: manga.title,
+            typeList: manga.typeList,
+            lastUpdateChapter: manga.lastUpdateChapter));
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return MangaInfoPage(
         coverImageBuilder: (context) => MangaCoverImage(
           source:
-              MangaRepoPool.getInstance().getMangaSourceByKey(item.sourceKey),
-          url: item.coverImgUrl,
+              MangaRepoPool.getInstance().getMangaSourceByKey(manga.sourceKey),
+          url: manga.coverImgUrl,
           tagPrefix: '${widget.name}${searchTime.toIso8601String()}',
           fit: BoxFit.cover,
         ),
-        sourceKey: item.sourceKey,
-        infoUrl: item.infoUrl,
+        sourceKey: manga.sourceKey,
+        infoUrl: manga.infoUrl,
       );
     }));
   }

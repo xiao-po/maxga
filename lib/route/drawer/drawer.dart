@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maxga/base/drawer/menu-item.dart';
 import 'package:maxga/constant/DrawerValue.dart';
+import 'package:maxga/provider/ThemeProvider.dart';
 import 'package:maxga/route/collection/collection-page.dart';
 import 'package:maxga/route/source-viewer/source-viewer.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +23,7 @@ class MaxgaDrawer extends StatefulWidget {
 class MaxgaDrawerState extends State<MaxgaDrawer> {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final list = DrawerMenuList.map((menuItem) => ListTile(
         title: Text(menuItem.title),
         leading: Icon(menuItem.icon),
@@ -39,7 +41,11 @@ class MaxgaDrawerState extends State<MaxgaDrawer> {
                 child: ListView(
                   children: list,
                 ),
-              ))
+              )),
+          ListTile(
+            title: const Text('夜间模式'),
+            trailing: Switch(value: theme.brightness == Brightness.dark, onChanged: (v) => Provider.of<ThemeProvider>(context).changeBrightness(),),
+          )
         ],
       ),
     );

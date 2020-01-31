@@ -60,9 +60,10 @@ class _MangaInfoChapterState extends State<MangaInfoChapter> {
   }
 
   Widget buildChapterStatus({String status}) {
+    final theme = Theme.of(context);
     final Color textColor = Color(0xff7b7b7b);
     final TextStyle textStyle = TextStyle(color: textColor);
-    final TextStyle highlightTextStyle = TextStyle(color: Colors.lightBlue);
+    final TextStyle highlightTextStyle = TextStyle(color: theme.accentColor);
     return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[

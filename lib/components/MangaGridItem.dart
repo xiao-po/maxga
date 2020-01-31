@@ -23,8 +23,6 @@ class MangaGridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future.microtask(
-        () => print('${context.size.height}  ${context.size.width}'));
     var gridCover = buildCover();
     if (manga.hasUpdate) {
       gridCover = Stack(fit: StackFit.expand,children: <Widget>[gridCover, buildHasUpdateIcon()]);
@@ -63,14 +61,13 @@ class MangaGridItem extends StatelessWidget {
                     style: TextStyle(
                         fontSize: 12,
                         textBaseline: TextBaseline.alphabetic,
-                        color: Colors.black45)),
+                    )),
               ),
               Text(source.name,
                   textAlign: TextAlign.left,
                   style: TextStyle(
                       fontSize: 12,
-                      textBaseline: TextBaseline.alphabetic,
-                      color: Colors.black45))
+                      textBaseline: TextBaseline.alphabetic))
             ],
           ),
         ],

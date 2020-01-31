@@ -12,7 +12,7 @@ class ColoredTabBar extends Container implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    color: color,
+    color: Theme.of(context).scaffoldBackgroundColor,
     child: tabBar,
   );
 }
