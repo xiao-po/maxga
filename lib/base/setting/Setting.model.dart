@@ -9,12 +9,14 @@ class MaxgaSettingItem {
   final String subTitle;
   final String description;
   final MaxgaSettingCategoryType category;
-  String value;
+  final bool hidden;
+  final String value;
 
-  MaxgaSettingItem(
+  const MaxgaSettingItem(
       {@required this.type,
       @required this.key,
       this.subTitle,
+      this.hidden = false,
       this.description,
       @required this.category,
       this.value,
@@ -30,13 +32,18 @@ class MaxgaSettingItem {
 //  }
 
   MaxgaSettingItem copy() {
+    return this.copyWith();
+  }
+
+  MaxgaSettingItem copyWith({String value, bool hidden}) {
     return MaxgaSettingItem(
         key: key,
         title: title,
         type: type,
+        hidden: hidden ?? this.hidden,
         subTitle: subTitle,
         description: description,
         category: category,
-        value: value);
+        value: value ?? this.value);
   }
 }

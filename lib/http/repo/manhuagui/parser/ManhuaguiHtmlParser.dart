@@ -49,7 +49,7 @@ class ManhuaguiHtmlParser {
           infoEl.children[4].querySelector('dd').innerHtml;
 
       final lastUpdateTime = DateUtils.convertTimeStringToTimestamp(
-          infoEl.children[5].querySelector('dd').innerHtml, 'yyyy-MM-dd');
+          infoEl.children[5].querySelector('dd').innerHtml, 'YYYY-MM-dd');
 
       Chapter lastUpdateChapter = Chapter();
       lastUpdateChapter.updateTime = lastUpdateTime;
@@ -82,7 +82,7 @@ class ManhuaguiHtmlParser {
         contList.children[1].querySelector('dd').innerHtml;
 
     final lastUpdateTime = DateUtils.convertTimeStringToTimestamp(
-        contList.children[2].querySelector('dd').innerHtml, 'yyyy-MM-dd');
+        contList.children[2].querySelector('dd').innerHtml, 'YYYY-MM-dd');
 
     final authors = contList.children[3].querySelector('dd').text.split(',');
     final typeList = contList.children[4].querySelector('dd').text.split(',');

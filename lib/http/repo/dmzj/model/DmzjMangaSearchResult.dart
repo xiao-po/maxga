@@ -86,10 +86,8 @@ class DmzjMangaSearchResult {
         id: id,
         infoUrl: '${DmzjMangaSource.apiDomain}/comic/comic_$id.json',
         coverImgUrl: cover,
-        title: lastName,
+        title: title,
         lastUpdateChapter: latestChapter,
         typeList: types.split('/'));
   }
-
-
 }

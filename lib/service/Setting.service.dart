@@ -9,18 +9,17 @@ class SettingService {
   static Future<List<MaxgaSettingItem>> getInitValue() async {
     final List<MaxgaSettingItem> settingList = [];
 
-    for (var item in SettingItemList) {
-      final settingItem = item.copy();
-      final value = await LocalStorage.getString('$_key${SettingTypeNameList[item.key]}');
-      settingItem.value = value ?? item.value;
+    for (MaxgaSettingItem item in SettingItemListValue.value) {
+      final v = await LocalStorage.getString('$_key${item.key.toString()}');
+      final MaxgaSettingItem settingItem = item.copyWith(value: v);
       settingList.add(settingItem);
     }
     return settingList;
   }
 
   static Future<bool> resetAllValue() async {
-    for (var item in SettingItemList) {
-      await LocalStorage.clearItem('$_key${SettingTypeNameList[item.key]}');
+    for (var item in SettingItemListValue.value) {
+      await LocalStorage.clearItem('$_key${item.key.toString()}');
     }
     return true;
   }

@@ -53,7 +53,7 @@ class HanhanHtmlParser {
         mangaTextInfoEl.children[4].text.replaceFirst('状态：', '').split(' ');
     final time = DateUtils.convertTimeStringToTimestamp(
         mangaTextInfoEl.children[5].text.replaceFirst('更新日期：', ''),
-        'yyyy-MM-dd');
+        'YYYY-MM-dd');
 
     final intro = document
         .querySelector('#detail_block')
@@ -123,7 +123,7 @@ class HanhanHtmlParser {
       authors = mangaInfoEl.children[1].innerHtml.split(' ');
       type = [mangaInfoEl.children[2].innerHtml];
       time = DateUtils.convertTimeStringToTimestamp(
-          mangaInfoEl.children[4].text, 'yyyy-MM-dd hh:mm');
+          mangaInfoEl.children[4].text, 'YYYY-MM-dd HH:mm');
       lastChapterTitle = el.querySelector('.tool').children[1].innerHtml;
     } else {
       var temp = mangaInfoEl.children[0].innerHtml;

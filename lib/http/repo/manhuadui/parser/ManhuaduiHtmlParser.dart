@@ -124,7 +124,7 @@ class ManhuaduiHtmlParser {
     final List<String> types = mangaInfoNode.children[2].text.trim().split('|');
     final String timeString = mangaInfoNode.children[3].text.trim();
     final int timestamp =
-        DateUtils.convertTimeStringToTimestamp(timeString, 'yyyy-MM-dd hh:mm');
+        DateUtils.convertTimeStringToTimestamp(timeString, 'YYYY-MM-dd HH:mm');
 
     final lastChapterName = el.children[2].text;
     final lastChapter = Chapter()..title = lastChapterName;
@@ -220,7 +220,7 @@ class ManhuaduiHtmlParser {
       final mangaTypeList = infoNode.children[2].text.split('|');
       final mangaUpdateTime = DateUtils.convertTimeStringToTimestamp(
           infoNode.children[3].querySelector('.date').innerHtml,
-          'yyyy-MM-dd hh:mm');
+          'YYYY-MM-dd HH:mm');
 
       Chapter lastChapter = Chapter();
       lastChapter.title = '';
@@ -259,7 +259,7 @@ class ManhuaduiHtmlParser {
     final statusString = otherInfoEl.children[2].text.trim();
     final status = statusString.substring(statusString.lastIndexOf(' ') + 1);
     final time = DateUtils.convertTimeStringToTimestamp(
-        otherInfoEl.children[4].children[1].innerHtml, 'yyyy-MM-dd hh:mm');
+        otherInfoEl.children[4].children[1].innerHtml, 'YYYY-MM-dd HH:mm');
 
     final intro = bodyEl.querySelector('.txtDesc').innerHtml;
     final chapterListEl = bodyEl
@@ -307,7 +307,7 @@ class ManhuaduiHtmlParser {
     final List<String> types = mangaInfoNode.children[2].text.trim().split('|');
     final String timeString = mangaInfoNode.children[3].text.trim();
     final int timestamp =
-        DateUtils.convertTimeStringToTimestamp(timeString, 'yyyy-MM-dd hh:mm');
+        DateUtils.convertTimeStringToTimestamp(timeString, 'YYYY-MM-dd HH:mm');
 
     final lastChapterName = comicNode.children[2].text;
     final lastChapter = Chapter()..title = lastChapterName;
@@ -340,7 +340,7 @@ class ManhuaduiHtmlParser {
 //    final types = itemTxtEl.children[2].children[1].innerHtml.split('|');
 //    final updateTime = DateUtils.convertTimeStringToTimestamp(
 //        itemTxtEl.children[3].children[1].innerHtml
-//        , 'yyyy-MM-dd hh:mm'
+//        , 'YYYY-MM-dd HH:mm'
 //    );
 //    final updateEl = el.querySelector('.coll');
 //    final lastChapterTitle = updateEl.innerHtml;
@@ -381,7 +381,7 @@ Manga getMangaInfo(String body) {
   final types = otherInfoEl.children[1].text.split(' | ');
   final status = otherInfoEl.children[2].text.split(' ')[2];
   final time = DateUtils.convertTimeStringToTimestamp(
-      otherInfoEl.children[4].children[1].innerHtml, 'yyyy-MM-dd hh:mm');
+      otherInfoEl.children[4].children[1].innerHtml, 'YYYY-MM-dd HH:mm');
 
   final intro = bodyEl.querySelector('.txtDesc').innerHtml;
   final chapterListEl = bodyEl

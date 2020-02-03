@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:maxga/provider/CollectionProvider.dart';
-import 'package:maxga/provider/HistoryProvider.dart';
-import 'package:maxga/provider/SettingProvider.dart';
-import 'package:maxga/provider/ThemeProvider.dart';
-import 'package:maxga/route/collection/collection-page.dart';
+import 'package:maxga/provider/public/CollectionProvider.dart';
+import 'package:maxga/provider/public/HistoryProvider.dart';
+import 'package:maxga/provider/public/SettingProvider.dart';
+import 'package:maxga/provider/public/ThemeProvider.dart';
+import 'package:maxga/route/android/collection/collection-page.dart';
 import 'package:provider/provider.dart';
 
 import 'database/database-initializr.dart';
@@ -23,7 +23,6 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-
     MaxgaDatabaseInitializr.initDataBase()
         .then((v) => HistoryProvider.getInstance().init())
         .then((v) => CollectionProvider.getInstance().init())

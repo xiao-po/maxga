@@ -6,12 +6,14 @@ class DateUtils {
         resultTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
       }
       var result = template;
-      result = result.replaceAll('yyyy', '${resultTime.year}');
+      result = result.replaceAll('YYYY', '${resultTime.year}');
       result = result.replaceAll('MM', '${resultTime.month < 10 ? '0${resultTime.month}' : resultTime.month}');
       result = result.replaceAll('dd', '${resultTime.day < 10 ? '0${resultTime.day}' : resultTime.day}');
-      result = result.replaceAll('hh', '${resultTime.hour}');
-      result = result.replaceAll('mm', '${resultTime.minute}');
-      result = result.replaceAll('ss', '${resultTime.second}');
+      result = result.replaceAll('HH', '${resultTime.hour < 10 ? '0${resultTime.hour}' : resultTime.day}}');
+      final int hh = resultTime.hour - 12 > 0 ? resultTime.hour - 12 : resultTime.hour;
+      result = result.replaceAll('hh', '${hh < 10 ? '0${resultTime.hour}' : hh}}');
+      result = result.replaceAll('mm', '${resultTime.minute < 10 ? '0${resultTime.minute}' : resultTime.minute}}');
+      result = result.replaceAll('ss', '${resultTime.second < 10 ? '0${resultTime.second}' : resultTime.second}}');
       return result;
     } catch(e) {
 
@@ -21,7 +23,7 @@ class DateUtils {
 
   static int convertTimeStringToTimestamp(String time, String template) {
     try {
-      int yearTemplateIndex = template.indexOf('yyyy');
+      int yearTemplateIndex = template.indexOf('YYYY');
       int yearValue = yearTemplateIndex >= 0 ? int.parse(
           time.substring(yearTemplateIndex, yearTemplateIndex + 4)
       ) : 0;
@@ -34,7 +36,7 @@ class DateUtils {
           time.substring(dayTemplateIndex, dayTemplateIndex + 2)
       ) : 1;
 
-      int hourTemplateIndex = template.indexOf('hh');
+      int hourTemplateIndex = template.indexOf('HH');
       int hourValue = hourTemplateIndex >= 0 ? int.parse(
           time.substring(hourTemplateIndex, hourTemplateIndex + 2)
       ) : 0;

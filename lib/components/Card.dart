@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maxga/Utils/DateUtils.dart';
 import 'package:maxga/components/skeleton.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
@@ -10,7 +11,7 @@ class MangaListTile extends StatelessWidget {
   final GestureLongPressCallback onLongPress;
   final Widget cover;
   final Widget title;
-  final List<MangaLabel> labels;
+  final List<Widget> labels;
   final CoverBuilder coverBuilder;
   final Widget extra;
 
@@ -37,7 +38,12 @@ class MangaListTile extends StatelessWidget {
     final double coverWidth = 100;
     final double coverHorizonPadding = (itemHeight - coverWidth) / 2;
     var edgeInsets = EdgeInsets.only(top: 0, left: 10);
-    var bodyColumn = <Widget>[title];
+    var bodyColumn = <Widget>[
+      Padding(
+        padding: EdgeInsets.only(bottom: 8),
+        child: title,
+      )
+    ];
     if (labels != null && labels.length > 0) {
       bodyColumn.addAll(labels);
     }
@@ -101,38 +107,38 @@ class MangaListTile extends StatelessWidget {
     );
   }
 }
-
-class MangaLabel extends StatelessWidget {
-  final Widget text;
-  final IconData icon;
-
-  const MangaLabel({Key key, this.text, this.icon}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    var containerPadding = EdgeInsets.only(top: 5);
-    return Container(
-      padding: containerPadding,
-      child: Row(
-        children: <Widget>[
-          buildMangaInfoIcon(icon),
-          Text(' '),
-          Expanded(
-            child: text,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Icon buildMangaInfoIcon(IconData icon) {
-    return Icon(
-      icon,
-      size: 16,
-      color: Color(0xffffac38),
-    );
-  }
-}
+//
+//class MangaLabel extends StatelessWidget {
+//  final Widget text;
+//  final IconData icon;
+//
+//  const MangaLabel({Key key, this.text, this.icon}) : super(key: key);
+//
+//  @override
+//  Widget build(BuildContext context) {
+//    var containerPadding = EdgeInsets.only(top: 5);
+//    return Container(
+//      padding: containerPadding,
+//      child: Row(
+//        children: <Widget>[
+//          buildMangaInfoIcon(icon),
+//          Text(' '),
+//          Expanded(
+//            child: text,
+//          ),
+//        ],
+//      ),
+//    );
+//  }
+//
+//  Icon buildMangaInfoIcon(IconData icon) {
+//    return Icon(
+//      icon,
+//      size: 16,
+//      color: Color(0xffffac38),
+//    );
+//  }
+//}
 
 class MangaExtra extends StatelessWidget {
   final Widget body;
@@ -160,6 +166,26 @@ class MangaExtra extends StatelessWidget {
   }
 }
 
+class MangaListTileLabel extends StatelessWidget {
+  final String text;
+  final Color textColor;
+
+  const MangaListTileLabel({Key key, this.text, this.textColor = Colors.grey}) : super(key: key);
+
+
+  @override
+  Widget build(BuildContext context) {
+    final extraTextStyle = TextStyle(fontSize: 13, color: textColor);
+    return Padding(
+        padding: EdgeInsets.only(top: 3, bottom: 3),
+        child:
+        Text(text, softWrap: false,
+            overflow: TextOverflow.fade,
+            style: extraTextStyle),
+    );
+  }
+}
+
 class MangaListTileExtra extends StatelessWidget {
   final SimpleMangaInfo manga;
   final MangaSource source;
@@ -168,7 +194,7 @@ class MangaListTileExtra extends StatelessWidget {
   const MangaListTileExtra({
     Key key,
     this.manga,
-    this.textColor,
+    this.textColor = Colors.grey,
     @required this.source,
   }) : super(key: key);
 
@@ -176,8 +202,7 @@ class MangaListTileExtra extends StatelessWidget {
   Widget build(BuildContext context) {
     final textStyle = TextStyle(color: textColor);
     final updateTime = manga.lastUpdateChapter.updateTime != null
-        ? this.convertTimeToYYYYMMDD(DateTime.fromMillisecondsSinceEpoch(
-            manga.lastUpdateChapter.updateTime))
+        ? DateUtils.formatTime(timestamp: manga.lastUpdateChapter.updateTime, template: 'YYYY-MM-dd')
         : '';
     var bottomText;
     if (manga.lastUpdateChapter != null) {
@@ -203,9 +228,6 @@ class MangaListTileExtra extends StatelessWidget {
     );
   }
 
-  String convertTimeToYYYYMMDD(DateTime dateTime) {
-    return '${dateTime.year}-${dateTime.month}-${dateTime.day}';
-  }
 }
 
 class SkeletonCardSliverList extends StatelessWidget {
