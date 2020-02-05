@@ -12,24 +12,16 @@ class MaxgaSettingItem {
   final bool hidden;
   final String value;
 
-  const MaxgaSettingItem(
-      {@required this.type,
-      @required this.key,
-      this.subTitle,
-      this.hidden = false,
-      this.description,
-      @required this.category,
-      this.value,
-      @required this.title});
-
-//  MaxgaSettingItem.formJson(Map<String, dynamic> settingItem) {
-//    type = settingItem['name'];
-//    title = settingItem['title'];
-//    subTitle = settingItem['subTitle'];
-//    description = settingItem['description'];
-//    category = settingItem['category'];
-//    value = settingItem['value'];
-//  }
+  const MaxgaSettingItem({@required this.type,
+    @required this.key,
+    this.subTitle,
+    this.hidden = false,
+    this.description,
+    @required this.category,
+    this.value,
+    @required this.title})
+      :
+        assert(type != null);
 
   MaxgaSettingItem copy() {
     return this.copyWith();
@@ -46,4 +38,29 @@ class MaxgaSettingItem {
         category: category,
         value: value ?? this.value);
   }
+}
+
+class MaxgaSettingPageItem extends MaxgaSettingItem {
+
+  final WidgetBuilder pageBuilder;
+
+  MaxgaSettingPageItem( {
+    @required MaxgaSettingItemType key,
+    String title,
+    String subTitle,
+    String description,
+    @required MaxgaSettingCategoryType category,
+    bool hidden,
+    String value,
+
+    this.pageBuilder,
+  }): super(
+      key: key,
+      title: title,
+      type: MaxgaSettingListTileType.page,
+      hidden: hidden,
+      subTitle: subTitle,
+      description: description,
+      category: category,
+      value: value);
 }

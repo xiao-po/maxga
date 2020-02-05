@@ -8,7 +8,7 @@ import '../collection/collection-page.dart';
 import '../source-viewer/source-viewer.dart';
 import 'about/about-page.dart';
 import 'history/history-page.dart';
-import 'setting/Setting-page.dart';
+import 'setting/setting-page.dart';
 
 class MaxgaDrawer extends StatefulWidget {
   final MaxgaMenuItemType active;

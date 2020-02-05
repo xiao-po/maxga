@@ -2,27 +2,26 @@ import 'package:flutter/cupertino.dart';
 
 typedef MangaSourceProxyReplaceCallback = String Function(String url);
 
-
-
 class MangaSource {
-  String name;
-  String domain;
-  String apiDomain;
-  String key;
-  String proxyDomain;
-  String iconUrl;
+  final String name;
+  final String domain;
+  final String apiDomain;
+  final String key;
+  final String proxyDomain;
+  final String iconUrl;
+
   // todo Proxy 功能搁置
-  MangaSourceProxyReplaceCallback proxyReplaceCallback;
+  final MangaSourceProxyReplaceCallback proxyReplaceCallback;
 
-  Map<String, String> headers;
+  final Map<String, String> headers;
 
-
-  MangaSource(
+  const MangaSource(
       {@required this.name,
       @required this.key,
-      @required  this.iconUrl,
-        this.proxyDomain,
+      @required this.iconUrl,
+      this.proxyDomain,
       this.headers,
-      proxyReplaceCallback,
-      @required this.apiDomain, @required this.domain});
+      this.proxyReplaceCallback,
+      @required this.apiDomain,
+      @required this.domain});
 }

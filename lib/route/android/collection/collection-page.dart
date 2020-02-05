@@ -6,6 +6,7 @@ import 'package:maxga/base/drawer/menu-item.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/components/MangaGridItem.dart';
 import 'package:maxga/components/MaxgaButton.dart';
+import 'package:maxga/components/base/WillExitScope.dart';
 import 'package:maxga/components/dialog.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/maxga/MaxgaReleaseInfo.dart';
@@ -44,32 +45,25 @@ class _CollectionPageState extends State<CollectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      child: Scaffold(
-        drawer: MaxgaDrawer(
-          active: MaxgaMenuItemType.collect,
-        ),
-        appBar: AppBar(
-          title: const Text('收藏'),
-          actions: <Widget>[
-            MaxgaSearchButton(),
-//            MaxgaTestButton(),
-          ],
-        ),
-        key: scaffoldKey,
-        body: buildBody(),
+    return Scaffold(
+      drawer: MaxgaDrawer(
+        active: MaxgaMenuItemType.collect,
       ),
-      onWillPop: () => onBack(),
+      appBar: AppBar(
+        title: const Text('收藏'),
+        actions: <Widget>[
+          MaxgaSearchButton(),
+//            MaxgaTestButton(),
+        ],
+      ),
+      key: scaffoldKey,
+      body: WillExitScope(
+        child: buildBody(),
+      ),
     );
   }
 
 
-  void showSnack(String message) {
-    scaffoldKey.currentState.showSnackBar(SnackBar(
-      content: Text(message),
-      duration: Duration(seconds: 2),
-    ));
-  }
 
   toSearch() {
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
@@ -77,21 +71,6 @@ class _CollectionPageState extends State<CollectionPage> {
     }));
   }
 
-
-  DateTime _lastPressedAt; //上次点击时间
-  Future<bool> onBack() async {
-    if (_lastPressedAt == null ||
-        DateTime.now().difference(_lastPressedAt) > Duration(seconds: 2)) {
-      //两次点击间隔超过1秒则重新计时
-      _lastPressedAt = DateTime.now();
-      showSnack('再按一次退出程序');
-      return false;
-    } else {
-      hiddenSnack();
-      await Future.delayed(Duration(milliseconds: 100));
-      return true;
-    }
-  }
 
   void hiddenSnack() {
     scaffoldKey.currentState.hideCurrentSnackBar();

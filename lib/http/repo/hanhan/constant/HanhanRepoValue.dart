@@ -1,10 +1,9 @@
 
 import 'package:maxga/model/manga/MangaSource.dart';
-
-// ignore: non_constant_identifier_names
-final HanhanMangaSource = MangaSource(
+const HanhanMangaSourceKey = 'hanhan';
+const HanhanMangaSource = const MangaSource(
     name: '汗汗漫画',
-    key: 'hanhan',
+    key: HanhanMangaSourceKey,
     domain: 'http://hanhan.xiaopo.moe',
     apiDomain: 'http://hanhan.xiaopo.moe',
     proxyDomain: 'http://hanhan.xiaopo.moe',

@@ -16,11 +16,11 @@ import 'package:maxga/components/MangaPageView.dart';
 /// [children] list and the length of the [TabBar.tabs] list.
 ///
 /// To see a sample implementation, visit the [TabController] documentation.
-class MangaListTabBarView extends StatefulWidget {
+class MaxgaTabBarView extends StatefulWidget {
   /// Creates a page view with one child per tab.
   ///
   /// The length of [children] must be the same as the [controller]'s length.
-  const MangaListTabBarView({
+  const MaxgaTabBarView({
     Key key,
     @required this.children,
     this.controller,
@@ -57,12 +57,12 @@ class MangaListTabBarView extends StatefulWidget {
   final DragStartBehavior dragStartBehavior;
 
   @override
-  _MangaListTabBarViewState createState() => _MangaListTabBarViewState();
+  _MaxgaTabBarViewState createState() => _MaxgaTabBarViewState();
 }
 
 final PageScrollPhysics _kTabBarViewPhysics = const PageScrollPhysics().applyTo(const ClampingScrollPhysics());
 
-class _MangaListTabBarViewState extends State<MangaListTabBarView> {
+class _MaxgaTabBarViewState extends State<MaxgaTabBarView> {
   TabController _controller;
   PageController _pageController;
   List<Widget> _children;
@@ -115,7 +115,7 @@ class _MangaListTabBarViewState extends State<MangaListTabBarView> {
   }
 
   @override
-  void didUpdateWidget(MangaListTabBarView oldWidget) {
+  void didUpdateWidget(MaxgaTabBarView oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.controller != oldWidget.controller)
       _updateTabController();

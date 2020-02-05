@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maxga/base/setting/Setting.model.dart';
+import 'package:maxga/http/repo/dmzj/constants/DmzjMangaSource.dart';
+import 'package:maxga/model/manga/MangaSource.dart';
 
 enum MaxgaSettingCategoryType {
   application,
@@ -8,7 +10,7 @@ enum MaxgaSettingCategoryType {
 }
 
 enum MaxgaSettingListTileType {
-  none,
+  page,
   checkbox,
   text,
   select,
@@ -24,6 +26,11 @@ enum MaxgaSettingItemType {
   useMaxgaProxy,
   resetSetting,
   defaultIndexPage,
+}
+
+enum DefaultIndexPage {
+  collect,
+  sourceViewer
 }
 
 
@@ -57,7 +64,7 @@ const Map<MaxgaSettingItemType, List<DropdownMenuItem<String>>>
       value: '1',
       child: const Text('图源'),
     ),
-  ],
+  ]
 };
 
 
@@ -69,45 +76,83 @@ final Map<MaxgaSettingCategoryType, String> SettingCategoryList = {
 };
 
 
+const _ApplicationSettingValueList = [
+  MaxgaSettingItem(
+    key: MaxgaSettingItemType.defaultIndexPage,
+    type: MaxgaSettingListTileType.select,
+    title: '默认主页',
+    value: '0',
+    category: MaxgaSettingCategoryType.application,
+  ),
+  MaxgaSettingItem(
+    key: MaxgaSettingItemType.defaultIndexPage,
+    type: MaxgaSettingListTileType.select,
+    title: '默认漫画源',
+    value: DmzjMangaSourceKey,
+    category: MaxgaSettingCategoryType.application,
+  ),
+  MaxgaSettingItem(
+    key: MaxgaSettingItemType.readOnlyOnWiFi,
+    type: MaxgaSettingListTileType.checkbox,
+    title: '仅 wifi 下阅读漫画',
+    value: '0',
+    category: MaxgaSettingCategoryType.application,
+  ),
+  MaxgaSettingItem(
+    key: MaxgaSettingItemType.useMaxgaProxy,
+    title: '使用内置代理',
+    type: MaxgaSettingListTileType.checkbox,
+    subTitle: '针对部分网站加入代理加速 (不包括图片)',
+    value: '0',
+    hidden: true,
+    category: MaxgaSettingCategoryType.network,
+  ),
+  MaxgaSettingItem(
+    key: MaxgaSettingItemType.defaultIndexPage,
+    type: MaxgaSettingListTileType.select,
+    title: '默认主页',
+    value: '0',
+    hidden: true,
+    category: MaxgaSettingCategoryType.application,
+  ),
+  MaxgaSettingItem(
+    key: MaxgaSettingItemType.readOnlyOnWiFi,
+    type: MaxgaSettingListTileType.checkbox,
+    title: '仅 wifi 下阅读漫画',
+    value: '0',
+    category: MaxgaSettingCategoryType.application,
+  ),
+];
+
+const _NetworkSettingItemList = [
+  MaxgaSettingItem(
+    key: MaxgaSettingItemType.useMaxgaProxy,
+    title: '使用内置代理',
+    type: MaxgaSettingListTileType.checkbox,
+    subTitle: '针对部分网站加入代理加速 (不包括图片)',
+    value: '0',
+    hidden: true,
+    category: MaxgaSettingCategoryType.network,
+  ),
+  MaxgaSettingItem(
+    key: MaxgaSettingItemType.timeoutLimit,
+    type: MaxgaSettingListTileType.select,
+    title: '超时时间',
+    value: '15000',
+    category: MaxgaSettingCategoryType.network,
+  ),
+  MaxgaSettingItem(
+    key: MaxgaSettingItemType.cleanCache,
+    type: MaxgaSettingListTileType.command,
+    title: '清除缓存',
+    category: MaxgaSettingCategoryType.network,
+  ),
+];
+
 class SettingItemListValue {
   static const _value = [
-    MaxgaSettingItem(
-      key: MaxgaSettingItemType.defaultIndexPage,
-      type: MaxgaSettingListTileType.select,
-      title: '默认主页',
-      value: '0',
-      hidden: true,
-      category: MaxgaSettingCategoryType.application,
-    ),
-    MaxgaSettingItem(
-      key: MaxgaSettingItemType.readOnlyOnWiFi,
-      type: MaxgaSettingListTileType.checkbox,
-      title: '仅 wifi 下阅读漫画',
-      value: '0',
-      category: MaxgaSettingCategoryType.application,
-    ),
-    MaxgaSettingItem(
-      key: MaxgaSettingItemType.useMaxgaProxy,
-      title: '使用内置代理',
-      type: MaxgaSettingListTileType.checkbox,
-      subTitle: '针对部分网站加入代理加速 (不包括图片)',
-      value: '0',
-      hidden: true,
-      category: MaxgaSettingCategoryType.network,
-    ),
-    MaxgaSettingItem(
-      key: MaxgaSettingItemType.timeoutLimit,
-      type: MaxgaSettingListTileType.select,
-      title: '超时时间',
-      value: '15000',
-      category: MaxgaSettingCategoryType.network,
-    ),
-    MaxgaSettingItem(
-      key: MaxgaSettingItemType.cleanCache,
-      type: MaxgaSettingListTileType.command,
-      title: '清除缓存',
-      category: MaxgaSettingCategoryType.network,
-    ),
+    ..._ApplicationSettingValueList,
+    ..._NetworkSettingItemList,
     MaxgaSettingItem(
       key: MaxgaSettingItemType.resetSetting,
       type: MaxgaSettingListTileType.confirmCommand,

@@ -1,4 +1,3 @@
-import 'package:maxga/base/error/MaxgaHttpError.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/http/repo/manhuagui/crypto/ManhuaguiCrypto.dart';
 import 'package:maxga/http/repo/manhuagui/parser/ManhuaguiHtmlParser.dart';
@@ -6,14 +5,8 @@ import 'package:maxga/http/utils/MaxgaHttpUtils.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 
-// ignore: non_constant_identifier_names
-final ManhuaguiMangaSource = MangaSource(
-    name: '漫画柜',
-    key: 'manhuagui',
-    domain: 'https://m.manhuagui.com/',
-    apiDomain: 'https://m.manhuagui.com/',
-    iconUrl: 'https://m.manhuagui.com/favicon.ico',
-    headers: {'Referer': 'https://m.manhuagui.com/'});
+import 'constants/ManhuaguiMangaSource.dart';
+
 
 class ManhuaguiDataRepo extends MaxgaDataHttpRepo {
   MangaSource _source = ManhuaguiMangaSource;

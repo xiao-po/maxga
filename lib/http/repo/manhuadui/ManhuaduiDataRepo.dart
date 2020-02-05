@@ -5,17 +5,10 @@ import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 
 import '../MaxgaDataHttpRepo.dart';
+import 'constants/ManhuaduiMangaSource.dart';
 
-final ManhuaduiMangaSource = MangaSource(
-  name: '漫画堆',
-  key: 'manhuadui',
-  domain: 'https://m.manhuadui.com',
-  apiDomain: 'https://m.manhuadui.com',
-  iconUrl: 'https://m.manhuadui.com/favicon.ico',
-  headers: {
-    'referer': 'https://m.manhuadui.com'
-  }
-);
+
+
 
 class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
   MangaSource _source = ManhuaduiMangaSource;

@@ -14,7 +14,7 @@ description: awesom manga app
 version: 0.1.0+14
 
 environment:
-  sdk: ">=2.2.2 <3.0.0"
+  sdk: ">=2.5.0 <3.0.0"
 
 dependencies:
   flutter:

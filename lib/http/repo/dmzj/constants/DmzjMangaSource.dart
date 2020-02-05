@@ -1,9 +1,8 @@
 import 'package:maxga/model/manga/MangaSource.dart';
-
-// ignore: non_constant_identifier_names
-final DmzjMangaSource = MangaSource(
+const DmzjMangaSourceKey = 'dmzj';
+const DmzjMangaSource = const MangaSource(
     name: '动漫之家',
-    key: 'dmzj',
+    key: DmzjMangaSourceKey,
     domain: 'https://m.dmzj.com',
     apiDomain: 'https://v3api.dmzj.com',
     iconUrl: 'http://dmzj.com/favicon.ico',

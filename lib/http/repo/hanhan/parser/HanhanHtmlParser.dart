@@ -139,10 +139,10 @@ class HanhanHtmlParser {
     return SimpleMangaInfo.fromMangaRepo(
         sourceKey: null,
         id: id,
-        authors: authors,
+        authors: authors ?? [],
         infoUrl: '${HanhanMangaSource.apiDomain}/comic/18$id/',
         coverImgUrl: coverImageUrl,
-        typeList: type,
+        typeList: type ?? [],
         lastUpdateChapter: lastChapter,
         title: title);
   }

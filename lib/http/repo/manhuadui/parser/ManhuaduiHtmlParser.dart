@@ -4,6 +4,7 @@ import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart';
 import 'package:maxga/Utils/DateUtils.dart';
 import 'package:maxga/http/repo/manhuadui/ManhuaduiDataRepo.dart';
+import 'package:maxga/http/repo/manhuadui/constants/ManhuaduiMangaSource.dart';
 import 'package:maxga/http/repo/manhuadui/crypto/ManhuaduiCrypto.dart';
 import 'package:maxga/model/manga/Chapter.dart';
 
@@ -129,7 +130,7 @@ class ManhuaduiHtmlParser {
     final lastChapterName = el.children[2].text;
     final lastChapter = Chapter()..title = lastChapterName;
     return SimpleMangaInfo.fromMangaRepo(
-        sourceKey: ManhuaduiMangaSource.key,
+        sourceKey: ManhuaduiMangaSourceKey,
         id: null,
         authors: authors,
         infoUrl: mangaInfoUrl,
@@ -216,8 +217,8 @@ class ManhuaduiHtmlParser {
       final titleNode = infoNode.querySelector('.title');
       final mangaTitle = titleNode.innerHtml;
       final mangaInfoUrl = titleNode.attributes['href'];
-      final mangaAuthors = infoNode.children[1].text.split(',');
-      final mangaTypeList = infoNode.children[2].text.split('|');
+      final mangaAuthors = infoNode.children[1].text.trim().split(',');
+      final mangaTypeList = infoNode.children[2].text.trim().split('|');
       final mangaUpdateTime = DateUtils.convertTimeStringToTimestamp(
           infoNode.children[3].querySelector('.date').innerHtml,
           'YYYY-MM-dd HH:mm');

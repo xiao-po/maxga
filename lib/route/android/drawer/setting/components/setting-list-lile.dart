@@ -24,8 +24,12 @@ class SettingListTile extends StatelessWidget {
         return CommandSettingListTile(setting: setting);
       case MaxgaSettingListTileType.confirmCommand:
         return AlertCommandSettingListTile(setting: setting);
+      case MaxgaSettingListTileType.page:
+        if(setting is MaxgaSettingPageItem) {
+          return SettingPageListTile(setting: (setting as MaxgaSettingPageItem));
+        }
+        break;
       case MaxgaSettingListTileType.text:
-      case MaxgaSettingListTileType.none:
       default:
         {
           return ListTile(
@@ -117,8 +121,6 @@ class AlertCommandSettingListTile extends StatelessWidget {
               ));
         });
   }
-
-  exec(BuildContext context) async {}
 }
 
 class CheckBoxSettingListTile extends StatelessWidget {
@@ -160,6 +162,27 @@ class DropDownSettingListTile extends StatelessWidget {
               .modifySetting(setting, newValue);
         },
         items: MaxgaDropDownOptionsMap[setting.key],
+      ),
+    );
+  }
+}
+
+
+class SettingPageListTile extends StatelessWidget {
+  final MaxgaSettingPageItem setting;
+
+  const SettingPageListTile({Key key, @required this.setting})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(setting.title),
+      contentPadding: SettingListTilePadding,
+      subtitle: setting.subTitle != null ? Text(setting.subTitle) : null,
+      trailing: Icon(Icons.chevron_right),
+      onTap: () => Navigator.push(
+        context, MaterialPageRoute(builder: (context) => setting.pageBuilder(context))
       ),
     );
   }

@@ -85,7 +85,6 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
             appBar: AppBar(
               leading: BackButton(color: Colors.black45),
               elevation: 0,
-              backgroundColor: Color(0xfffafafa),
             ),
             body: ErrorPage("读取漫画信息发生了错误呢~~~", onTap: () {
               debugPrint('error page on tap');
@@ -98,8 +97,6 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
           mangaInfoChapter = SkeletonMangaChapterGrid(colCount: 6);
           break;
         }
-      default:
-        {}
     }
     return Scaffold(
         body: MangaInfoWrapper(

@@ -4,9 +4,10 @@ import 'package:maxga/base/drawer/menu-item.dart';
 import 'package:maxga/base/error/MaxgaHttpError.dart';
 import 'package:maxga/components/Card.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
-import 'package:maxga/components/MangaListTabView.dart';
+import 'package:maxga/components/base/MaxgaTabView.dart';
 import 'package:maxga/components/MaxgaButton.dart';
 import 'package:maxga/components/TabBar.dart';
+import 'package:maxga/components/base/WillExitScope.dart';
 import 'package:maxga/components/dialog.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
@@ -44,20 +45,6 @@ class _SourceViewerPageState extends State<SourceViewerPage>
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return SearchPage();
     }));
-  }
-
-  DateTime _lastPressedAt; // 上次点击时间
-  Future<bool> onBack() async {
-    if (_lastPressedAt == null ||
-        DateTime.now().difference(_lastPressedAt) > Duration(seconds: 2)) {
-      // 两次点击间隔超过1秒则重新计时
-      _lastPressedAt = DateTime.now();
-      showSnack('再按一次退出程序');
-      return false;
-    } else {
-      await Future.delayed(Duration(milliseconds: 100));
-      return true;
-    }
   }
 
   void hiddenSnack() {
@@ -145,14 +132,14 @@ class _SourceViewerPageState extends State<SourceViewerPage>
         theme.brightness == Brightness.dark ? Colors.white : Colors.black87;
     var tabBarIndicator =
         theme.brightness == Brightness.dark ? Colors.white24 : Colors.black38;
-    final body = Scaffold(
-      key: scaffoldKey,
-      drawer: MaxgaDrawer(
-        active: MaxgaMenuItemType.mangaSourceViewer,
-      ),
-      appBar: AppBar(
+    var appBar = AppBar(
         title: Text(sourceName),
-        actions: buildAppBarActions(),
+        actions: <Widget>[
+          MaxgaSearchButton(),
+          MaxgaSourceSelectButton(
+            onSelect: (source) => this.setMangaSource(source),
+          )
+        ],
         elevation: 1,
         bottom: ColoredTabBar(
           color: Colors.white,
@@ -168,8 +155,8 @@ class _SourceViewerPageState extends State<SourceViewerPage>
                 .toList(growable: false),
           ),
         ),
-      ),
-      body: MangaListTabBarView(
+      );
+    var tabViewer = MaxgaTabBarView(
         controller: this.tabController,
         children: tabs
             .map((state) => RefreshIndicator(
@@ -180,23 +167,20 @@ class _SourceViewerPageState extends State<SourceViewerPage>
                   ),
                 ))
             .toList(growable: false),
+      );
+    return Scaffold(
+      key: scaffoldKey,
+      drawer: MaxgaDrawer(
+        active: MaxgaMenuItemType.mangaSourceViewer,
+      ),
+      appBar: appBar,
+      body: WillExitScope(
+        child: tabViewer,
       ),
     );
 
-    return WillPopScope(
-      child: body,
-      onWillPop: () => onBack(),
-    );
   }
 
-  List<Widget> buildAppBarActions() {
-    return <Widget>[
-      MaxgaSearchButton(),
-      MaxgaSourceSelectButton(
-        onSelect: (source) => this.setMangaSource(source),
-      )
-    ];
-  }
 
   buildIndexBody(MangaSourceViewerPage state) {
     if (!state.initOver) {

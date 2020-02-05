@@ -1,6 +1,5 @@
 import 'dart:async';
 
-
 import 'package:flutter/material.dart';
 import 'package:maxga/http/repo/dmzj/DmzjDataRepo.dart';
 import 'package:maxga/service/LocalStorage.service.dart';
@@ -37,13 +36,28 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    var theme = Theme.of(context);
+    var textStyle = theme.brightness == Brightness.light
+        ? TextStyle(color: Colors.black54)
+        : TextStyle(color: theme.hintColor);
+    final textField = TextField(
+      controller: searchInputController,
+      onChanged: (words) => this.inputChange(words),
+      onEditingComplete: () =>
+          this.toSearch(this.searchInputController.value.text),
+      decoration: InputDecoration(
+        hintText: '漫画名称、作者名字',
+        hintStyle: textStyle,
+        enabledBorder:
+            UnderlineInputBorder(borderSide: BorderSide(color: Colors.black12)),
+        focusedBorder:
+            UnderlineInputBorder(borderSide: BorderSide(color: Colors.black12)),
+      ),
+    );
     return Scaffold(
       appBar: AppBar(
-        leading: BackButton(
-          color: Colors.black54,
-        ),
-        title: buildTextField(),
-        backgroundColor: Colors.white,
+        leading: BackButton(),
+        title: textField,
       ),
       body: buildSearchBody(),
       floatingActionButton: this.hasWords == true
@@ -52,28 +66,9 @@ class _SearchPageState extends State<SearchPage> {
                   this.toSearch(this.searchInputController.value.text),
               child: Icon(
                 Icons.search,
-                color: Colors.black54,
               ),
-              backgroundColor: Colors.white,
             )
           : Container(),
-    );
-  }
-
-  Widget buildTextField() {
-    return TextField(
-      controller: searchInputController,
-      onChanged: (words) => this.inputChange(words),
-      onEditingComplete: () =>
-          this.toSearch(this.searchInputController.value.text),
-      decoration: InputDecoration(
-        hintText: '漫画名称、作者名字',
-        hintStyle: TextStyle(color: Colors.black54),
-        enabledBorder:
-            UnderlineInputBorder(borderSide: BorderSide(color: Colors.black12)),
-        focusedBorder:
-            UnderlineInputBorder(borderSide: BorderSide(color: Colors.black12)),
-      ),
     );
   }
 
@@ -169,9 +164,7 @@ class _SearchPageState extends State<SearchPage> {
               leading: Icon(Icons.history),
             ))
         .toList();
-    return ListView(
-      children: historyListTiles
-    );
+    return ListView(children: historyListTiles);
   }
 
   void goResultPage(String keywords) {

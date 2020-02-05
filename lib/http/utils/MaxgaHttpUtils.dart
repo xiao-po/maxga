@@ -35,7 +35,7 @@ class MaxgaHttpUtils {
         }
       }
     }
-
+    print('success, url is $url');
     try {
       final T result = parser(response);
       return result;

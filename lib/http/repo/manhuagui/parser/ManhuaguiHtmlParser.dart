@@ -3,6 +3,7 @@ import 'package:html/parser.dart';
 import 'package:maxga/Utils/DateUtils.dart';
 import 'package:maxga/http/repo/manhuadui/ManhuaduiDataRepo.dart';
 import 'package:maxga/http/repo/manhuagui/ManhuaguiDataRepo.dart';
+import 'package:maxga/http/repo/manhuagui/constants/ManhuaguiMangaSource.dart';
 import 'package:maxga/model/manga/Chapter.dart';
 import 'package:maxga/model/manga/Manga.dart';
 
@@ -56,7 +57,7 @@ class ManhuaguiHtmlParser {
       lastUpdateChapter.title = lastUpdateChapterTitle;
 
       return SimpleMangaInfo.fromMangaRepo(
-        sourceKey: ManhuaduiMangaSource.key,
+        sourceKey: ManhuaguiMangaSourceKey,
         id: id,
         infoUrl: url,
         coverImgUrl: coverImageUrl,

@@ -1,24 +1,26 @@
 class DateUtils {
   static String formatTime({DateTime time, int timestamp, String template}) {
+    if (timestamp == null && time == null) {
+      throw DateUtilError('时间不能为 null ');
+    }
+    var resultTime = time;
     try {
-      var resultTime = time;
       if (resultTime == null) {
         resultTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
       }
-      var result = template;
-      result = result.replaceAll('YYYY', '${resultTime.year}');
-      result = result.replaceAll('MM', '${resultTime.month < 10 ? '0${resultTime.month}' : resultTime.month}');
-      result = result.replaceAll('dd', '${resultTime.day < 10 ? '0${resultTime.day}' : resultTime.day}');
-      result = result.replaceAll('HH', '${resultTime.hour < 10 ? '0${resultTime.hour}' : resultTime.day}}');
-      final int hh = resultTime.hour - 12 > 0 ? resultTime.hour - 12 : resultTime.hour;
-      result = result.replaceAll('hh', '${hh < 10 ? '0${resultTime.hour}' : hh}}');
-      result = result.replaceAll('mm', '${resultTime.minute < 10 ? '0${resultTime.minute}' : resultTime.minute}}');
-      result = result.replaceAll('ss', '${resultTime.second < 10 ? '0${resultTime.second}' : resultTime.second}}');
-      return result;
     } catch(e) {
-
       throw DateUtilError('时间戳 formatter 失败');
     }
+    var result = template;
+    final int hh = resultTime.hour - 12 > 0 ? resultTime.hour - 12 : resultTime.hour;
+    result = result.replaceAll('YYYY', '${resultTime.year}');
+    result = result.replaceAll('MM', '${resultTime.month < 10 ? '0${resultTime.month}' : resultTime.month}');
+    result = result.replaceAll('dd', '${resultTime.day < 10 ? '0${resultTime.day}' : resultTime.day}');
+    result = result.replaceAll('HH', '${resultTime.hour < 10 ? '0${resultTime.hour}' : resultTime.day}}');
+    result = result.replaceAll('hh', '${hh < 10 ? '0${resultTime.hour}' : hh}}');
+    result = result.replaceAll('mm', '${resultTime.minute < 10 ? '0${resultTime.minute}' : resultTime.minute}}');
+    result = result.replaceAll('ss', '${resultTime.second < 10 ? '0${resultTime.second}' : resultTime.second}}');
+    return result;
   }
 
   static int convertTimeStringToTimestamp(String time, String template) {
