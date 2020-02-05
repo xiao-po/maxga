@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:maxga/base/drawer/menu-item.dart';
 import 'package:maxga/base/error/MaxgaHttpError.dart';
+import 'package:maxga/base/setting/SettingValue.dart';
 import 'package:maxga/components/Card.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/components/base/MaxgaTabView.dart';
@@ -13,6 +14,7 @@ import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/model/maxga/MaxgaReleaseInfo.dart';
 import 'package:maxga/provider/public/HistoryProvider.dart';
+import 'package:maxga/provider/public/SettingProvider.dart';
 import 'package:maxga/provider/source-viewer/source-viwer-provider.dart';
 import 'package:maxga/service/UpdateService.dart';
 import 'package:maxga/MangaRepoPool.dart';
@@ -100,7 +102,8 @@ class _SourceViewerPageState extends State<SourceViewerPage>
   @override
   void initState() {
     super.initState();
-    final source = MangaRepoPool.getInstance().currentSource;
+    final sourceKey = SettingProvider.getInstance().getItemValue(MaxgaSettingItemType.defaultMangaSource);
+    final source = MangaRepoPool.getInstance().getMangaSourceByKey(sourceKey);
     setMangaSource(source);
     tabController = TabController(vsync: this, length: 2, initialIndex: 0);
   }
@@ -200,7 +203,10 @@ class _SourceViewerPageState extends State<SourceViewerPage>
           return MangaSourceViewerErrorPage(
             errorType: state.errorType,
             source: state.source,
-            onTap: () => this.loadNextPage(state),
+            onTap: () => this.setState(() {
+              state.loadState = MangaSourceViewerPageLoadState.none;
+              this.refreshPage(state);
+            }),
           );
       }
     } else {

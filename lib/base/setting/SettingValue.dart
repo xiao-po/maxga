@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:maxga/base/setting/Setting.model.dart';
 import 'package:maxga/http/repo/dmzj/constants/DmzjMangaSource.dart';
+import 'package:maxga/http/repo/hanhan/constant/HanhanRepoValue.dart';
+import 'package:maxga/http/repo/manhuadui/constants/ManhuaduiMangaSource.dart';
+import 'package:maxga/http/repo/manhuagui/constants/ManhuaguiMangaSource.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 
 enum MaxgaSettingCategoryType {
@@ -26,6 +29,7 @@ enum MaxgaSettingItemType {
   useMaxgaProxy,
   resetSetting,
   defaultIndexPage,
+  defaultMangaSource,
 }
 
 enum DefaultIndexPage {
@@ -64,6 +68,24 @@ const Map<MaxgaSettingItemType, List<DropdownMenuItem<String>>>
       value: '1',
       child: const Text('图源'),
     ),
+  ],
+  MaxgaSettingItemType.defaultMangaSource: [
+    DropdownMenuItem(
+      value: DmzjMangaSourceKey,
+      child: const Text('动漫之家'),
+    ),
+    DropdownMenuItem(
+      value: HanhanMangaSourceKey,
+      child: const Text('汗汗漫画'),
+    ),
+    DropdownMenuItem(
+      value: ManhuaguiMangaSourceKey,
+      child: const Text('漫画柜'),
+    ),
+    DropdownMenuItem(
+      value: ManhuaduiMangaSourceKey,
+      child: const Text('漫画堆'),
+    ),
   ]
 };
 
@@ -85,7 +107,7 @@ const _ApplicationSettingValueList = [
     category: MaxgaSettingCategoryType.application,
   ),
   MaxgaSettingItem(
-    key: MaxgaSettingItemType.defaultIndexPage,
+    key: MaxgaSettingItemType.defaultMangaSource,
     type: MaxgaSettingListTileType.select,
     title: '默认漫画源',
     value: DmzjMangaSourceKey,
@@ -100,27 +122,12 @@ const _ApplicationSettingValueList = [
   ),
   MaxgaSettingItem(
     key: MaxgaSettingItemType.useMaxgaProxy,
-    title: '使用内置代理',
+    title: 'Api 加速访问',
     type: MaxgaSettingListTileType.checkbox,
-    subTitle: '针对部分网站加入代理加速 (不包括图片)',
+    subTitle: '针对部分海外网站的 api 提供加速 \n'
+        '（不包括图片, 无法正常使用时请关闭）',
     value: '0',
-    hidden: true,
     category: MaxgaSettingCategoryType.network,
-  ),
-  MaxgaSettingItem(
-    key: MaxgaSettingItemType.defaultIndexPage,
-    type: MaxgaSettingListTileType.select,
-    title: '默认主页',
-    value: '0',
-    hidden: true,
-    category: MaxgaSettingCategoryType.application,
-  ),
-  MaxgaSettingItem(
-    key: MaxgaSettingItemType.readOnlyOnWiFi,
-    type: MaxgaSettingListTileType.checkbox,
-    title: '仅 wifi 下阅读漫画',
-    value: '0',
-    category: MaxgaSettingCategoryType.application,
   ),
 ];
 

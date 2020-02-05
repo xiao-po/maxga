@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:maxga/MangaRepoPool.dart';
+import 'package:maxga/base/setting/SettingValue.dart';
 import 'package:maxga/provider/public/CollectionProvider.dart';
 import 'package:maxga/provider/public/HistoryProvider.dart';
 import 'package:maxga/provider/public/SettingProvider.dart';
 import 'package:maxga/provider/public/ThemeProvider.dart';
 import 'package:maxga/route/android/collection/collection-page.dart';
+import 'package:maxga/route/android/source-viewer/source-viewer.dart';
 import 'package:provider/provider.dart';
 
 import 'database/database-initializr.dart';
@@ -30,6 +33,8 @@ class _MyAppState extends State<MyApp> {
         .then((v) => ThemeProvider.getInstance().init())
         .then((v) {
       this.isInitOver = true;
+
+      print('app init over');
       setState(() {});
     });
   }
@@ -37,7 +42,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     if (!isInitOver) {
-      MaterialApp(
+      return MaterialApp(
         title: 'Maxga First Version',
         theme: ThemeData(
           primarySwatch: Colors.blue,
@@ -73,11 +78,12 @@ class MaxGaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SettingProvider settingProvider = Provider.of<SettingProvider>(context);
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) =>  MaterialApp(
         title: 'Maxga First Version',
         theme: themeProvider.theme,
-        home: CollectionPage(),
+        home: settingProvider.getItemValue(MaxgaSettingItemType.defaultIndexPage) == '0' ? CollectionPage() : SourceViewerPage(),
       ),
     );
   }

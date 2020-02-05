@@ -18,39 +18,32 @@ class _CupertinoSourceViewerState extends State<CupertinoSourceViewer> with Sing
   @override
   void initState() {
     super.initState();
-    final source = MangaRepoPool.getInstance().currentSource;
-    setMangaSource(source);
     pageController = PageController(initialPage: 0);
   }
 
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        leading: Padding(
-          padding: EdgeInsets.only(top: 15),
-          child: Text('动漫之家', style: TextStyle(color: Colors.grey[500]),),
-        ),
-          middle: _CupertinoTabBar(
+      child:
+      SafeArea(
+        child: Padding(
+          padding: EdgeInsets.only(top: 0),
+          child: PageView(
             controller: pageController,
+            children: <Widget>[
+              ListView.builder(
+                itemBuilder: (context, index) => Container(
+                  child: Text('$index'),
+                ),
+              ),
+              Container(
+                color: Colors.white,
+                child: Text('2'),
+              )
+            ],
           ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.only(top: 60),
-        child: PageView(
-          controller: pageController,
-          children: <Widget>[
-            Container(
-              color: Colors.black,
-              child: Text('1'),
-            ),
-            Container(
-              color: Colors.white,
-              child: Text('2'),
-            )
-          ],
         ),
-      ),
+      )
     );
   }
 

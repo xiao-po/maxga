@@ -1,11 +1,10 @@
-
 import 'package:maxga/model/manga/MangaSource.dart';
 const HanhanMangaSourceKey = 'hanhan';
 const HanhanMangaSource = const MangaSource(
     name: '汗汗漫画',
     key: HanhanMangaSourceKey,
-    domain: 'http://hanhan.xiaopo.moe',
-    apiDomain: 'http://hanhan.xiaopo.moe',
+    domain: 'http://bbssoo.com',
+    apiDomain: 'http://bbssoo.com',
     proxyDomain: 'http://hanhan.xiaopo.moe',
     iconUrl: 'http://hanhan.xiaopo.moe/favicon.ico',
     headers: {

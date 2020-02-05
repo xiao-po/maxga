@@ -28,7 +28,9 @@ class SettingListTile extends StatelessWidget {
         if(setting is MaxgaSettingPageItem) {
           return SettingPageListTile(setting: (setting as MaxgaSettingPageItem));
         }
-        break;
+        return ListTile(
+            title: const Text('没有类型的选项'),
+            subtitle: Text(setting?.value ?? '') ?? null);
       case MaxgaSettingListTileType.text:
       default:
         {

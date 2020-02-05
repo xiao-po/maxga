@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:maxga/base/error/MaxgaHttpError.dart';
+import 'package:maxga/base/setting/SettingValue.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
+import 'package:maxga/provider/public/SettingProvider.dart';
 
 import '../../MangaRepoPool.dart';
 
@@ -16,12 +18,13 @@ class MaxgaHttpUtils {
     Dio dio = MangaRepoPool.getInstance().dio;
     var retryTimes = 3;
     // todo: proxy setting
-//    final isUseProxy = SettingProvider.getInstance().getBoolItemValue(MaxgaSettingItemType.useMaxgaProxy);
-//    final requestUrl = isUseProxy ? source.proxyReplaceCallback(url) : url;
+    final isUseProxy = SettingProvider.getInstance().getBoolItemValue(MaxgaSettingItemType.useMaxgaProxy);
+    final requestUrl = isUseProxy ? source.replaceUrlToProxy(url) : url;
+    print('start request, url is $requestUrl');
     while (retryTimes > 0) {
 
       try {
-        response = await dio.get(url, options: Options(
+        response = await dio.get(requestUrl, options: Options(
             headers: Map.from(source?.headers ?? {}),
         ));
         break;
@@ -35,7 +38,6 @@ class MaxgaHttpUtils {
         }
       }
     }
-    print('success, url is $url');
     try {
       final T result = parser(response);
       return result;

@@ -10,16 +10,12 @@ import 'model/manga/MangaSource.dart';
 class MangaRepoPool {
   Map<String, MaxgaDataHttpRepo> _map = {};
   Map<String, MangaSource> _mangaSourceMap = {};
-  MangaSource _currentSource;
   Dio _dio = Dio(
     BaseOptions(
       connectTimeout: 15000,
     )
   );
 
-  void changeMangaSource(MangaSource source) {
-    _currentSource = source;
-  }
 
   void changeTimeoutLimit(int value) {
     this._dio = Dio(
@@ -31,8 +27,6 @@ class MangaRepoPool {
 
   List<MaxgaDataHttpRepo> get allDataRepo => _getAllRepo();
   List<MangaSource> get allDataSource => _getAllSource();
-  MangaSource get currentSource => _currentSource;
-  MaxgaDataHttpRepo get currentDataRepo => _map[_currentSource.key];
 
   Dio get dio => _dio;
   
@@ -50,11 +44,10 @@ class MangaRepoPool {
     final dmzjDataRepo = DmzjDataRepo();
     final hanhanDateRepo = HanhanDateRepo();
     final manhuaguiDateRepo = ManhuaguiDataRepo();
-    registryRepo(manhuaduiDataRepo);
-    registryRepo(manhuaguiDateRepo);
     registryRepo(dmzjDataRepo);
     registryRepo(hanhanDateRepo);
-    _currentSource = dmzjDataRepo.mangaSource;
+    registryRepo(manhuaduiDataRepo);
+    registryRepo(manhuaguiDateRepo);
   }
 
   registryRepo(MaxgaDataHttpRepo repo) {

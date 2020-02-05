@@ -10,8 +10,6 @@ class MangaSource {
   final String proxyDomain;
   final String iconUrl;
 
-  // todo Proxy 功能搁置
-  final MangaSourceProxyReplaceCallback proxyReplaceCallback;
 
   final Map<String, String> headers;
 
@@ -21,7 +19,14 @@ class MangaSource {
       @required this.iconUrl,
       this.proxyDomain,
       this.headers,
-      this.proxyReplaceCallback,
       @required this.apiDomain,
       @required this.domain});
+
+  replaceUrlToProxy(String url) {
+    if (this.proxyDomain != null) {
+      return url.replaceFirst(this.apiDomain, this.proxyDomain);
+    } else {
+      return url;
+    }
+  }
 }

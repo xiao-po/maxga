@@ -49,6 +49,7 @@ class SettingProvider extends BaseProvider {
     });
     _items = itemList;
     notifyListeners();
+    print('setting init over');
     return true;
   }
 

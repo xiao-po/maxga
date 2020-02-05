@@ -31,7 +31,7 @@ class _HistToryPageState extends State<HistoryPage> {
         title: Text('历史记录'),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.delete_forever),
+            icon: Icon(Icons.delete_forever, color: Colors.red[400],),
             onPressed: () => deleteHistoryList(),
           )
         ],
