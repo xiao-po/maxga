@@ -54,9 +54,8 @@ class SettingProvider extends BaseProvider {
   }
 
   MaxgaSettingItem _createTitleItem(MaxgaSettingCategoryType type) {
-    return MaxgaSettingItem(
+    return MaxgaSettingItem.title(
         subTitle: SettingCategoryList[type],
-        type: MaxgaSettingListTileType.title,
         category: type);
   }
 
