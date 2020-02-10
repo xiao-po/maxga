@@ -1,5 +1,7 @@
 
 
+import 'package:maxga/database/database-value.dart';
+
 import '../ReadMangaStatus.dart';
 
 class ReadMangaStatusUtils {
@@ -26,16 +28,14 @@ class ReadMangaStatusUtils {
   }
   static Map<String, dynamic> toMangaReadStatusTableEntity(ReadMangaStatus manga) {
     return  {
-      'infoUrl': manga.infoUrl,
-      'readImageIndex': manga.readImageIndex,
-      'readChapterId': manga.readChapterId,
-      'isCollect': manga.isCollect ? 1 : 0,
+      MangaReadStatusTableColumns.infoUrl: manga.infoUrl,
+      MangaReadStatusTableColumns.lastReadImageIndex: manga.pageIndex,
+      MangaReadStatusTableColumns.lastReadChapterId: manga.chapterId,
+      MangaReadStatusTableColumns.updateTime: manga.updateTime.toIso8601String()
     };
   }
 
   static ReadMangaStatus fromMangaReadStatusTable(Map<String, dynamic> map) {
-    Map<String, dynamic> value = Map.from(map);
-    value['isCollect'] = value['isCollect'] == 1;
-    return ReadMangaStatus.fromJson(value);
+    return ReadMangaStatus.fromJson(map);
   }
 }

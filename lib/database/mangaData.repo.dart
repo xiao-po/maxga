@@ -9,7 +9,7 @@ class MangaDataRepository {
   static Future<List<Manga>> findAll({Database database}) {
     return MaxgaDataBaseUtils.openSearchTransaction<List<Manga>>(
       action: (db) async {
-        List<Map> maps = await db.query(MaxgaDatabaseTableValue.manga);
+        List<Map> maps = await db.query(DatabaseTables.manga);
         return maps.map((item) => MangaModelDatabaseUtils.fromSql(item)).toList();
       },
       database: database,
@@ -19,8 +19,8 @@ class MangaDataRepository {
   static Future<List<Manga>> findByUrlList(List<String> urlList, {Database database}) {
     return MaxgaDataBaseUtils.openSearchTransaction<List<Manga>>(
       action: (db) async {
-        List<Map> maps = await db.query(MaxgaDatabaseTableValue.manga,
-            where: '${MaxgaDatabaseMangaTableValue.infoUrl} in (${urlList.map((v) => '?').join(',')})',
+        List<Map> maps = await db.query(DatabaseTables.manga,
+            where: '${MangaTableColumns.infoUrl} in (${urlList.map((v) => '?').join(',')})',
             whereArgs: urlList);
         if (maps.isEmpty) {
           return null;
@@ -34,8 +34,8 @@ class MangaDataRepository {
   static Future<Manga> findByUrl(String url, {Database database}) {
     return MaxgaDataBaseUtils.openSearchTransaction<Manga>(
       action: (db) async {
-        List<Map> maps = await db.query(MaxgaDatabaseTableValue.manga,
-            where: '${MaxgaDatabaseMangaTableValue.infoUrl} = ?',
+        List<Map> maps = await db.query(DatabaseTables.manga,
+            where: '${MangaTableColumns.infoUrl} = ?',
             limit: 1,
             whereArgs: [url]);
         if (maps.isEmpty) {
@@ -52,10 +52,10 @@ class MangaDataRepository {
     return MaxgaDataBaseUtils.openSearchTransaction<List<Manga>>(
       action: (db) async {
         List<Map> maps = await db.rawQuery(
-            'select ${MaxgaDatabaseMangaTableValue.values().join(',').replaceFirst(MaxgaDatabaseMangaTableValue.infoUrl, 'a.${MaxgaDatabaseMangaTableValue.infoUrl}')} '
-            'from ${MaxgaDatabaseTableValue.manga} as a left join ${MaxgaDatabaseTableValue.mangaReadStatus} as b '
+            'select ${MangaTableColumns.values().join(',').replaceFirst(MangaTableColumns.infoUrl, 'a.${MangaTableColumns.infoUrl}')} '
+            'from ${DatabaseTables.manga} as a left join ${DatabaseTables.collect_status} as b '
             'on a.infoUrl = b.infoUrl '
-            'where ${MaxgaDatabaseMangaReadStatusTableValue.isCollect} = ?',
+            'where ${MangaReadStatusTableColumns.isCollect} = ?',
             [isCollected ? 1 : 0]);
         return maps.map((item) => MangaModelDatabaseUtils.fromSql(item)).toList();
       },
@@ -66,7 +66,7 @@ class MangaDataRepository {
   static Future<bool> insert(Manga manga, {Database database}) {
     return MaxgaDataBaseUtils.openUpdateTransaction(
       action: (db) async {
-        final value = await db.insert(MaxgaDatabaseTableValue.manga,
+        final value = await db.insert(DatabaseTables.manga,
             MangaModelDatabaseUtils.toSqlEntity(manga));
         return true;
       },
@@ -77,7 +77,7 @@ class MangaDataRepository {
   static Future<bool> update(Manga manga, {Database database}) {
     return MaxgaDataBaseUtils.openUpdateTransaction(
       action: (db) async {
-        final value = await db.update(MaxgaDatabaseTableValue.manga,
+        final value = await db.update(DatabaseTables.manga,
             MangaModelDatabaseUtils.toSqlEntity(manga),
             where: 'infoUrl = ?', whereArgs: [manga.infoUrl]);
         return true;

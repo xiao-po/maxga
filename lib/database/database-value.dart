@@ -1,11 +1,13 @@
 const MaxgaDataBaseName = 'maxga';
 
-class MaxgaDatabaseTableValue {
+class DatabaseTables {
   static const String manga = 'manga';
   static const String mangaReadStatus = 'manga_read_status';
+
+  static const String collect_status = 'collect_status';
 }
 
-class MaxgaDatabaseMangaTableValue {
+class MangaTableColumns {
   static const String sourceKey = 'sourceKey';
   static const String authors = 'authors';
   static const String id = 'id';
@@ -20,38 +22,52 @@ class MaxgaDatabaseMangaTableValue {
 
   static List<String> values() {
     return [
-      MaxgaDatabaseMangaTableValue.sourceKey,
-      MaxgaDatabaseMangaTableValue.authors,
-      MaxgaDatabaseMangaTableValue.id,
-      MaxgaDatabaseMangaTableValue.infoUrl,
-      MaxgaDatabaseMangaTableValue.status,
-      MaxgaDatabaseMangaTableValue.coverImgUrl,
-      MaxgaDatabaseMangaTableValue.title,
-      MaxgaDatabaseMangaTableValue.introduce,
-      MaxgaDatabaseMangaTableValue.typeList,
-      MaxgaDatabaseMangaTableValue.chapterList,
-      MaxgaDatabaseMangaTableValue.hasUpdate
+      MangaTableColumns.sourceKey,
+      MangaTableColumns.authors,
+      MangaTableColumns.id,
+      MangaTableColumns.infoUrl,
+      MangaTableColumns.status,
+      MangaTableColumns.coverImgUrl,
+      MangaTableColumns.title,
+      MangaTableColumns.introduce,
+      MangaTableColumns.typeList,
+      MangaTableColumns.chapterList,
+      MangaTableColumns.hasUpdate
     ];
   }
 
 }
 
-class MaxgaDatabaseMangaReadStatusTableValue {
+class MangaReadStatusTableColumns {
   static const String infoUrl = 'infoUrl';
-  static const String isCollect = 'isCollect';
-  static const String lastReadDate = 'lastReadDate';
-  static const String lastReadChapterId = 'lastReadChapterId';
-  static const String lastReadImageIndex = 'lastReadImageIndex';
+  static const String isCollect = 'isCollected';
+  static const String lastReadChapterId = 'chapterId';
+  static const String lastReadImageIndex = 'pageIndex';
+  static const String updateTime = 'updateTime';
 
 
   static List<String> values() {
     return [
-      MaxgaDatabaseMangaReadStatusTableValue.isCollect,
-      MaxgaDatabaseMangaReadStatusTableValue.lastReadDate,
-      MaxgaDatabaseMangaReadStatusTableValue.lastReadChapterId,
-      MaxgaDatabaseMangaReadStatusTableValue.infoUrl,
-      MaxgaDatabaseMangaReadStatusTableValue.lastReadImageIndex,
+      MangaReadStatusTableColumns.isCollect,
+      MangaReadStatusTableColumns.lastReadChapterId,
+      MangaReadStatusTableColumns.infoUrl,
+      MangaReadStatusTableColumns.lastReadImageIndex,
+      MangaReadStatusTableColumns.updateTime,
     ];
   }
+}
 
+class CollectStatusTableColumns {
+
+  static const String infoUrl = 'infoUrl';
+  static const String isCollected = 'isCollected';
+  static const String updateTime = 'updateTime';
+
+  static List<String> values() {
+    return [
+      CollectStatusTableColumns.isCollected,
+      CollectStatusTableColumns.infoUrl,
+      CollectStatusTableColumns.updateTime,
+    ];
+  }
 }

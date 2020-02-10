@@ -10,8 +10,8 @@ class MangaReadStatusRepository {
     return MaxgaDataBaseUtils.openSearchTransaction<ReadMangaStatus>(
       action: (db) async {
         final List<Map<String, dynamic>> result = await db.query(
-            MaxgaDatabaseTableValue.mangaReadStatus,
-            where: '${MaxgaDatabaseMangaReadStatusTableValue.infoUrl} = ?',
+            DatabaseTables.mangaReadStatus,
+            where: '${MangaReadStatusTableColumns.infoUrl} = ?',
             limit: 1,
             whereArgs: [url]);
         return result.length != 0 ? ReadMangaStatusUtils.fromMangaReadStatusTable(result[0]) : null;
@@ -25,8 +25,8 @@ class MangaReadStatusRepository {
     return MaxgaDataBaseUtils.openSearchTransaction<List<ReadMangaStatus>>(
       action: (db) async {
         final List<Map<String, dynamic>> result = await db.query(
-            MaxgaDatabaseTableValue.mangaReadStatus,
-            where: '${MaxgaDatabaseMangaReadStatusTableValue.isCollect} = ?',
+            DatabaseTables.mangaReadStatus,
+            where: '${MangaReadStatusTableColumns.isCollect} = ?',
             whereArgs: [isCollected ? 1 : 0]);
 
         return result.length != 0 ? result.map((item) => ReadMangaStatusUtils.fromMangaReadStatusTable(item)) : null;
@@ -39,7 +39,7 @@ class MangaReadStatusRepository {
   static Future<bool> insert(ReadMangaStatus manga, {Database database}) {
     return MaxgaDataBaseUtils.openUpdateTransaction(
       action: (db) async {
-        final value = await db.insert(MaxgaDatabaseTableValue.mangaReadStatus,
+        final value = await db.insert(DatabaseTables.mangaReadStatus,
             ReadMangaStatusUtils.toMangaReadStatusTableEntity(manga));
         return true;
       },
@@ -50,7 +50,7 @@ class MangaReadStatusRepository {
   static Future<bool> update(ReadMangaStatus status, {Database database}) {
     return MaxgaDataBaseUtils.openUpdateTransaction(
       action: (db) async {
-        await db.update(MaxgaDatabaseTableValue.mangaReadStatus, ReadMangaStatusUtils.toMangaReadStatusTableEntity(status),where: '${MaxgaDatabaseMangaReadStatusTableValue.infoUrl} = ?',whereArgs: [status.infoUrl] );
+        await db.update(DatabaseTables.mangaReadStatus, ReadMangaStatusUtils.toMangaReadStatusTableEntity(status),where: '${MangaReadStatusTableColumns.infoUrl} = ?',whereArgs: [status.infoUrl] );
         return true;
       },
       database: database,
@@ -72,7 +72,7 @@ class MangaReadStatusRepository {
     return MaxgaDataBaseUtils.openSearchTransaction<List<ReadMangaStatus>>(
       action: (db) async {
         final List<Map<String, dynamic>> result = await db.query(
-            MaxgaDatabaseTableValue.mangaReadStatus);
+            DatabaseTables.mangaReadStatus);
         return result.length != 0 ? result.map((item) => ReadMangaStatusUtils.fromMangaReadStatusTable(item)).toList() : null;
       },
       database: database,

@@ -26,7 +26,7 @@ class MangaInfoBottomBar extends StatelessWidget {
         children: <Widget>[
           FlatButton.icon(
               onPressed: onCollect,
-              icon: Icon(Icons.star_border, color: collected ? iconActiveColor : theme.hintColor,),
+              icon: !collected ? Icon(Icons.star_border, color: theme.hintColor,) : Icon(Icons.star, color: iconActiveColor),
               label: const Text('收藏')),
           FlatButton(
             onPressed: onResume,

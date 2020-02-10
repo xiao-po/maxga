@@ -10,7 +10,6 @@ import 'package:maxga/provider/public/CollectionProvider.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/service/MangaReadStorage.service.dart';
 
-
 import '../mangaInfo/MaganInfoWrapper.dart';
 import '../mangaInfo/MangaInfoCover.dart';
 import '../mangaViewer/MangaViewer.dart';
@@ -45,12 +44,24 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   ReadMangaStatus readMangaStatus;
   Manga manga;
   MangaSource source;
+  bool isCollected;
   List<Chapter> chapterList = [];
 
   @override
   void initState() {
     super.initState();
-    _initInfo(url: widget.infoUrl, sourceKey: widget.sourceKey);
+    _initInfo(url: widget.infoUrl, sourceKey: widget.sourceKey)
+        .then((Manga manga) async {
+      var isCollected = CollectionProvider.getInstance()
+              .collectionMangaList
+              .indexWhere((item) => item.infoUrl == manga.infoUrl) !=
+          -1;
+      if (mounted) {
+        setState(() {
+          this.isCollected = isCollected;
+        });
+      }
+    });
     source = MangaRepoPool.getInstance().getMangaSourceByKey(widget.sourceKey);
   }
 
@@ -73,8 +84,8 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
           loadOver = true;
           mangaInfoBottomBar = MangaInfoBottomBar(
             onResume: () => onResumeProcess(),
-            readed: readMangaStatus.readChapterId != null,
-            collected: readMangaStatus.isCollect,
+            readed: readMangaStatus.chapterId != null,
+            collected: isCollected,
             onCollect: () => collectManga(),
           );
           break;
@@ -135,21 +146,6 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     ]);
   }
 
-  Widget buildLoadPage() {
-    return Container(
-      height: 300,
-      child: Center(
-        child: SizedBox(
-          height: 40,
-          width: 40,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-          ),
-        ),
-      ),
-    );
-  }
-
   Future<Manga> _initInfo(
       {@required String sourceKey, @required String url}) async {
     MaxgaDataHttpRepo repo =
@@ -179,9 +175,6 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
       }),
       Future.delayed(Duration(milliseconds: 500))
     ]);
-    if (mounted) {
-      setState(() {});
-    }
     return manga;
   }
 
@@ -196,8 +189,9 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
                   initIndex: imagePage,
                 )));
     if (result != null) {
-      readMangaStatus.readChapterId = result.chapter.id;
-      readMangaStatus.readImageIndex = result.pageIndex;
+      readMangaStatus.chapterId = result.chapter.id;
+      readMangaStatus.pageIndex = result.pageIndex;
+      readMangaStatus.updateTime = DateTime.now();
       await Future.wait([
         MangaStorageService.saveMangaStatus(readMangaStatus),
       ]);
@@ -207,11 +201,10 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   }
 
   onResumeProcess() {
-    if (readMangaStatus.readChapterId != null) {
+    if (readMangaStatus.chapterId != null) {
       var chapter = chapterList
-          .firstWhere((item) => item.id == readMangaStatus.readChapterId);
-      this.enjoyMangaContent(chapter,
-          imagePage: readMangaStatus.readImageIndex);
+          .firstWhere((item) => item.id == readMangaStatus.chapterId);
+      this.enjoyMangaContent(chapter, imagePage: readMangaStatus.pageIndex);
     } else {
       var chapter = getFirstChapter();
       this.enjoyMangaContent(chapter, imagePage: 0);
@@ -242,11 +235,13 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     try {
       await Future.wait([
         MangaStorageService.saveManga(manga),
-        CollectionProvider.getInstance().setMangaCollectStatus(manga,
-            isCollected: !readMangaStatus.isCollect),
+        CollectionProvider.getInstance()
+            .setMangaCollectStatus(manga, isCollected: !isCollected),
       ]);
-      readMangaStatus.isCollect = !readMangaStatus.isCollect;
-      if (mounted) setState(() {});
+      if (mounted)
+        setState(() {
+          isCollected = !isCollected;
+        });
     } catch (e) {
       print(e);
       Scaffold.of(context).showSnackBar(SnackBar(

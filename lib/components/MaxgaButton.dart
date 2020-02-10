@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:maxga/database/collect-status.repo.dart';
+import 'package:maxga/database/readMangaStatus.repo.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
+import 'package:maxga/model/maxga/ReadMangaStatus.dart';
 import 'package:maxga/provider/public//HistoryProvider.dart';
 import 'package:maxga/route/ios/index/index-page.dart';
 import 'package:maxga/route/android/search/search-page.dart';
@@ -69,9 +74,9 @@ class MaxgaTestButton extends StatelessWidget {
         Icons.details,
       ),
       onPressed: () async {
-        Navigator.push(context, TransparentCupertinoPageRoute(
-          builder: (context) => CupertinoIndexPage(),
-        ));
+//        final data = await CollectStatusRepo.findAllCollect();
+        final List<ReadMangaStatus> data = await MangaReadStatusRepository.findAll();
+        print(data.map((item) => item.updateTime).toList());
       },
     );
   }

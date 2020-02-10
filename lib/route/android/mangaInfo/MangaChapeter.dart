@@ -135,7 +135,7 @@ class _MangaChapterGrid extends StatelessWidget {
         children: chapterList
             .map((item) => Align(
                   child: MangaOutlineButton(
-                    active: readStatus?.readChapterId == item.id ?? null,
+                    active: readStatus?.chapterId == item.id ?? null,
                     text: Text(
                       item.title,
                       textAlign: TextAlign.center,

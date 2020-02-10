@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/base/setting/SettingValue.dart';
 import 'package:maxga/provider/public/CollectionProvider.dart';
 import 'package:maxga/provider/public/HistoryProvider.dart';

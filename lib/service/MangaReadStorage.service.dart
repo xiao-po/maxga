@@ -1,8 +1,10 @@
 
+import 'package:maxga/database/collect-status.repo.dart';
 import 'package:maxga/database/mangaData.repo.dart';
 import 'package:maxga/database/readMangaStatus.repo.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/maxga/ReadMangaStatus.dart';
+import 'package:maxga/model/maxga/collect-status.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MangaStorageService {
@@ -45,7 +47,7 @@ class MangaStorageService {
       isSaveToMangaReadStatusTableSuccess = await MangaReadStatusRepository.insert(status);
     }
 
-    return true;
+    return isSaveToMangaReadStatusTableSuccess;
   }
 
   static Future<List<Manga>> getMangaByUrlList(List<String> urlList)  {
@@ -56,14 +58,17 @@ class MangaStorageService {
   }
 
   static Future<bool> setMangaCollectedStatus(Manga manga, {bool isCollected = true}) async {
-    ReadMangaStatus readMangaStatus = await MangaReadStatusRepository.findByUrl(manga.infoUrl);
-    final isExist = readMangaStatus != null;
+    CollectStatus collectStatus = await CollectStatusRepo.findByInfoUrl(manga.infoUrl);
+    final isExist = collectStatus != null;
     if (isExist) {
-      return MangaReadStatusRepository.update(readMangaStatus..isCollect = isCollected);
+      collectStatus.updateTime = DateTime.now();
+      collectStatus.isCollected = isCollected;
+      return CollectStatusRepo.update(collectStatus);
     } else {
-      return MangaReadStatusRepository.insert(ReadMangaStatus(
-        infoUrl: manga.infoUrl,
-        isCollect: isCollected
+      return CollectStatusRepo.insert(CollectStatus(
+          infoUrl: manga.infoUrl,
+          isCollected: isCollected,
+        updateTime: DateTime.now()
       ));
     }
 

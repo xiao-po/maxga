@@ -1,5 +1,4 @@
 import 'package:maxga/database/mangaData.repo.dart';
-import 'package:maxga/database/readMangaStatus.repo.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'database-value.dart';
@@ -26,8 +25,25 @@ class MaxgaDatabaseInitializr {
     }
   }
 
-  static _onUpdate(Database database, int oldVersion) {
+  static _onUpdate(Database database, int oldVersion) async {
     switch (oldVersion) {
+      case 1: {
+        await database.execute('ALTER TABLE "${DatabaseTables.mangaReadStatus}" RENAME TO "_${DatabaseTables.mangaReadStatus}_old_v1";');
+        await database.execute('create table manga_read_status ('
+            'infoUrl text,'
+            'updateTime TEXT,'
+            'pageIndex integer,'
+            'chapterId integer'
+            ');');
+
+        await database.execute('INSERT INTO "manga_read_status" SELECT "infoUrl", "lastReadDate", "readImageIndex","readChapterId"  FROM "_${DatabaseTables.mangaReadStatus}_old_v1";');
+        await database.execute("create table collect_status ("
+            "infoUrl text,"
+            "updateTime text,"
+            "isCollected integer"
+            ")");
+        await database.execute('insert into collect_status select "infoUrl", "lastReadDate", "lastReadDate" from "_${DatabaseTables.mangaReadStatus}_old_v1"');
+      }
     }
   }
 
@@ -55,12 +71,10 @@ class _MaxgaDataBaseFirstVersionHelper {
         'chapterList text'
         ');');
 
-    await db.execute('create table manga_read_status ('
-        'infoUrl text,'
-        'isCollect INTEGER,'
-        'lastReadDate TEXT,'
-        'readImageIndex integer,'
-        'readChapterId integer'
-        ');');
+    await db.execute("create table collect_status ("
+        "infoUrl text,"
+        "updateTime text,"
+        "isCollected integer"
+        ")");
   }
 }
