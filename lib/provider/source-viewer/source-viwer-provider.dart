@@ -58,7 +58,7 @@ class MangaSourceViewerPage {
       this.mangaList.addAll(mangaList);
       errorType = null;
       loadState = MangaSourceViewerPageLoadState.over;
-    } on MangaHttpError catch (e) {
+    } on MangaRepoError catch (e) {
       debugPrint(e.message);
       errorType = e.type;
       loadState = MangaSourceViewerPageLoadState.error;
@@ -80,7 +80,7 @@ class MangaSourceViewerPage {
       this.mangaList = mangaList;
       errorType = null;
       loadState = MangaSourceViewerPageLoadState.over;
-    } on MangaHttpError catch (e) {
+    } on MangaRepoError catch (e) {
       errorType = e.type;
       loadState = MangaSourceViewerPageLoadState.error;
       rethrow;

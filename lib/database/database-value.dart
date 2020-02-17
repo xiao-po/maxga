@@ -40,7 +40,7 @@ class MangaTableColumns {
 
 class MangaReadStatusTableColumns {
   static const String infoUrl = 'infoUrl';
-  static const String isCollect = 'isCollected';
+  static const String sourceKey = 'sourceKey';
   static const String lastReadChapterId = 'chapterId';
   static const String lastReadImageIndex = 'pageIndex';
   static const String updateTime = 'updateTime';
@@ -48,7 +48,7 @@ class MangaReadStatusTableColumns {
 
   static List<String> values() {
     return [
-      MangaReadStatusTableColumns.isCollect,
+      MangaReadStatusTableColumns.sourceKey,
       MangaReadStatusTableColumns.lastReadChapterId,
       MangaReadStatusTableColumns.infoUrl,
       MangaReadStatusTableColumns.lastReadImageIndex,
@@ -60,12 +60,14 @@ class MangaReadStatusTableColumns {
 class CollectStatusTableColumns {
 
   static const String infoUrl = 'infoUrl';
-  static const String isCollected = 'isCollected';
+  static const String sourceKey = 'sourceKey';
+  static const String collected = 'collected';
   static const String updateTime = 'updateTime';
 
   static List<String> values() {
     return [
-      CollectStatusTableColumns.isCollected,
+      CollectStatusTableColumns.sourceKey,
+      CollectStatusTableColumns.collected,
       CollectStatusTableColumns.infoUrl,
       CollectStatusTableColumns.updateTime,
     ];

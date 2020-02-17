@@ -10,8 +10,22 @@ class CollectStatusRepo {
         action: (database) async {
           List<Map> maps = await database.query(
             DatabaseTables.collect_status,
-            where: "${CollectStatusTableColumns.isCollected} = ?",
+            where: "${CollectStatusTableColumns.collected} = ?",
             whereArgs: [1],
+          );
+          if (maps.isEmpty) {
+            return null;
+          }
+          return maps.map((map) => CollectStatus.fromDatabase(map)).toList();
+        },
+        database: database);
+  }
+
+  static Future<List<CollectStatus>> findAll({Database database}) {
+    return MaxgaDataBaseUtils.openSearchTransaction<List<CollectStatus>>(
+        action: (database) async {
+          List<Map> maps = await database.query(
+            DatabaseTables.collect_status,
           );
           if (maps.isEmpty) {
             return null;

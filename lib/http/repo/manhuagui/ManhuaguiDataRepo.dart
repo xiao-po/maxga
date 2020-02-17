@@ -15,7 +15,7 @@ class ManhuaguiDataRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<List<String>> getChapterImageList(String url) async {
-    return _httpUtils.requestApi<List<String>>('$url',
+    return _httpUtils.requestMangaSourceApi<List<String>>('$url',
         parser: (res) =>
             ManhuaguiCrypto.decrypt(parser.getEncryptImageString(res.data))
                 .map((url) => 'https://i.hamreus.com$url')
@@ -24,7 +24,7 @@ class ManhuaguiDataRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<List<SimpleMangaInfo>> getLatestUpdate(int page) async {
-    return _httpUtils.requestApi<List<SimpleMangaInfo>>(
+    return _httpUtils.requestMangaSourceApi<List<SimpleMangaInfo>>(
         '${_source.apiDomain}update/?page=${page + 1}&ajax=1&order=1',
         parser: (res) => parser.getSimpleMangaInfoListFromUpdatePage(res.data)
           ..forEach((manga) {
@@ -35,7 +35,7 @@ class ManhuaguiDataRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<Manga> getMangaInfo( String url) async {
-    return _httpUtils.requestApi<Manga>(url,
+    return _httpUtils.requestMangaSourceApi<Manga>(url,
         parser: (res) => parser.getMangaInfo(res.data)
           ..infoUrl = url
           ..chapterList.forEach((chapter) {
@@ -45,7 +45,7 @@ class ManhuaguiDataRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<List<SimpleMangaInfo>> getSearchManga(String keywords) async {
-    return _httpUtils.requestApi<List<SimpleMangaInfo>>(
+    return _httpUtils.requestMangaSourceApi<List<SimpleMangaInfo>>(
         'https://m.manhuagui.com/s/$keywords.html',
         parser: (res) => parser.getSimpleMangaInfoFromSearch(res.data)
           ..forEach((manga) {
@@ -65,7 +65,7 @@ class ManhuaguiDataRepo extends MaxgaDataHttpRepo {
 
   @override
   Future<List<SimpleMangaInfo>> getRankedManga(int page) async {
-    return _httpUtils.requestApi<List<SimpleMangaInfo>>(
+    return _httpUtils.requestMangaSourceApi<List<SimpleMangaInfo>>(
         '${_source.apiDomain}rank/?page=${page + 1}&ajax=1&order=1',
         parser: (res) => parser.getSimpleMangaInfoListFromUpdatePage(res.data)
           ..forEach((manga) {

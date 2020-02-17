@@ -1,7 +1,7 @@
 import 'dart:io';
 
-
 import 'package:flutter/material.dart';
+import 'package:maxga/components/base/ZeroDivider.dart';
 import 'package:maxga/model/maxga/MaxgaReleaseInfo.dart';
 import 'package:maxga/service/UpdateService.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -32,7 +32,7 @@ class _AboutPageState extends State<AboutPage> {
     super.initState();
     UpdateService.getCurrentVersion().then((v) {
       currentVersion = v;
-      setState(() { });
+      setState(() {});
     });
     if (Platform.isAndroid) {
       checkUpdateStatus();
@@ -68,7 +68,7 @@ class _AboutPageState extends State<AboutPage> {
                 itemCount: list.length,
                 itemBuilder: (context, index) => list[index],
                 separatorBuilder: (context, index) {
-                  return Divider();
+                  return ZeroDivider();
                 },
               ),
             )
@@ -77,7 +77,7 @@ class _AboutPageState extends State<AboutPage> {
   }
 
   handleUpdateListTileTapEvent() {
-    switch(checkUpdateLoading) {
+    switch (checkUpdateLoading) {
       case CheckUpdateStatus.notUpdate:
       case CheckUpdateStatus.none:
       case CheckUpdateStatus.loading:
@@ -104,19 +104,15 @@ class _AboutPageState extends State<AboutPage> {
         return null;
       case CheckUpdateStatus.error:
         return Text('网络出错', style: trailingTextStyle);
-      default: {
-        throw Error();
-      }
+      default:
+        {
+          throw Error();
+        }
     }
   }
 
   Widget buildListTileIndicator() => SizedBox(
-        width: 20,
-        height: 20,
-        child: CircularProgressIndicator(
-            strokeWidth: 2
-        )
-      );
+      width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2));
 
   Widget buildApplicationAndVersionIntro() {
     return Container(

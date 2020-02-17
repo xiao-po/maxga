@@ -52,10 +52,10 @@ class MangaDataRepository {
     return MaxgaDataBaseUtils.openSearchTransaction<List<Manga>>(
       action: (db) async {
         List<Map> maps = await db.rawQuery(
-            'select ${MangaTableColumns.values().join(',').replaceFirst(MangaTableColumns.infoUrl, 'a.${MangaTableColumns.infoUrl}')} '
+            'select ${MangaTableColumns.values().join(',').replaceFirst(MangaTableColumns.sourceKey, 'a.${MangaTableColumns.sourceKey}').replaceFirst(MangaTableColumns.infoUrl, 'a.${MangaTableColumns.infoUrl}')} '
             'from ${DatabaseTables.manga} as a left join ${DatabaseTables.collect_status} as b '
             'on a.infoUrl = b.infoUrl '
-            'where ${MangaReadStatusTableColumns.isCollect} = ?',
+            'where ${CollectStatusTableColumns.collected} = ?',
             [isCollected ? 1 : 0]);
         return maps.map((item) => MangaModelDatabaseUtils.fromSql(item)).toList();
       },

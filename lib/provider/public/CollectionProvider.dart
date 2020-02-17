@@ -96,7 +96,10 @@ class CollectionProvider extends BaseProvider {
   Future<bool> setMangaCollectStatus(Manga manga, {isCollected = true}) async {
     try {
       if (isCollected) {
-        this._collectedMangaList.add(manga);
+        final index = this.collectionMangaList.indexWhere((item) => manga.infoUrl == item.infoUrl);
+        if (index ==  -1) {
+          this._collectedMangaList.add(manga);
+        }
       } else {
         this._collectedMangaList.removeWhere((item) => item.infoUrl == manga.infoUrl);
       }

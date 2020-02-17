@@ -8,18 +8,22 @@ class ReadMangaStatus {
   int chapterId;
   int pageIndex;
   DateTime updateTime;
+  String sourceKey;
+
   ReadMangaStatus({
     @required this.infoUrl,
     this.pageIndex,
     this.chapterId,
-    this.updateTime,
-});
+    DateTime updateTime,
+    this.sourceKey
+}): this.updateTime = updateTime ?? DateTime.now();
 
   ReadMangaStatus.fromJson(Map<String, dynamic> json) {
     if (json['updateTime'] != null) {
       updateTime = DateTime.parse(json['updateTime']);
     }
     infoUrl = json['infoUrl'];
+    sourceKey = json['sourceKey'];
     pageIndex = json['pageIndex'];
     chapterId = json['chapterId'];
   }
@@ -28,6 +32,7 @@ class ReadMangaStatus {
         'infoUrl': infoUrl,
         'pageIndex': pageIndex,
         'chapterId': chapterId,
-        'updateTime': updateTime,
+        'updateTime': updateTime.toIso8601String(),
+        'sourceKey': sourceKey,
       };
 }

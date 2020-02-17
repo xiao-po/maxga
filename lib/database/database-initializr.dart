@@ -31,6 +31,7 @@ class MaxgaDatabaseInitializr {
         await database.execute('ALTER TABLE "${DatabaseTables.mangaReadStatus}" RENAME TO "_${DatabaseTables.mangaReadStatus}_old_v1";');
         await database.execute('create table manga_read_status ('
             'infoUrl text,'
+            'sourceKey text,'
             'updateTime TEXT,'
             'pageIndex integer,'
             'chapterId integer'
@@ -39,6 +40,7 @@ class MaxgaDatabaseInitializr {
         await database.execute('INSERT INTO "manga_read_status" SELECT "infoUrl", "lastReadDate", "readImageIndex","readChapterId"  FROM "_${DatabaseTables.mangaReadStatus}_old_v1";');
         await database.execute("create table collect_status ("
             "infoUrl text,"
+            'sourceKey text,'
             "updateTime text,"
             "isCollected integer"
             ")");
@@ -71,10 +73,19 @@ class _MaxgaDataBaseFirstVersionHelper {
         'chapterList text'
         ');');
 
-    await db.execute("create table collect_status ("
-        "infoUrl text,"
-        "updateTime text,"
-        "isCollected integer"
+    await db.execute('create table ${DatabaseTables.mangaReadStatus} ('
+        'infoUrl text,'
+        'updateTime TEXT,'
+        'sourceKey text,'
+        'pageIndex integer,'
+        'chapterId integer'
+        ');');
+
+    await db.execute("create table ${DatabaseTables.collect_status} ("
+        "${CollectStatusTableColumns.infoUrl} text,"
+        "${CollectStatusTableColumns.updateTime} text,"
+        "${CollectStatusTableColumns.collected} integer,"
+        "${CollectStatusTableColumns.sourceKey} text"
         ")");
   }
 }

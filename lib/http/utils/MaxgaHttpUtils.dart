@@ -1,40 +1,44 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:maxga/base/error/MaxgaHttpError.dart';
 import 'package:maxga/base/setting/SettingValue.dart';
+import 'package:maxga/constant/TestValue.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/provider/public/SettingProvider.dart';
 
 import '../../MangaRepoPool.dart';
+
+
+
 
 class MaxgaHttpUtils {
   final MangaSource source;
 
   MaxgaHttpUtils(this.source);
 
-  Future<T> requestApi<T>(String url,
+  Future<T> requestMangaSourceApi<T>(String url,
       {T Function(Response<String> response) parser}) async {
     Response<String> response;
     Dio dio = MangaRepoPool.getInstance().dio;
     var retryTimes = 3;
-    // todo: proxy setting
-    final isUseProxy = SettingProvider.getInstance().getBoolItemValue(MaxgaSettingItemType.useMaxgaProxy);
+    final isUseProxy = SettingProvider.getInstance()
+        .getBoolItemValue(MaxgaSettingItemType.useMaxgaProxy);
     final requestUrl = isUseProxy ? source.replaceUrlToProxy(url) : url;
-    print('start request, url is $requestUrl');
     while (retryTimes > 0) {
-
       try {
-        response = await dio.get(requestUrl, options: Options(
-            headers: Map.from(source?.headers ?? {}),
-        ));
+        response = await dio.get(requestUrl,
+            options: Options(
+              headers: Map.from(source?.headers ?? {}),
+            ));
         break;
-      } on DioError catch(e) {
+      } on DioError catch (e) {
         retryTimes--;
         if (e.type == DioErrorType.CONNECT_TIMEOUT) {
-          throw MangaHttpError( MangaHttpErrorType.CONNECT_TIMEOUT, source);
+          throw MangaRepoError(MangaHttpErrorType.CONNECT_TIMEOUT, source);
         }
         if (retryTimes == 0) {
-          throw MangaHttpError(MangaHttpErrorType.RESPONSE_ERROR, source);
+          throw MangaRepoError(MangaHttpErrorType.RESPONSE_ERROR, source);
         }
       }
     }
@@ -42,8 +46,10 @@ class MaxgaHttpUtils {
       final T result = parser(response);
       return result;
     } catch (e) {
-      throw MangaHttpError(MangaHttpErrorType.PARSE_ERROR,source);
+      throw MangaRepoError(MangaHttpErrorType.PARSE_ERROR, source);
     }
   }
+
+
 
 }

@@ -39,6 +39,7 @@ class ThemeProvider extends BaseProvider {
     this._theme = ThemeData(
         brightness: isDarkMode ? Brightness.dark : Brightness.light,
         accentColor: isDarkMode ? Colors.teal : null,
+        scaffoldBackgroundColor: isDarkMode ? Colors.grey[850] : Colors.grey[100],
     );
   }
 

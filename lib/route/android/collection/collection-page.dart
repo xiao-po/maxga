@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:maxga/MangaRepoPool.dart';
+import 'package:maxga/base/delay.dart';
 import 'package:maxga/base/drawer/menu-item.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/components/MangaGridItem.dart';
@@ -11,13 +13,14 @@ import 'package:maxga/components/dialog.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/maxga/MaxgaReleaseInfo.dart';
 import 'package:maxga/provider/public/CollectionProvider.dart';
+import 'package:maxga/route/android/user/base/LoginPageResult.dart';
+import 'package:maxga/route/android/user/login-page.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
 import 'package:maxga/service/UpdateService.dart';
 import 'package:provider/provider.dart';
-import 'package:maxga/MangaRepoPool.dart';
 
-import '../mangaInfo/MangaInfoPage.dart';
 import '../drawer/drawer.dart';
+import '../mangaInfo/MangaInfoPage.dart';
 import '../search/search-page.dart';
 
 class CollectionPage extends StatefulWidget {
@@ -30,6 +33,11 @@ class CollectionPage extends StatefulWidget {
 class _CollectionPageState extends State<CollectionPage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
+  MaxgaReleaseInfo nextVersion;
+
+  bool isShowUpdateBanner = false;
+  bool isShowLoginBanner = true;
+  bool isShowSyncBanner = false;
 
   @override
   void initState() {
@@ -48,12 +56,13 @@ class _CollectionPageState extends State<CollectionPage> {
     return Scaffold(
       drawer: MaxgaDrawer(
         active: MaxgaMenuItemType.collect,
+        loginCallback: () => toLogin(),
       ),
       appBar: AppBar(
         title: const Text('收藏'),
         actions: <Widget>[
           MaxgaSearchButton(),
-            MaxgaTestButton(),
+          MaxgaTestButton(),
         ],
       ),
       key: scaffoldKey,
@@ -63,14 +72,88 @@ class _CollectionPageState extends State<CollectionPage> {
     );
   }
 
+  MaterialBanner buildUpdateBanner() {
+    return MaterialBanner(
+      content: const Text('有新版本更新, 点击查看'),
+      leading: const CircleAvatar(child: Icon(Icons.arrow_upward)),
+      actions: <Widget>[
+        FlatButton(
+          child: const Text('查看'),
+          onPressed: () {
+            openUpdateDialog(nextVersion);
+            setState(() {
+              isShowUpdateBanner = false;
+            });
+          },
+        ),
+        FlatButton(
+          child: const Text('忽略'),
+          onPressed: () {
+            UpdateService.ignoreUpdate(nextVersion);
+            setState(() {
+              isShowUpdateBanner = false;
+            });
+          },
+        ),
+      ],
+    );
+  }
 
+  MaterialBanner buildLoginBanner() {
+    return MaterialBanner(
+      content: const Text('登录后即可享受同步多设备间的阅读数据，不丢失阅读记录'),
+      leading: const CircleAvatar(child: Icon(Icons.person_pin)),
+      actions: <Widget>[
+        FlatButton(
+          child: const Text('登录'),
+          onPressed: () async {
+            await AnimationDelay();
+            toLogin();
+          },
+        ),
+        FlatButton(
+          child: const Text('忽略'),
+          onPressed: () async {
+            await AnimationDelay();
+            setState(() {
+              isShowLoginBanner = false;
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget buildSyncBanner() {
+    return MaterialBanner(
+      content: const Text('是否立即同步的收藏和阅读记录？'),
+      leading: const CircleAvatar(child: Icon(Icons.sync)),
+      actions: <Widget>[
+        FlatButton(
+          child: const Text('同步'),
+          onPressed: () {
+            setState(() {
+              isShowSyncBanner = false;
+            });
+          },
+        ),
+        FlatButton(
+          child: const Text('忽略'),
+          onPressed: () {
+            setState(() {
+              isShowSyncBanner = false;
+            });
+          },
+        ),
+      ],
+    );
+  }
 
   toSearch() {
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return SearchPage();
     }));
   }
-
 
   void hiddenSnack() {
     scaffoldKey.currentState.hideCurrentSnackBar();
@@ -80,28 +163,9 @@ class _CollectionPageState extends State<CollectionPage> {
     try {
       final nextVersion = await UpdateService.checkUpdateStatus();
       if (nextVersion != null) {
-        final buttonPadding = const EdgeInsets.fromLTRB(15, 5, 15, 5);
-        scaffoldKey.currentState.showSnackBar(SnackBar(
-            duration: Duration(seconds: 3),
-            content: GestureDetector(
-              child: Padding(
-                padding: buttonPadding,
-                child: Text('有新版本更新, 点击查看'),
-              ),
-              onTap: () {
-                hiddenSnack();
-                openUpdateDialog(nextVersion);
-              },
-            ),
-            action: SnackBarAction(
-              label: '忽略',
-              textColor: Colors.greenAccent,
-              onPressed: () {
-                openUpdateDialog(nextVersion);
-              },
-            )));
+        isShowUpdateBanner = true;
       }
-    } catch(e) {
+    } catch (e) {
       debugPrint('检查更新失败');
     }
   }
@@ -110,36 +174,47 @@ class _CollectionPageState extends State<CollectionPage> {
     showDialog(
         context: context,
         builder: (context) => UpdateDialog(
-          text: nextVersion.description,
-          url: nextVersion.url,
-          onIgnore: () => UpdateService.ignoreUpdate(nextVersion),
-        ));
+              text: nextVersion.description,
+              url: nextVersion.url,
+              onIgnore: () => UpdateService.ignoreUpdate(nextVersion),
+            ));
   }
-
 
   Widget buildBody() {
     CollectionProvider provider = Provider.of<CollectionProvider>(context);
     if (!provider.loadOver) {
-      return Container();
+      return Column(
+        children: <Widget>[
+          if (isShowUpdateBanner) buildUpdateBanner(),
+          if (isShowLoginBanner) buildLoginBanner(),
+          if (isShowSyncBanner) buildSyncBanner(),
+          Container(),
+        ],
+      );
     } else if (provider.loadOver && provider.isEmpty) {
-      return ErrorPage('您没有收藏的漫画');
+      return Column(
+        children: <Widget>[
+          if (isShowUpdateBanner) buildUpdateBanner(),
+          if (isShowLoginBanner) buildLoginBanner(),
+          if (isShowSyncBanner) buildSyncBanner(),
+          Expanded(
+            child: ErrorPage('您没有收藏的漫画'),
+          ),
+        ],
+      );
     } else {
-      double screenWith = MediaQuery
-          .of(context)
-          .size
-          .width;
+      double screenWith = MediaQuery.of(context).size.width;
       double itemMaxWidth = 140;
       double radio = screenWith / itemMaxWidth;
-      final double itemWidth = radio.floor() > 3 ? itemMaxWidth : screenWith /
-          3;
+      final double itemWidth =
+          radio.floor() > 3 ? itemMaxWidth : screenWith / 3;
       final double height = (itemWidth + 20) / 13 * 15 + 40;
-      var gridView = GridView.count(
+      var gridView = SliverGrid.count(
         crossAxisCount: radio.floor() > 3 ? radio.floor() : 3,
         childAspectRatio: itemWidth / height,
         children: provider.collectionMangaList
             .map(
-              (el) =>
-              Material(
+              (el) => Material(
                   color: Colors.transparent,
                   child: InkWell(
                       onTap: () => this.startRead(el),
@@ -149,20 +224,27 @@ class _CollectionPageState extends State<CollectionPage> {
                         source: MangaRepoPool.getInstance()
                             .getMangaSourceByKey(el.sourceKey),
                       ))),
-        )
+            )
             .toList(growable: false),
       );
-      return MediaQuery.removePadding(
-          context: context,
-          removeTop: true,
-          child: RefreshIndicator(
-            onRefresh: () => this.updateCollectedManga(),
-            child: gridView,
+
+      return RefreshIndicator(
+          onRefresh: () => this.updateCollectedManga(),
+          child: CustomScrollView(
+            slivers: <Widget>[
+              if (isShowUpdateBanner)
+                SliverToBoxAdapter(
+                  child: buildUpdateBanner(),
+                ),
+              if (isShowLoginBanner)
+                SliverToBoxAdapter(child: buildLoginBanner()),
+              if (isShowSyncBanner)
+                SliverToBoxAdapter(child: buildSyncBanner()),
+              gridView,
+            ],
           ));
     }
   }
-
-
 
   startRead(Manga item) async {
     Provider.of<CollectionProvider>(context).setMangaNoUpdate(item);
@@ -170,8 +252,7 @@ class _CollectionPageState extends State<CollectionPage> {
       return MangaInfoPage(
           infoUrl: item.infoUrl,
           sourceKey: item.sourceKey,
-          coverImageBuilder: (context) =>
-              MangaCoverImage(
+          coverImageBuilder: (context) => MangaCoverImage(
                 source: MangaRepoPool.getInstance()
                     .getMangaSourceByKey(item.sourceKey),
                 url: item.coverImgUrl,
@@ -180,7 +261,6 @@ class _CollectionPageState extends State<CollectionPage> {
               ));
     }));
   }
-
 
   updateCollectedManga() {
     final c = new Completer<bool>();
@@ -198,8 +278,8 @@ class _CollectionPageState extends State<CollectionPage> {
   }
 
   Future updateCollectionAction() async {
-    final CollectionProvider collectionState = Provider.of<CollectionProvider>(
-        context);
+    final CollectionProvider collectionState =
+        Provider.of<CollectionProvider>(context);
     final result = await collectionState.checkAndUpdateCollectManga();
     if (result != null) {
       scaffoldKey.currentState.showSnackBar(SnackBar(
@@ -208,4 +288,17 @@ class _CollectionPageState extends State<CollectionPage> {
     }
   }
 
+  void toLogin() async {
+    LoginPageResult result = await Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => LoginPage()));
+    if (result != null && result.success) {
+      scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text('登录成功'),
+      ));
+      setState(() {
+        this.isShowLoginBanner = false;
+        this.isShowSyncBanner = true;
+      });
+    }
+  }
 }

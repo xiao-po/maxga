@@ -4,6 +4,7 @@ import 'package:maxga/provider/public/CollectionProvider.dart';
 import 'package:maxga/provider/public/HistoryProvider.dart';
 import 'package:maxga/provider/public/SettingProvider.dart';
 import 'package:maxga/provider/public/ThemeProvider.dart';
+import 'package:maxga/provider/public/UserProvider.dart';
 import 'package:maxga/route/android/collection/collection-page.dart';
 import 'package:maxga/route/android/source-viewer/source-viewer.dart';
 import 'package:provider/provider.dart';
@@ -30,6 +31,7 @@ class _MyAppState extends State<MyApp> {
         .then((v) => CollectionProvider.getInstance().init())
         .then((v) => SettingProvider.getInstance().init())
         .then((v) => ThemeProvider.getInstance().init())
+        .then((v) => UserProvider.getInstance().init())
         .then((v) {
       this.isInitOver = true;
 
@@ -62,6 +64,9 @@ class _MyAppState extends State<MyApp> {
         ),
         ChangeNotifierProvider(
           create: (context) => ThemeProvider.getInstance(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => UserProvider.getInstance(),
         ),
       ],
       child: MaxGaApp(),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:maxga/base/delay.dart';
 import 'package:maxga/base/drawer/menu-item.dart';
 import 'package:maxga/constant/DrawerValue.dart';
 import 'package:maxga/provider/public/ThemeProvider.dart';
+import 'package:maxga/provider/public/UserProvider.dart';
 import 'package:provider/provider.dart';
 
 import '../collection/collection-page.dart';
@@ -12,9 +14,10 @@ import 'setting/setting-page.dart';
 
 class MaxgaDrawer extends StatefulWidget {
   final MaxgaMenuItemType active;
+  final VoidCallback loginCallback;
 
-  const MaxgaDrawer({Key key, this.active}) : super(key: key);
-
+  const MaxgaDrawer({Key key, this.active, @required this.loginCallback})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => MaxgaDrawerState();
@@ -25,15 +28,33 @@ class MaxgaDrawerState extends State<MaxgaDrawer> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final list = DrawerMenuList.map((menuItem) => ListTile(
-        title: Text(menuItem.title),
-        leading: Icon(menuItem.icon),
-        selected: menuItem.type == widget.active,
-        onTap: () => _handleMenuItemChoose(menuItem.type))).toList(growable: false);
+            title: Text(menuItem.title),
+            leading: Icon(menuItem.icon),
+            selected: menuItem.type == widget.active,
+            onTap: () => _handleMenuItemChoose(menuItem.type)))
+        .toList(growable: false);
     return Drawer(
       child: Column(
         children: <Widget>[
-          UserAccountsDrawerHeader(
-            accountName: const Text('MaxGa'),
+          Consumer<UserProvider>(
+            builder:
+                (BuildContext context, UserProvider value, Widget child) {
+                  if (value.isLogin) {
+                    return UserAccountsDrawerHeader(
+                        accountName: Text(value.user.username)
+                    );
+                  } else {
+                    return UserAccountsDrawerHeader(
+                        accountName: GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                            AnimationDelay()
+                                .then((v) => widget.loginCallback());
+                          },
+                          child: const Text('未登录'),
+                        ));
+                  }
+                },
           ),
           MediaQuery.removePadding(
               context: context,
@@ -44,7 +65,11 @@ class MaxgaDrawerState extends State<MaxgaDrawer> {
               )),
           ListTile(
             title: const Text('夜间模式'),
-            trailing: Switch(value: theme.brightness == Brightness.dark, onChanged: (v) => Provider.of<ThemeProvider>(context).changeBrightness(),),
+            trailing: Switch(
+              value: theme.brightness == Brightness.dark,
+              onChanged: (v) =>
+                  Provider.of<ThemeProvider>(context).changeBrightness(),
+            ),
           )
         ],
       ),
@@ -55,20 +80,22 @@ class MaxgaDrawerState extends State<MaxgaDrawer> {
     switch (type) {
       case MaxgaMenuItemType.collect:
         Navigator.pop(context);
-        await Future.delayed(Duration(milliseconds: 300));
+        await AnimationDelay();
         Navigator.pushReplacement(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) => CollectionPage(),
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  CollectionPage(),
             ));
         break;
       case MaxgaMenuItemType.mangaSourceViewer:
         Navigator.pop(context);
-        await Future.delayed(Duration(milliseconds: 300));
+        await AnimationDelay();
         Navigator.pushReplacement(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) => SourceViewerPage(),
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  SourceViewerPage(),
             ));
         break;
       case MaxgaMenuItemType.history:

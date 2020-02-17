@@ -9,6 +9,7 @@ import 'package:maxga/components/base/MaxgaTabView.dart';
 import 'package:maxga/components/MaxgaButton.dart';
 import 'package:maxga/components/TabBar.dart';
 import 'package:maxga/components/base/WillExitScope.dart';
+import 'package:maxga/components/base/ZeroDivider.dart';
 import 'package:maxga/components/dialog.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
@@ -16,6 +17,8 @@ import 'package:maxga/model/maxga/MaxgaReleaseInfo.dart';
 import 'package:maxga/provider/public/HistoryProvider.dart';
 import 'package:maxga/provider/public/SettingProvider.dart';
 import 'package:maxga/provider/source-viewer/source-viwer-provider.dart';
+import 'package:maxga/route/android/user/base/LoginPageResult.dart';
+import 'package:maxga/route/android/user/login-page.dart';
 import 'package:maxga/service/UpdateService.dart';
 import 'package:maxga/MangaRepoPool.dart';
 import 'package:provider/provider.dart';
@@ -175,6 +178,7 @@ class _SourceViewerPageState extends State<SourceViewerPage>
       key: scaffoldKey,
       drawer: MaxgaDrawer(
         active: MaxgaMenuItemType.mangaSourceViewer,
+        loginCallback: toLogin,
       ),
       appBar: appBar,
       body: WillExitScope(
@@ -217,7 +221,7 @@ class _SourceViewerPageState extends State<SourceViewerPage>
   ListView buildMangaListView(MangaSourceViewerPage state) {
     return ListView.separated(
       controller: state.controller,
-      separatorBuilder: (context, index) => Divider(),
+      separatorBuilder: (context, index) => ZeroDivider(),
       itemBuilder: (context, index) {
         if (index == state.mangaList.length) {
           if (state.isLast) {
@@ -329,7 +333,7 @@ class _SourceViewerPageState extends State<SourceViewerPage>
     sourceName = state.source.name;
     try {
       await state.refreshPage();
-    } on MangaHttpError catch (e) {
+    } on MangaRepoError catch (e) {
       debugPrint(e.message);
     } finally {
       if (state.loadState != MangaSourceViewerPageLoadState.loading) {
@@ -341,7 +345,7 @@ class _SourceViewerPageState extends State<SourceViewerPage>
   Future<void> loadNextPage(MangaSourceViewerPage state) async {
     try {
       await state.loadNextPage();
-    } on MangaHttpError catch (e) {
+    } on MangaRepoError catch (e) {
       debugPrint(e.message);
     } finally {
       if (state.loadState != MangaSourceViewerPageLoadState.loading) {
@@ -388,5 +392,16 @@ class _SourceViewerPageState extends State<SourceViewerPage>
         sourceKey: manga.sourceKey,
       );
     }));
+  }
+
+
+  void toLogin() async {
+    LoginPageResult result = await Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => LoginPage()));
+    if (result != null && result.success) {
+      scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text('登录成功'),
+      ));
+    }
   }
 }

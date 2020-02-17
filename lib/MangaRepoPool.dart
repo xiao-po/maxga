@@ -55,7 +55,7 @@ class MangaRepoPool {
     _map[repo.mangaSource.key] = repo;
   }
 
-  getRepo({MangaSource source, String key}) {
+  MaxgaDataHttpRepo getRepo({MangaSource source, String key}) {
     if (key != null) {
       return _map[key];
     }

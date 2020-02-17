@@ -10,7 +10,7 @@ enum MangaHttpErrorType {
 }
 
 
-class MangaHttpError extends Error {
+class MangaRepoError extends Error {
   String get message {
     switch(this.type) {
       case MangaHttpErrorType.NULL_PARAM:
@@ -29,5 +29,5 @@ class MangaHttpError extends Error {
   }
   final MangaSource source;
   final MangaHttpErrorType type;
-  MangaHttpError(this.type, this.source);
+  MangaRepoError(this.type, this.source);
 }

@@ -1,4 +1,3 @@
-
 import 'package:maxga/database/collect-status.repo.dart';
 import 'package:maxga/database/mangaData.repo.dart';
 import 'package:maxga/database/readMangaStatus.repo.dart';
@@ -10,9 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class MangaStorageService {
   static final String _key = 'manga_process_';
 
-
   static Future<bool> saveManga(Manga manga) async {
-
     final isMangaExist = await MangaDataRepository.isExist(manga.infoUrl);
     bool isSaveToMangaTableSuccess = false;
     if (isMangaExist) {
@@ -29,51 +26,53 @@ class MangaStorageService {
 
   static Future<List<Manga>> getCollectedManga() {
     return MangaDataRepository.findByIsCollected(true);
-
   }
 
   static Future<ReadMangaStatus> getMangaStatusByUrl(String url) async {
-    return (await MangaReadStatusRepository.findByUrl(url)) ?? ReadMangaStatus(
-      infoUrl: url
-    );
+    return (await MangaReadStatusRepository.findByUrl(url)) ??
+        ReadMangaStatus(infoUrl: url);
   }
 
   static Future<bool> saveMangaStatus(ReadMangaStatus status) async {
-    final isMangaReadStatusExist = await MangaReadStatusRepository.isExist(status.infoUrl);
+    final isMangaReadStatusExist =
+        await MangaReadStatusRepository.isExist(status.infoUrl);
     bool isSaveToMangaReadStatusTableSuccess = false;
     if (isMangaReadStatusExist) {
-      isSaveToMangaReadStatusTableSuccess = await MangaReadStatusRepository.update(status);
+      isSaveToMangaReadStatusTableSuccess =
+          await MangaReadStatusRepository.update(status);
     } else {
-      isSaveToMangaReadStatusTableSuccess = await MangaReadStatusRepository.insert(status);
+      isSaveToMangaReadStatusTableSuccess =
+          await MangaReadStatusRepository.insert(status);
     }
 
     return isSaveToMangaReadStatusTableSuccess;
   }
 
-  static Future<List<Manga>> getMangaByUrlList(List<String> urlList)  {
+  static Future<List<Manga>> getMangaByUrlList(List<String> urlList) {
     if (urlList == null || urlList.isEmpty) {
       return Future.value([]);
     }
     return MangaDataRepository.findByUrlList(urlList);
   }
 
-  static Future<bool> setMangaCollectedStatus(Manga manga, {bool isCollected = true}) async {
-    CollectStatus collectStatus = await CollectStatusRepo.findByInfoUrl(manga.infoUrl);
+  static Future<bool> setMangaCollectedStatus(Manga manga,
+      {bool isCollected = true}) async {
+    CollectStatus collectStatus =
+        await CollectStatusRepo.findByInfoUrl(manga.infoUrl);
     final isExist = collectStatus != null;
     if (isExist) {
+      collectStatus.sourceKey = manga.sourceKey;
       collectStatus.updateTime = DateTime.now();
-      collectStatus.isCollected = isCollected;
+      collectStatus.collected = isCollected;
       return CollectStatusRepo.update(collectStatus);
     } else {
       return CollectStatusRepo.insert(CollectStatus(
           infoUrl: manga.infoUrl,
-          isCollected: isCollected,
-        updateTime: DateTime.now()
-      ));
+          collected: isCollected,
+          sourceKey: manga.sourceKey,
+          updateTime: DateTime.now()));
     }
-
   }
-
 
 //  static Future<ReadMangaStatus> getMangaStatus(Manga manga) async {
 //    final allReadManga = (await _getAllReadManga()).toList();

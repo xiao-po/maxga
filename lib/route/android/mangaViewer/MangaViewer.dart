@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/Utils/MaxgaUtils.dart';
+import 'package:maxga/base/delay.dart';
 import 'package:maxga/base/setting/SettingValue.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/manga/Chapter.dart';
@@ -179,7 +180,7 @@ class _MangaViewerState extends State<MangaViewer> {
         getChapterData(currentChapter),
         getChapterData(preChapter),
         getChapterData(nextChapter),
-        Future.delayed(Duration(milliseconds: 300)),
+        AnimationDelay(),
       ]);
       Chapter currentChapterData = resultChapterList[0];
 

@@ -189,6 +189,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
                   initIndex: imagePage,
                 )));
     if (result != null) {
+      readMangaStatus.sourceKey = source.key;
       readMangaStatus.chapterId = result.chapter.id;
       readMangaStatus.pageIndex = result.pageIndex;
       readMangaStatus.updateTime = DateTime.now();

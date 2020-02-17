@@ -8,9 +8,13 @@ import 'package:maxga/database/readMangaStatus.repo.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/model/maxga/ReadMangaStatus.dart';
 import 'package:maxga/provider/public//HistoryProvider.dart';
+import 'package:maxga/provider/public/UserProvider.dart';
+import 'package:maxga/route/android/user/login-page.dart';
+import 'package:maxga/route/android/user/user-detail-page.dart';
 import 'package:maxga/route/ios/index/index-page.dart';
 import 'package:maxga/route/android/search/search-page.dart';
 import 'package:maxga/service/MangaReadStorage.service.dart';
+import 'package:maxga/service/MaxgaServer.service.dart';
 import 'package:provider/provider.dart';
 
 import '../MangaRepoPool.dart';
@@ -75,8 +79,9 @@ class MaxgaTestButton extends StatelessWidget {
       ),
       onPressed: () async {
 //        final data = await CollectStatusRepo.findAllCollect();
-        final List<ReadMangaStatus> data = await MangaReadStatusRepository.findAll();
-        print(data.map((item) => item.updateTime).toList());
+//        final List<ReadMangaStatus> data = await MangaReadStatusRepository.findAll();
+         Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => UserDetailPage()));
       },
     );
   }

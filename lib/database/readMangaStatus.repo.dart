@@ -20,21 +20,6 @@ class MangaReadStatusRepository {
     );
   }
 
-  static Future<List<ReadMangaStatus>> findByCollected(bool isCollected,
-      {Database database}) {
-    return MaxgaDataBaseUtils.openSearchTransaction<List<ReadMangaStatus>>(
-      action: (db) async {
-        final List<Map<String, dynamic>> result = await db.query(
-            DatabaseTables.mangaReadStatus,
-            where: '${MangaReadStatusTableColumns.isCollect} = ?',
-            whereArgs: [isCollected ? 1 : 0]);
-
-        return result.length != 0 ? result.map((item) => ReadMangaStatusUtils.fromMangaReadStatusTable(item)) : null;
-      },
-      database: database,
-    );
-  }
-
 
   static Future<bool> insert(ReadMangaStatus manga, {Database database}) {
     return MaxgaDataBaseUtils.openUpdateTransaction(
