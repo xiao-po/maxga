@@ -176,13 +176,13 @@ class _MangaViewerState extends State<MangaViewer> {
       chapterIndex =
           chapterList.indexWhere((el) => el.url == widget.currentChapter.url);
       currentChapter = chapterList[chapterIndex];
-      final resultChapterList = await Future.wait<Chapter>([
+      final resultChapterList = await Future.wait([
         getChapterData(currentChapter),
         getChapterData(preChapter),
         getChapterData(nextChapter),
         AnimationDelay(),
       ]);
-      Chapter currentChapterData = resultChapterList[0];
+      Chapter currentChapterData = resultChapterList[0] as Chapter;
 
       if (mounted) {
         setState(() {
@@ -201,12 +201,12 @@ class _MangaViewerState extends State<MangaViewer> {
         });
       }
     } catch (e) {
-      print(e);
       if (mounted) {
         setState(() {
           this.loadStatus = _MangaViewerLoadState.error;
         });
       }
+      rethrow;
     }
   }
 

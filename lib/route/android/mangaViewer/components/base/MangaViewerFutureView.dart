@@ -23,10 +23,11 @@ class MangaFeatureView extends StatelessWidget {
             context: context,
             removeBottom: true,
             child: AppBar(
+              iconTheme: IconThemeData(color: Colors.grey[400]),
               backgroundColor: Color(0xff263238),
               elevation: 0,
               leading: BackButton(),
-              title: Text(title),
+              title: Text(title, style: TextStyle(color: Colors.grey[400]),),
             )),
         MediaQuery.removePadding(
             context: context,

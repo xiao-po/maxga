@@ -10,6 +10,7 @@ import 'package:maxga/service/user.service.dart';
 import 'base/FormItem.dart';
 import 'base/RegistryPageResult.dart';
 import 'base/user-page-form-components.dart';
+import 'components/RegistryButton.dart';
 
 class RegistryForm {
   final FormItem user;
@@ -19,17 +20,17 @@ class RegistryForm {
   final VoidCallback onChange;
 
   List<FormItem> get allItem => [
-        user,
-        email,
-        password,
-        rePassword,
-      ];
+    user,
+    email,
+    password,
+    rePassword,
+  ];
 
   bool get hasError =>
       user.invalid ||
-      password.invalid ||
-      rePassword.invalid ||
-      email.invalid;
+          password.invalid ||
+          rePassword.invalid ||
+          email.invalid;
 
   String get errorText {
     if (user.invalid) {
@@ -50,22 +51,21 @@ class RegistryForm {
 
   RegistryForm(
       {FormItem user,
-      FormItem password,
-      FormItem rePassword,
-      FormItem email,
-      String username,
-      this.onChange})
+        FormItem password,
+        FormItem rePassword,
+        FormItem email,
+        String username,
+        this.onChange})
       : this.user = user ??
-            FormItem(text: username ?? "", validators: [
-              MaxgaValidator.checkSpaceExist,
-              MaxgaValidator.emptyValidator
-            ]),
+      FormItem(text: username ?? "", validators: [
+        MaxgaValidator.checkSpaceExist,
+        MaxgaValidator.emptyValidator
+      ]),
         this.password = password ??
             FormItem(validators: [
               MaxgaValidator.emptyValidator,
               MaxgaValidator.passwordLengthValidator,
               MaxgaValidator.checkSpaceExist,
-              MaxgaValidator.emptyValidator
             ]),
         this.rePassword = rePassword ??
             FormItem(validators: [
@@ -104,10 +104,10 @@ class RegistryForm {
   }
 
   UserRegistryQuery get value => UserRegistryQuery(
-        user.value.trim(),
-        password.value.trim(),
-        email.value,
-      );
+    user.value.trim(),
+    password.value.trim(),
+    email.value,
+  );
 
   void setDirtyAndValidate() {
     for (var value in this.allItem) {
@@ -157,8 +157,11 @@ class _RegistryPageState extends State<RegistryPage> {
           children: <Widget>[
             Hero(
               tag: 'username',
-              child: MaxgaTextFiled.fromItem(form.user,
-                  placeHolder: "请输入用户名", icon: Icons.person),
+              child: MaxgaTextFiled.fromItem(
+                  form.user,
+                  placeHolder: "请输入用户名",
+                  icon: Icons.person,
+              ),
             ),
             MaxgaTextFiled.fromItem(
               form.email,
@@ -177,8 +180,13 @@ class _RegistryPageState extends State<RegistryPage> {
             Container(
               width: double.infinity,
               height: 40,
-              child: _RegistryButton(
+              child: PrimaryButton(
                 onPressed: registry,
+                content: Text(
+                  '注册',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             )
           ],
@@ -213,9 +221,9 @@ class _RegistryPageState extends State<RegistryPage> {
       } on MaxgaRequestError catch (e) {
         Navigator.of(context).pop();
         switch (e.status) {
-          case MaxgaServerResponseStatus.USERNAME_EXISTED:
+          case MaxgaServerResponseStatus.USERNAME_INVALID:
             setState(() {
-              form.user.setError("用户名已经存在");
+              form.user.setError(e.message);
             });
             break;
           case MaxgaServerResponseStatus.SERVICE_FAILED:
@@ -223,6 +231,17 @@ class _RegistryPageState extends State<RegistryPage> {
               content: Text('服务器异常'),
             ));
             break;
+          case MaxgaServerResponseStatus.PASSWORD_INVALID:
+            setState(() {
+              form.password.setError(e.message);
+            });
+            break;
+          case MaxgaServerResponseStatus.EMAIL_INVALID:
+            setState(() {
+              form.email.setError(e.message);
+            });
+            break;
+
           case MaxgaServerResponseStatus.SUCCESS:
           case MaxgaServerResponseStatus.TIMEOUT:
           case MaxgaServerResponseStatus.PARAM_ERROR:
@@ -233,6 +252,9 @@ class _RegistryPageState extends State<RegistryPage> {
           case MaxgaServerResponseStatus.UPDATE_VALUE_EXIST:
           case MaxgaServerResponseStatus.UPDATE_VALUE_OUT_OF_DATE:
           case MaxgaServerResponseStatus.OPERATION_NOT_PERMIT:
+          case MaxgaServerResponseStatus.ACTIVE_TOKEN_OUT_OF_DATE:
+          case MaxgaServerResponseStatus.ANOTHER_ACTIVE_TOKEN_EXIST:
+          case MaxgaServerResponseStatus.RESET_EMAIL_LIMITED:
             break;
         }
       } catch (e) {
@@ -251,27 +273,4 @@ class _RegistryPageState extends State<RegistryPage> {
   }
 }
 
-class _RegistryButton extends StatelessWidget {
-  final VoidCallback onPressed;
 
-  const _RegistryButton({
-    Key key,
-    this.onPressed,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return FlatButton(
-      color: Colors.blue,
-      shape: RoundedRectangleBorder(
-        borderRadius: new BorderRadius.circular(5.0),
-      ),
-      onPressed: onPressed,
-      child: Text(
-        '注册',
-        textAlign: TextAlign.center,
-        style: TextStyle(color: Colors.white),
-      ),
-    );
-  }
-}

@@ -126,6 +126,7 @@ class _SourceViewerPageState extends State<SourceViewerPage>
         MangaSourceViewerPage('排名', SourceViewType.rank, source),
       ];
     });
+
     await Future.wait(
         tabs.map((state) => this.loadNextPage(state)).toList(growable: false));
   }
@@ -147,19 +148,16 @@ class _SourceViewerPageState extends State<SourceViewerPage>
           )
         ],
         elevation: 1,
-        bottom: ColoredTabBar(
-          color: Colors.white,
-          tabBar: TabBar(
-            controller: tabController,
-            labelColor: tabBarLabelColor,
-            indicatorColor: tabBarIndicator,
-            unselectedLabelColor: Colors.grey,
-            tabs: tabs
-                .map((item) => Tab(
-                      text: item.title,
-                    ))
-                .toList(growable: false),
-          ),
+        bottom: TabBar(
+          controller: tabController,
+          labelColor: tabBarLabelColor,
+          indicatorColor: tabBarIndicator,
+          unselectedLabelColor: Colors.grey,
+          tabs: tabs
+              .map((item) => Tab(
+            text: item.title,
+          ))
+              .toList(growable: false),
         ),
       );
     var tabViewer = MaxgaTabBarView(
@@ -349,7 +347,9 @@ class _SourceViewerPageState extends State<SourceViewerPage>
       debugPrint(e.message);
     } finally {
       if (state.loadState != MangaSourceViewerPageLoadState.loading) {
-        setState(() {});
+        if (mounted) {
+          setState(() {});
+        }
       }
     }
   }
@@ -392,6 +392,7 @@ class _SourceViewerPageState extends State<SourceViewerPage>
         sourceKey: manga.sourceKey,
       );
     }));
+
   }
 
 

@@ -7,12 +7,20 @@ import 'package:maxga/base/setting/SettingValue.dart';
 import 'package:maxga/provider/base/BaseProvider.dart';
 import 'package:maxga/service/Setting.service.dart';
 
+class SettingGroup {
+  final String title;
+  final List<MaxgaSettingItem> items;
+  final MaxgaSettingCategoryType category;
+  SettingGroup({ this.items, this.category}): this.title = SettingCategoryList[category];
+
+
+}
 
 
 class SettingProvider extends BaseProvider {
-  List<MaxgaSettingItem> _items;
+  List<SettingGroup> _items;
 
-  List<MaxgaSettingItem> get itemList => _items;
+  List<SettingGroup> get itemList => _items;
 
   static SettingProvider _instance;
 
@@ -26,26 +34,35 @@ class SettingProvider extends BaseProvider {
   SettingProvider();
 
   MaxgaSettingItem getItem(MaxgaSettingItemType type) {
-    return this._items.firstWhere((el) => el.key == type);
+    for(final group in itemList) {
+      for(final item in group.items) {
+        if (item.key == type) {
+          return item;
+        }
+      }
+    }
+    return null;
   }
 
   String getItemValue(MaxgaSettingItemType type) {
-    return this.getItem(type).value;
+    return this.getItem(type)?.value ?? '0';
   }
 
   bool getBoolItemValue(MaxgaSettingItemType type) {
-    final value = this._items.firstWhere((el) => el.key == type).value;
+    final value = getItem(type).value ?? '0';
     return value == '1';
   }
 
   Future<bool> init() async {
     final value = await SettingService.getInitValue();
-    List<MaxgaSettingItem> itemList = <MaxgaSettingItem>[];
+    List<SettingGroup> itemList = [];
     SettingCategoryList.keys.forEach((type) {
-      var titleItem = _createTitleItem(type);
-      itemList
-        ..add(titleItem)
-        ..addAll(value.where((item) => item.category == type));
+      itemList.add(
+        SettingGroup(
+          category: type,
+          items: value.where((item) => item.category == type).toList(growable: false),
+        )
+      );
     });
     _items = itemList;
     notifyListeners();
@@ -53,17 +70,14 @@ class SettingProvider extends BaseProvider {
     return true;
   }
 
-  MaxgaSettingItem _createTitleItem(MaxgaSettingCategoryType type) {
-    return MaxgaSettingItem.title(
-        subTitle: SettingCategoryList[type],
-        category: type);
-  }
+
 
   Future<bool> modifySetting(MaxgaSettingItem item,String v) async {
     final isSuccess =
         await SettingService.saveItem(item.key.toString(), v);
-    final index = _items.indexOf(item);
-    _items[index] = item.copyWith(value: v);
+    final group = _items.firstWhere((group) => group.category == item.category);
+    final index = group.items.indexWhere((config) => config.key == item.key);
+    group.items[index] = item.copyWith(value: v);
     notifyListeners();
     return isSuccess;
   }

@@ -15,4 +15,12 @@ class UserService {
   static Future<String> refreshToken(String refreshToken) async {
     return UserHttpRepo.refreshToken(refreshToken);
   }
+
+  static Future<void> resetPasswordRequest(String email) async {
+    return UserHttpRepo.resetPasswordRequest(email);
+  }
+
+  static Future<void> logout(String refreshToken) {
+    return UserHttpRepo.logout(refreshToken);
+  }
 }

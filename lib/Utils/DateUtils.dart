@@ -16,10 +16,10 @@ class DateUtils {
     result = result.replaceAll('YYYY', '${resultTime.year}');
     result = result.replaceAll('MM', '${resultTime.month < 10 ? '0${resultTime.month}' : resultTime.month}');
     result = result.replaceAll('dd', '${resultTime.day < 10 ? '0${resultTime.day}' : resultTime.day}');
-    result = result.replaceAll('HH', '${resultTime.hour < 10 ? '0${resultTime.hour}' : resultTime.day}}');
+    result = result.replaceAll('HH', '${resultTime.hour < 10 ? '0${resultTime.hour}' : resultTime.day}');
     result = result.replaceAll('hh', '${hh < 10 ? '0${resultTime.hour}' : hh}}');
-    result = result.replaceAll('mm', '${resultTime.minute < 10 ? '0${resultTime.minute}' : resultTime.minute}}');
-    result = result.replaceAll('ss', '${resultTime.second < 10 ? '0${resultTime.second}' : resultTime.second}}');
+    result = result.replaceAll('mm', '${resultTime.minute < 10 ? '0${resultTime.minute}' : resultTime.minute}');
+    result = result.replaceAll('ss', '${resultTime.second < 10 ? '0${resultTime.second}' : resultTime.second}');
     return result;
   }
 

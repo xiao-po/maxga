@@ -18,6 +18,8 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+  var scaffoldKey = GlobalKey<ScaffoldState>();
+
   final searchInputController = TextEditingController();
 
   SearchStep searchStatus = SearchStep.beforeInput;
@@ -41,6 +43,7 @@ class _SearchPageState extends State<SearchPage> {
         ? TextStyle(color: Colors.black54)
         : TextStyle(color: theme.hintColor);
     final textField = TextField(
+      textInputAction: TextInputAction.search,
       controller: searchInputController,
       onChanged: (words) => this.inputChange(words),
       onEditingComplete: () =>
@@ -55,6 +58,7 @@ class _SearchPageState extends State<SearchPage> {
       ),
     );
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         leading: BackButton(),
         title: textField,
@@ -66,9 +70,10 @@ class _SearchPageState extends State<SearchPage> {
                   this.toSearch(this.searchInputController.value.text),
               child: Icon(
                 Icons.search,
+                color: theme.brightness == Brightness.dark ? Colors.grey[400] : Colors.white,
               ),
             )
-          : Container(),
+          : null,
     );
   }
 
@@ -115,6 +120,12 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void toSearch(String words) async {
+    if (words.trim() == "") {
+      scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: const Text("请输入漫画名称或者作者名称"),
+      ));
+      return null;
+    }
     this.goResultPage(words);
 
     List<String> historyList = this.historySearchWords.toList();

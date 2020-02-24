@@ -37,54 +37,60 @@ enum DefaultIndexPage {
   sourceViewer
 }
 
+class SelectOption<T> {
+  final String title;
+  final T value;
 
+  const SelectOption({this.title, this.value});
+  
+}
 
-const Map<MaxgaSettingItemType, List<DropdownMenuItem<String>>>
-    MaxgaDropDownOptionsMap = const {
+const Map<MaxgaSettingItemType, List<SelectOption<String>>>
+    MaxgaSelectOptionsMap = const {
   MaxgaSettingItemType.timeoutLimit: [
-    DropdownMenuItem(
+    SelectOption(
       value: '5000',
-      child: const Text('5s'),
+      title: '5s',
     ),
-    DropdownMenuItem(
+    SelectOption(
       value: '10000',
-      child: const Text('10s'),
+      title: '10s',
     ),
-    DropdownMenuItem(
+    SelectOption(
       value: '15000',
-      child: const Text('15s'),
+      title: '15s',
     ),
-    DropdownMenuItem(
+    SelectOption(
       value: '30000',
-      child: const Text('30s'),
+      title: '30s',
     ),
   ],
   MaxgaSettingItemType.defaultIndexPage: [
-    DropdownMenuItem(
+    SelectOption(
       value: '0',
-      child: const Text('收藏'),
+      title: '收藏',
     ),
-    DropdownMenuItem(
+    SelectOption(
       value: '1',
-      child: const Text('图源'),
+      title: '图源',
     ),
   ],
   MaxgaSettingItemType.defaultMangaSource: [
-    DropdownMenuItem(
+    SelectOption(
       value: DmzjMangaSourceKey,
-      child: const Text('动漫之家'),
+      title: '动漫之家',
     ),
-    DropdownMenuItem(
+    SelectOption(
       value: HanhanMangaSourceKey,
-      child: const Text('汗汗漫画'),
+      title: '汗汗漫画',
     ),
-    DropdownMenuItem(
+    SelectOption(
       value: ManhuaguiMangaSourceKey,
-      child: const Text('漫画柜'),
+      title: '漫画柜',
     ),
-    DropdownMenuItem(
+    SelectOption(
       value: ManhuaduiMangaSourceKey,
-      child: const Text('漫画堆'),
+      title: '漫画堆',
     ),
   ]
 };

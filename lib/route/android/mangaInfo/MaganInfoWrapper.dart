@@ -28,11 +28,12 @@ class _MangaInfoWrapperState extends State<MangaInfoWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    Color originColor = Theme.of(context).accentColor;
+    Color originColor = Theme.of(context).primaryColor;
     Color appbarColor = Color.fromARGB((opacity * 0xff).floor(),
         originColor.red, originColor.green, originColor.blue);
+    var titleColor = Colors.grey[500];
     Color appbarTitleColor = Color.fromARGB(
-        (opacity * 0xff).floor(), 0x000000ff, 0x000000ff, 0x000000ff);
+        (opacity * 0xff).floor(), titleColor.red, titleColor.green, titleColor.blue);
 
     return Stack(
       children: <Widget>[
@@ -63,10 +64,11 @@ class _MangaInfoWrapperState extends State<MangaInfoWrapper> {
               removeBottom: true,
               child: AppBar(
                 backgroundColor: appbarColor,
+                iconTheme: IconThemeData(color: Colors.grey[400]),
                 leading: BackButton(),
+                elevation: 0,
                 title: Text(widget.title,
                     style: TextStyle(color: appbarTitleColor)),
-                elevation: 0,
                 actions: widget.appbarActions,
               )),
         ),
@@ -77,8 +79,9 @@ class _MangaInfoWrapperState extends State<MangaInfoWrapper> {
   void listenScrollTopForModifyBackgroundColor() {
     if (scrollController.position.extentBefore < 200) {
       var opacity = scrollController.position.extentBefore / 100;
-      this.opacity = opacity > 0.9 ? 1 : opacity;
-      setState(() {});
+      setState(() {
+        this.opacity = opacity > 0.9 ? 1 : opacity;
+      });
     }
   }
 

@@ -9,7 +9,7 @@ class UserHttpRepo {
     return MaxgaServerHttpUtils.requestMaxgaServer<bool>(
       MaxgaServerApi.registry,
       query,
-      (v) => true,
+          (v) => true,
     );
   }
 
@@ -18,7 +18,7 @@ class UserHttpRepo {
       MaxgaServerApi.login +
           '?username=${query.username}&password=${query.password}',
       query,
-      (v) => User.fromJson(v),
+          (v) => User.fromJson(v),
     );
   }
 
@@ -26,7 +26,23 @@ class UserHttpRepo {
     return MaxgaServerHttpUtils.requestMaxgaServer<String>(
       MaxgaServerApi.refreshToken,
       null,
-      (v) => v,
+          (v) => v,
+    );
+  }
+
+  static Future<void> resetPasswordRequest(String email) {
+    return MaxgaServerHttpUtils.requestMaxgaServer<String>(
+      MaxgaServerApi.resetPassword.replaceFirst("{email}", email),
+      null,
+          (v) => v,
+    );
+  }
+
+  static Future<void> logout(String refreshToken) {
+    return MaxgaServerHttpUtils.requestMaxgaServer<String>(
+      MaxgaServerApi.logout.replaceFirst("{refreshToken}", refreshToken),
+      null,
+          (v) => v,
     );
   }
 }

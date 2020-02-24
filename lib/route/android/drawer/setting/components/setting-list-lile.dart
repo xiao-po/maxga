@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:maxga/base/setting/Setting.model.dart';
 import 'package:maxga/base/setting/SettingValue.dart';
+import 'package:maxga/components/base/ZeroDivider.dart';
+import 'package:maxga/components/list-tile.dart';
 import 'package:maxga/provider/public/SettingProvider.dart';
 import 'package:provider/provider.dart';
 
@@ -9,7 +11,7 @@ const SettingListTilePadding = const EdgeInsets.only(left: 24, right: 20);
 class SettingListTile extends StatelessWidget {
   final MaxgaSettingItem setting;
 
-  const SettingListTile({Key key, this.setting}) : super(key: key);
+  const SettingListTile(this.setting, {Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +27,9 @@ class SettingListTile extends StatelessWidget {
       case MaxgaSettingListTileType.confirmCommand:
         return AlertCommandSettingListTile(setting: setting);
       case MaxgaSettingListTileType.page:
-        if(setting is MaxgaSettingPageItem) {
-          return SettingPageListTile(setting: (setting as MaxgaSettingPageItem));
+        if (setting is MaxgaSettingPageItem) {
+          return SettingPageListTile(
+              setting: (setting as MaxgaSettingPageItem));
         }
         return ListTile(
             title: const Text('没有类型的选项'),
@@ -68,13 +71,13 @@ class CommandSettingListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: SettingListTilePadding,
+    return MaxgaConfigListTile(
       title: Text(setting.title),
-      subtitle: setting.subTitle != null ? Text(setting.subTitle) : null,
-      onTap: () async {
-        var isSuccess = await Provider.of<SettingProvider>(context)
-            .onChange(setting);
+//      subtitle: setting.subTitle != null ? Text(setting.subTitle) : null,
+      trailing: const Icon(Icons.chevron_right),
+      onPressed: () async {
+        var isSuccess =
+            await Provider.of<SettingProvider>(context).onChange(setting);
         if (isSuccess) {
           Scaffold.of(context).showSnackBar(SnackBar(
             content: Text('${setting.title}结束'),
@@ -93,11 +96,11 @@ class AlertCommandSettingListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-        contentPadding: SettingListTilePadding,
+    return MaxgaConfigListTile(
         title: Text(setting.title),
-        subtitle: setting.subTitle != null ? Text(setting.subTitle) : null,
-        onTap: () async {
+//        subtitle: setting.subTitle != null ? Text(setting.subTitle) : null,
+        trailing: const Icon(Icons.chevron_right),
+        onPressed: () async {
           showDialog(
               context: context,
               child: AlertDialog(
@@ -133,15 +136,25 @@ class CheckBoxSettingListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CheckboxListTile(
-      value: setting.value == '1',
-      title: Text('  ' + setting.title),
-      subtitle: setting.subTitle != null ? Text('  ' + setting.subTitle) : null,
-      onChanged: (checked) {
-        Provider.of<SettingProvider>(context)
-            .modifySetting(setting, checked ? '1' : '0');
+    return MaxgaConfigListTile(
+      title: Text(setting.title),
+      subTitle: setting.subTitle != null ? Text(setting.subTitle) : null,
+      onPressed: () {
+        var checked = !(setting.value == '1');
+        changeValue(context, checked);
       },
+      trailing: SizedBox(
+        height: 20,
+        child: Switch(
+            onChanged: (bool value) => changeValue(context, value),
+            value: setting.value == '1'),
+      ),
     );
+  }
+
+  void changeValue(BuildContext context, bool checked) {
+    Provider.of<SettingProvider>(context)
+        .modifySetting(setting, checked ? '1' : '0');
   }
 }
 
@@ -153,22 +166,83 @@ class DropDownSettingListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(setting.title),
-      contentPadding: SettingListTilePadding,
-      subtitle: setting.subTitle != null ? Text(setting.subTitle) : null,
-      trailing: DropdownButton<String>(
-        value: setting.value,
-        onChanged: (String newValue) {
-          Provider.of<SettingProvider>(context)
-              .modifySetting(setting, newValue);
-        },
-        items: MaxgaDropDownOptionsMap[setting.key],
-      ),
-    );
+    return MaxgaConfigListTile(
+        title: Text(setting.title),
+//      contentPadding: SettingListTilePadding,
+//      subtitle: setting.subTitle != null ? Text(setting.subTitle) : null,
+        trailing: RichText(
+          text: TextSpan(children: [
+            TextSpan(
+                text: setting.value, style: TextStyle(color: Colors.grey[400])),
+            const WidgetSpan(child: const Icon(Icons.chevron_right))
+          ]),
+        ),
+        onPressed: () => toSelectConfigPage(context));
+  }
+
+  toSelectConfigPage(BuildContext context) async {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (c) => Consumer<SettingProvider>(
+                  builder: (context, value, child) => SelectConfigPage(
+                    title: Text(setting.title),
+                    selected: value.getItemValue(setting.key),
+                    items: MaxgaSelectOptionsMap[setting.key],
+                    onSelect: (item) {
+                      value.modifySetting(setting, item.value);
+                    },
+                  ),
+                )));
   }
 }
 
+class SelectConfigPage extends StatelessWidget {
+  final Text title;
+  final List<SelectOption<String>> items;
+  final String selected;
+  final ValueChanged<SelectOption<String>> onSelect;
+
+  const SelectConfigPage(
+      {Key key,
+      @required this.title,
+      @required this.items,
+      @required this.selected,
+      @required this.onSelect})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context);
+    List<Widget> children = [];
+    for (var index = 0; index < items.length; index++) {
+      children.add(MaxgaConfigSelectTile(
+        title: Text(items[index].title),
+        active: items[index].value == selected,
+        onTap: () => onSelect(items[index]),
+      ));
+      if ((index + 1) < items.length) {
+        children.add(ZeroDivider());
+      }
+    }
+    return Scaffold(
+        appBar: AppBar(
+          title: title,
+        ),
+        body: Padding(
+          padding: EdgeInsets.only(top: 30),
+          child: ListView(
+            children: <Widget>[
+              Container(
+                  decoration: ConfigListBoxDecoration(theme),
+                  child: Column(
+                    children: children,
+                  ))
+            ],
+          ),
+        ));
+  }
+}
 
 class SettingPageListTile extends StatelessWidget {
   final MaxgaSettingPageItem setting;
@@ -184,8 +258,9 @@ class SettingPageListTile extends StatelessWidget {
       subtitle: setting.subTitle != null ? Text(setting.subTitle) : null,
       trailing: Icon(Icons.chevron_right),
       onTap: () => Navigator.push(
-        context, MaterialPageRoute(builder: (context) => setting.pageBuilder(context))
-      ),
+          context,
+          MaterialPageRoute(
+              builder: (context) => setting.pageBuilder(context))),
     );
   }
 }

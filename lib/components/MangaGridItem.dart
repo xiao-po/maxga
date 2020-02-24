@@ -1,10 +1,10 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
-import 'package:maxga/model/maxga/ReadMangaStatus.dart';
 
 import 'MangaCoverImage.dart';
-import 'dart:math' as math;
 
 class MangaGridItem extends StatelessWidget {
   final Manga manga;
@@ -13,11 +13,14 @@ class MangaGridItem extends StatelessWidget {
 
   final MangaSource source;
 
+  final Color textColor;
+
   const MangaGridItem(
       {Key key,
       @required this.manga,
       @required this.tagPrefix,
       @required this.source,
+      this.textColor,
       this.width = 130})
       : super(key: key);
 
@@ -25,7 +28,9 @@ class MangaGridItem extends StatelessWidget {
   Widget build(BuildContext context) {
     var gridCover = buildCover();
     if (manga.hasUpdate) {
-      gridCover = Stack(fit: StackFit.expand,children: <Widget>[gridCover, buildHasUpdateIcon()]);
+      gridCover = Stack(
+          fit: StackFit.expand,
+          children: <Widget>[gridCover, buildHasUpdateIcon()]);
     }
     return Container(
       margin: EdgeInsets.only(top: 10, bottom: 10, left: 5, right: 5),
@@ -48,7 +53,7 @@ class MangaGridItem extends StatelessWidget {
                   textAlign: TextAlign.left,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 14)),
+                  style: TextStyle(fontSize: 14, color: textColor)),
             ),
           ),
           Row(
@@ -59,15 +64,15 @@ class MangaGridItem extends StatelessWidget {
                     textAlign: TextAlign.left,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                        fontSize: 12,
-                        textBaseline: TextBaseline.alphabetic,
+                      fontSize: 12,
+                      color: textColor,
+                      textBaseline: TextBaseline.alphabetic,
                     )),
               ),
               Text(source.name,
                   textAlign: TextAlign.left,
                   style: TextStyle(
-                      fontSize: 12,
-                      textBaseline: TextBaseline.alphabetic))
+                      fontSize: 12,color: textColor, textBaseline: TextBaseline.alphabetic))
             ],
           ),
         ],

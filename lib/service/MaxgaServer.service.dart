@@ -9,7 +9,7 @@ import 'package:maxga/service/MangaReadStorage.service.dart';
 
 class MaxgaServerService {
   static Future<bool> sync() async {
-    var collectStatusList = await CollectStatusRepo.findAll();
+    var collectStatusList = (await CollectStatusRepo.findAll()) ?? [];
     var shouldUpdateCollectStatusList = await
         SyncHttpRepo.syncCollectApi(collectStatusList);
     for (CollectStatus value in shouldUpdateCollectStatusList) {
@@ -25,7 +25,7 @@ class MaxgaServerService {
   }
 
   static Future<bool> syncReadStatus() async {
-    var readStatusList = await MangaReadStatusRepository.findAll();
+    var readStatusList = (await MangaReadStatusRepository.findAll()) ?? [];
     var shouldUpdateReadStatusList = await
     SyncHttpRepo.syncStatusApi(readStatusList);
     for (ReadMangaStatus item in shouldUpdateReadStatusList) {

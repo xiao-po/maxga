@@ -9,10 +9,12 @@ import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/components/MangaGridItem.dart';
 import 'package:maxga/components/MaxgaButton.dart';
 import 'package:maxga/components/base/WillExitScope.dart';
+import 'package:maxga/components/circular-progress-dialog.dart';
 import 'package:maxga/components/dialog.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/maxga/MaxgaReleaseInfo.dart';
 import 'package:maxga/provider/public/CollectionProvider.dart';
+import 'package:maxga/provider/public/UserProvider.dart';
 import 'package:maxga/route/android/user/base/LoginPageResult.dart';
 import 'package:maxga/route/android/user/login-page.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
@@ -21,7 +23,6 @@ import 'package:provider/provider.dart';
 
 import '../drawer/drawer.dart';
 import '../mangaInfo/MangaInfoPage.dart';
-import '../search/search-page.dart';
 
 class CollectionPage extends StatefulWidget {
   final String name = 'index_page';
@@ -36,7 +37,7 @@ class _CollectionPageState extends State<CollectionPage> {
   MaxgaReleaseInfo nextVersion;
 
   bool isShowUpdateBanner = false;
-  bool isShowLoginBanner = true;
+  bool isShowLoginBanner = false;
   bool isShowSyncBanner = false;
 
   @override
@@ -49,20 +50,25 @@ class _CollectionPageState extends State<CollectionPage> {
         }
       });
     }
+    if (UserProvider.getInstance().isFirstOpen) {
+      this.isShowLoginBanner = true;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    Color textColor = Colors.grey[500];
     return Scaffold(
       drawer: MaxgaDrawer(
         active: MaxgaMenuItemType.collect,
         loginCallback: () => toLogin(),
       ),
       appBar: AppBar(
-        title: const Text('收藏'),
+        title: Text('收藏'),
+        elevation: 1,
         actions: <Widget>[
           MaxgaSearchButton(),
-          MaxgaTestButton(),
+          MaxgaTestButton()
         ],
       ),
       key: scaffoldKey,
@@ -72,13 +78,14 @@ class _CollectionPageState extends State<CollectionPage> {
     );
   }
 
-  MaterialBanner buildUpdateBanner() {
-    return MaterialBanner(
+  Widget buildUpdateBanner() {
+    var body = MaterialBanner(
       content: const Text('有新版本更新, 点击查看'),
       leading: const CircleAvatar(child: Icon(Icons.arrow_upward)),
       actions: <Widget>[
         FlatButton(
           child: const Text('查看'),
+          color: Theme.of(context).accentColor,
           onPressed: () {
             openUpdateDialog(nextVersion);
             setState(() {
@@ -87,6 +94,7 @@ class _CollectionPageState extends State<CollectionPage> {
           },
         ),
         FlatButton(
+          color: Theme.of(context).accentColor,
           child: const Text('忽略'),
           onPressed: () {
             UpdateService.ignoreUpdate(nextVersion);
@@ -97,10 +105,14 @@ class _CollectionPageState extends State<CollectionPage> {
         ),
       ],
     );
+    return Padding(
+      padding: EdgeInsets.only(top: 10),
+      child: body,
+    );
   }
 
-  MaterialBanner buildLoginBanner() {
-    return MaterialBanner(
+  Widget buildLoginBanner() {
+    var body =  MaterialBanner(
       content: const Text('登录后即可享受同步多设备间的阅读数据，不丢失阅读记录'),
       leading: const CircleAvatar(child: Icon(Icons.person_pin)),
       actions: <Widget>[
@@ -122,19 +134,38 @@ class _CollectionPageState extends State<CollectionPage> {
         ),
       ],
     );
+
+    return Padding(
+      padding: EdgeInsets.only(top: 10),
+      child: body,
+    );
   }
 
   Widget buildSyncBanner() {
-    return MaterialBanner(
+    var body = MaterialBanner(
       content: const Text('是否立即同步的收藏和阅读记录？'),
       leading: const CircleAvatar(child: Icon(Icons.sync)),
       actions: <Widget>[
         FlatButton(
           child: const Text('同步'),
-          onPressed: () {
-            setState(() {
-              isShowSyncBanner = false;
-            });
+          onPressed: () async {
+            showDialog(context: context, child: CircularProgressDialog(forbidCancel: true, tip: "同步中",));
+            try {
+              await Future.wait([
+                UserProvider.getInstance().sync(),
+                AnimationDelay()
+              ]);
+              setState(() {
+                isShowSyncBanner = false;
+              });
+            } catch(e) {
+              Scaffold.of(context).showSnackBar(SnackBar(
+                content: Text("同步出现问题"),
+              ));
+            } finally {
+
+              Navigator.of(context).pop();
+            }
           },
         ),
         FlatButton(
@@ -147,12 +178,10 @@ class _CollectionPageState extends State<CollectionPage> {
         ),
       ],
     );
-  }
-
-  toSearch() {
-    Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
-      return SearchPage();
-    }));
+    return Padding(
+      padding: EdgeInsets.only(top: 10),
+      child: body,
+    );
   }
 
   void hiddenSnack() {

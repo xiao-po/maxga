@@ -8,11 +8,11 @@ import 'package:maxga/route/android/user/base/LoginPageResult.dart';
 import 'package:maxga/route/android/user/base/MaxgaValidator.dart';
 import 'package:maxga/route/android/user/base/RegistryPageResult.dart';
 import 'package:maxga/route/android/user/registry-page.dart';
-import 'package:maxga/service/MaxgaServer.service.dart';
 import 'package:maxga/service/user.service.dart';
 
 import 'base/FormItem.dart';
 import 'base/user-page-form-components.dart';
+import 'components/reset-password-button.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -41,7 +41,7 @@ class _LoginPageState extends State<LoginPage> {
           title: const Text('登录'),
         ),
         body: Padding(
-          padding: EdgeInsets.only(left: 10, right: 10, top: 150),
+          padding: EdgeInsets.only(left: 10, right: 10, top: 30),
           child: Column(
             children: <Widget>[
               Hero(
@@ -53,13 +53,7 @@ class _LoginPageState extends State<LoginPage> {
                   icon: Icons.lock_outline, placeHolder: "请输入密码"),
               Container(
                 alignment: Alignment.centerRight,
-                child: FlatButton(
-                  onPressed: () {},
-                  child: Text(
-                    '忘记密码?',
-                    style: TextStyle(fontSize: 14, color: theme.accentColor),
-                  ),
-                ),
+                child: ResetPasswordButton(),
               ),
               Row(
                 children: <Widget>[
@@ -89,6 +83,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   goRegistryPage() async {
+    setState(() {
+      usernameItem.clearError();
+    });
     FocusScope.of(context).requestFocus(new FocusNode());
     RegistryPageResult result = await Navigator.of(context).push(
         MaterialPageRoute(
@@ -154,6 +151,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
+
 class _LoginButton extends StatelessWidget {
   final VoidCallback onPressed;
 
@@ -166,11 +164,12 @@ class _LoginButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    var isDark = theme.brightness == Brightness.dark;
     return FlatButton(
       shape: RoundedRectangleBorder(
         borderRadius: new BorderRadius.circular(5.0),
       ),
-      color: theme.primaryColor,
+      color: theme.accentColor,
       onPressed: onPressed,
       child: Text(
         '登录',
@@ -191,17 +190,19 @@ class _RegistryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var theme = Theme.of(context);
+    var isDark = theme.brightness == Brightness.dark;
     return FlatButton(
-      color: Colors.white,
+      color: isDark ? Colors.grey[800] : Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: new BorderRadius.circular(5.0),
-        side: BorderSide(color: Colors.grey),
+        side: BorderSide(color:  Colors.grey[300]),
       ),
       onPressed: onPressed,
       child: Text(
         '注册',
         textAlign: TextAlign.center,
-        style: TextStyle(color: Colors.blue),
+        style: TextStyle(color: isDark ? Colors.grey[200] : theme.accentColor),
       ),
     );
   }

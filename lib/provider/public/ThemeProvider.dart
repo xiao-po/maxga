@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maxga/base/custom-ink-splash/custom-ink-splash.dart';
 import 'package:maxga/provider/base/BaseProvider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,12 +24,12 @@ class ThemeProvider extends BaseProvider {
     _setBrightness(prefs.getBool(DarkModeKey) ?? false);
   }
 
-
   changeBrightness() {
     final isDarkMode = this.theme.brightness == Brightness.dark;
     this._setBrightness(!isDarkMode);
     notifyListeners();
   }
+
   setBrightness([bool isDarkMode = false]) {
     this._setBrightness(isDarkMode);
     notifyListeners();
@@ -37,9 +38,17 @@ class ThemeProvider extends BaseProvider {
   _setBrightness(bool isDarkMode) {
     this._changeBrightness(isDarkMode);
     this._theme = ThemeData(
-        brightness: isDarkMode ? Brightness.dark : Brightness.light,
-        accentColor: isDarkMode ? Colors.teal : null,
-        scaffoldBackgroundColor: isDarkMode ? Colors.grey[850] : Colors.grey[100],
+      brightness: isDarkMode ? Brightness.dark : Brightness.light,
+      accentColor: isDarkMode ? Colors.teal : Colors.cyan,
+      primaryColor: isDarkMode ? Colors.grey[800] : Colors.white,
+      splashFactory: CustomInkSplash.splashFactory,
+      cursorColor: isDarkMode ? Colors.teal : Colors.cyan,
+      buttonTheme: ButtonThemeData(
+          textTheme: ButtonTextTheme.primary,
+          colorScheme: ThemeData.light()
+              .colorScheme
+              .copyWith(primary: isDarkMode ? Colors.teal : Colors.cyan)),
+      scaffoldBackgroundColor: isDarkMode ? Colors.grey[900] : Colors.grey[50],
     );
   }
 

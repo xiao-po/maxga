@@ -8,6 +8,7 @@ import 'package:maxga/database/readMangaStatus.repo.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/model/maxga/ReadMangaStatus.dart';
 import 'package:maxga/provider/public//HistoryProvider.dart';
+import 'package:maxga/provider/public/SettingProvider.dart';
 import 'package:maxga/provider/public/UserProvider.dart';
 import 'package:maxga/route/android/user/login-page.dart';
 import 'package:maxga/route/android/user/user-detail-page.dart';
@@ -24,7 +25,7 @@ class MaxgaSearchButton extends StatelessWidget {
 
   const MaxgaSearchButton({
     Key key,
-    this.color = Colors.white,
+    this.color = Colors.grey,
   }) : super(key: key);
 
   @override
@@ -78,10 +79,7 @@ class MaxgaTestButton extends StatelessWidget {
         Icons.details,
       ),
       onPressed: () async {
-//        final data = await CollectStatusRepo.findAllCollect();
-//        final List<ReadMangaStatus> data = await MangaReadStatusRepository.findAll();
-         Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => UserDetailPage()));
+
       },
     );
   }

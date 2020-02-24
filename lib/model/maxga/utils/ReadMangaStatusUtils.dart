@@ -31,7 +31,8 @@ class ReadMangaStatusUtils {
       MangaReadStatusTableColumns.infoUrl: manga.infoUrl,
       MangaReadStatusTableColumns.lastReadImageIndex: manga.pageIndex,
       MangaReadStatusTableColumns.lastReadChapterId: manga.chapterId,
-      MangaReadStatusTableColumns.updateTime: manga.updateTime.toIso8601String()
+      MangaReadStatusTableColumns.updateTime: manga.updateTime.toIso8601String(),
+      MangaReadStatusTableColumns.sourceKey: manga.sourceKey,
     };
   }
 

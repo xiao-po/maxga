@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
-class ZeroDivider extends Divider {
+class ZeroDivider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var isDark = Theme.of(context).brightness == Brightness.dark;
+    return Divider(height: 1, color: isDark ? Colors.grey[900] :Colors.grey[400]);
+  }
 
-  ZeroDivider(): super(height: 1, color: Colors.grey[300]);
 
 }

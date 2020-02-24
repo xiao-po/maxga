@@ -5,5 +5,9 @@ class MaxgaServerApi {
 
   static const String registry = '/registry';
   static const String refreshToken = '/refreshToken';
+
+  static const String resetPassword = "/user/password/reset?email={email}";
+
+  static const String logout = "/user/logout";
 }
 
