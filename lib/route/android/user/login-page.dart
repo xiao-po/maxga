@@ -41,7 +41,7 @@ class _LoginPageState extends State<LoginPage> {
           title: const Text('登录'),
         ),
         body: Padding(
-          padding: EdgeInsets.only(left: 10, right: 10, top: 30),
+          padding: EdgeInsets.only(left: 10, right: 10, top: 50),
           child: Column(
             children: <Widget>[
               Hero(

@@ -91,19 +91,26 @@ class UserProvider  extends BaseProvider {
 
   void setLoginStatus(User user) async {
     await LocalStorage.setString(_userStorageKey, json.encode(user));
+    await setSyncInterval(7);
     isFirstOpen = false;
     this.user = user;
     notifyListeners();
   }
-  void setSyncInterval(int interval) async {
+  Future<void> setSyncInterval(int interval) async {
     await LocalStorage.setNumber(_syncIntervalKey,  interval);
     this.syncInterval = interval;
     notifyListeners();
   }
 
   Future<void> logout() async {
-//    await LocalStorage.clearItem(_userStorageKey);
+    await LocalStorage.clearItem(_userStorageKey);
+    await LocalStorage.clearItem(_syncIntervalKey);
+    await LocalStorage.clearItem(_syncTimeKey);
+    await LocalStorage.clearItem(_lastRemindSyncKey);
 //    await UserService.logout(user.refreshToken);
+    this.syncInterval = 0;
+    this.lastRemindSyncTime = null;
+    this.lastSyncTime = null;
     this.user = null;
     notifyListeners();
   }

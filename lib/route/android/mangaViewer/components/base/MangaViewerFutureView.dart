@@ -16,6 +16,7 @@ class MangaFeatureView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var theme = Theme.of(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
@@ -35,6 +36,8 @@ class MangaFeatureView extends StatelessWidget {
             child: BottomAppBar(
               color: Color(0xff263238),
               child: Slider(
+                activeColor: theme.accentColor,
+                inactiveColor: theme.accentColor.withAlpha(0x55),
                 onChanged: onPageChange,
                 value: pageIndex.toDouble(),
                 max: (imageCount - 1).toDouble(),
