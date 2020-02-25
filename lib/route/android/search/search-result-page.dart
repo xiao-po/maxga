@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:maxga/components/Card.dart';
 import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/model/manga/Manga.dart';
@@ -35,6 +36,7 @@ class SearchResultPage extends StatefulWidget {
 }
 
 class _SearchResultPageState extends State<SearchResultPage> {
+  var scaffoldKey = GlobalKey<ScaffoldState>();
   List<_SearchResult> searchResultList = [];
   DateTime searchTime = DateTime.now();
   int expandCount = 0;
@@ -77,8 +79,21 @@ class _SearchResultPageState extends State<SearchResultPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         title: Text(widget.keyword),
+        actions: <Widget>[
+          IconButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: widget.keyword));
+              scaffoldKey.currentState.hideCurrentSnackBar();
+              scaffoldKey.currentState.showSnackBar(SnackBar(
+                content: const Text("已经复制关键词"),
+              ));
+            },
+              icon: Icon(Icons.content_copy, size: 16,),
+          )
+        ],
       ),
       body: buildBodyByState(),
       floatingActionButton: expandCount > 0

@@ -75,8 +75,7 @@ class _CollectionPageState extends State<CollectionPage> {
         title: Text('收藏'),
         elevation: 1,
         actions: <Widget>[
-          MaxgaSearchButton(),
-          MaxgaTestButton()
+          MaxgaSearchButton()
         ],
       ),
       key: scaffoldKey,
