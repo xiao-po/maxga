@@ -53,6 +53,14 @@ class _CollectionPageState extends State<CollectionPage> {
     if (UserProvider.getInstance().isFirstOpen) {
       this.isShowLoginBanner = true;
     }
+    UserProvider.getInstance().isShouldSync().then((v) async {
+      await UserProvider.getInstance().setLastRemindSyncTime();
+      setState(() {
+
+        this.isShowSyncBanner = v;
+
+      });
+    });
   }
 
   @override
@@ -142,8 +150,13 @@ class _CollectionPageState extends State<CollectionPage> {
   }
 
   Widget buildSyncBanner() {
+    var userProvider = Provider.of<UserProvider>(context);
+    var tipText =const Text('是否立即同步的收藏和阅读记录？');
+    if (userProvider.lastRemindSyncTime != null) {
+      tipText = Text('已经超过 ${userProvider.syncInterval} 天未同步数据，是否立即同步的收藏和阅读记录？');
+    }
     var body = MaterialBanner(
-      content: const Text('是否立即同步的收藏和阅读记录？'),
+      content: tipText,
       leading: const CircleAvatar(child: Icon(Icons.sync)),
       actions: <Widget>[
         FlatButton(
@@ -169,7 +182,7 @@ class _CollectionPageState extends State<CollectionPage> {
           },
         ),
         FlatButton(
-          child: const Text('忽略'),
+          child: const Text('下次提醒'),
           onPressed: () {
             setState(() {
               isShowSyncBanner = false;

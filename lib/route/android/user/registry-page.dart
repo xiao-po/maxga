@@ -20,17 +20,14 @@ class RegistryForm {
   final VoidCallback onChange;
 
   List<FormItem> get allItem => [
-    user,
-    email,
-    password,
-    rePassword,
-  ];
+        user,
+        email,
+        password,
+        rePassword,
+      ];
 
   bool get hasError =>
-      user.invalid ||
-          password.invalid ||
-          rePassword.invalid ||
-          email.invalid;
+      user.invalid || password.invalid || rePassword.invalid || email.invalid;
 
   String get errorText {
     if (user.invalid) {
@@ -51,16 +48,16 @@ class RegistryForm {
 
   RegistryForm(
       {FormItem user,
-        FormItem password,
-        FormItem rePassword,
-        FormItem email,
-        String username,
-        this.onChange})
+      FormItem password,
+      FormItem rePassword,
+      FormItem email,
+      String username,
+      this.onChange})
       : this.user = user ??
-      FormItem(text: username ?? "", validators: [
-        MaxgaValidator.checkSpaceExist,
-        MaxgaValidator.emptyValidator
-      ]),
+            FormItem(text: username ?? "", validators: [
+              MaxgaValidator.checkSpaceExist,
+              MaxgaValidator.emptyValidator
+            ]),
         this.password = password ??
             FormItem(validators: [
               MaxgaValidator.emptyValidator,
@@ -104,10 +101,10 @@ class RegistryForm {
   }
 
   UserRegistryQuery get value => UserRegistryQuery(
-    user.value.trim(),
-    password.value.trim(),
-    email.value,
-  );
+        user.value.trim(),
+        password.value.trim(),
+        email.value,
+      );
 
   void setDirtyAndValidate() {
     for (var value in this.allItem) {
@@ -158,9 +155,9 @@ class _RegistryPageState extends State<RegistryPage> {
             Hero(
               tag: 'username',
               child: MaxgaTextFiled.fromItem(
-                  form.user,
-                  placeHolder: "请输入用户名",
-                  icon: Icons.person,
+                form.user,
+                placeHolder: "请输入用户名",
+                icon: Icons.person,
               ),
             ),
             MaxgaTextFiled.fromItem(
@@ -173,10 +170,13 @@ class _RegistryPageState extends State<RegistryPage> {
               form.password,
               icon: Icons.lock_outline,
               placeHolder: "请输入密码",
+              obscureText: true,
               tipText: "密码不得少于 6 位，不能多于 20 位",
             ),
             MaxgaTextFiled.fromItem(form.rePassword,
-                placeHolder: "请再次输入密码", icon: Icons.lock_outline),
+                obscureText: true,
+                placeHolder: "请再次输入密码",
+                icon: Icons.lock_outline),
             Container(
               width: double.infinity,
               height: 40,
@@ -211,7 +211,8 @@ class _RegistryPageState extends State<RegistryPage> {
     } else {
       var query = form.value;
       showDialog(
-          context: context, builder: (context) => CircularProgressDialog(forbidCancel: true));
+          context: context,
+          builder: (context) => CircularProgressDialog(forbidCancel: true));
 
       try {
         await UserService.registry(query);
@@ -272,5 +273,3 @@ class _RegistryPageState extends State<RegistryPage> {
     form.dispose();
   }
 }
-
-

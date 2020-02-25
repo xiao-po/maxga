@@ -41,8 +41,8 @@ class SelectOption<T> {
   final String title;
   final T value;
 
-  const SelectOption({this.title, this.value});
-  
+  const SelectOption({@required this.title,@required this.value});
+
 }
 
 const Map<MaxgaSettingItemType, List<SelectOption<String>>>
@@ -63,6 +63,11 @@ const Map<MaxgaSettingItemType, List<SelectOption<String>>>
     SelectOption(
       value: '30000',
       title: '30s',
+    ),
+
+    SelectOption(
+      value: '60000',
+      title: '60s',
     ),
   ],
   MaxgaSettingItemType.defaultIndexPage: [

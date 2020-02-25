@@ -106,7 +106,7 @@ class MaxgaConfigSelectTile extends StatelessWidget {
   final VoidCallback onTap;
   final Widget title;
 
-  const MaxgaConfigSelectTile({Key key, this.active, this.onTap, this.title}) : super(key: key);
+  const MaxgaConfigSelectTile({Key key,@required this.active,@required this.onTap,@required this.title}) : super(key: key);
 
 
   @override

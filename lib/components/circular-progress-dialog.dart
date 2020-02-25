@@ -38,7 +38,7 @@ class CircularProgressDialog extends StatelessWidget {
         child: Align(
           child: Container(
             width: 100,
-            height: 110,
+            height: 120,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               color: Colors.black38,

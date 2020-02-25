@@ -26,6 +26,15 @@ class LocalStorage {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.remove('$_prefix$key');
   }
+  static Future<bool> setNumber(String key, int value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setInt('$_prefix$key', value);
+  }
+
+  static Future<int> getNumber(String key) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('$_prefix$key');
+  }
 
 
 

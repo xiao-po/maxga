@@ -11,15 +11,19 @@ import '../base/BaseProvider.dart';
 class UserProvider  extends BaseProvider {
   User user;
   DateTime lastSyncTime;
+  DateTime lastRemindSyncTime;
+  int syncInterval;
 
   bool isFirstOpen = false;
   bool get isLogin => user != null;
 
   String get token => user?.token ?? null;
 
-  static String _userStorageKey = "\$userStorage";
-  static String _syncTimeKey = "\$syncTimeKey";
-  static String _firstOpenKey = "\$firstOpenKey";
+  static const String _userStorageKey = "\$userStorage";
+  static const String _syncTimeKey = "\$syncTimeKey";
+  static const String _firstOpenKey = "\$firstOpenKey";
+  static const String _syncIntervalKey = "\$syncIntervalKey";
+  static const String _lastRemindSyncKey = '\$lastRemindSyncKey';
   static UserProvider _instance;
 
   static UserProvider getInstance() {
@@ -33,8 +37,37 @@ class UserProvider  extends BaseProvider {
     await this._loadLoginStatus();
     await this._loadSyncTime();
     await this._loadFirstOpenStatus();
+    await this._loadSyncInterval();
+
+    final lastRemindSyncTimeString = await LocalStorage.getString(_lastRemindSyncKey);
+    if (lastRemindSyncTimeString != null) {
+      this.lastRemindSyncTime = DateTime(2020, 2, 24);
+    }
     if (this.isFirstOpen) {
       await this._setFirstOpenTime();
+    }
+  }
+
+  Future<void> setLastRemindSyncTime() {
+    return LocalStorage.setString(_lastRemindSyncKey, DateTime.now().toIso8601String());
+  }
+
+  Future<void> delayOneDayRemindSync() {
+    return LocalStorage.setString(_lastRemindSyncKey, lastRemindSyncTime.add(Duration(days: 1)).toIso8601String());
+  }
+
+  Future<bool> isShouldSync() async {
+    if (this.syncInterval == 0) {
+      return false;
+    }
+    if(this.lastRemindSyncTime == null) {
+      return true;
+    }
+    var diffDays = DateTime.now().difference(this.lastRemindSyncTime);
+    if (diffDays.inDays - this.syncInterval > 1) {
+      return true;
+    } else  {
+      return DateTime.now().day - this.lastRemindSyncTime.day == 1;
     }
   }
 
@@ -62,17 +95,9 @@ class UserProvider  extends BaseProvider {
     this.user = user;
     notifyListeners();
   }
-
-  Future<void> _loadLoginStatus() async {
-    var userStorageString = await LocalStorage.getString(_userStorageKey);
-    if (userStorageString == null) {
-      return null;
-    }
-    var user = User.fromJson(
-        json.decode(userStorageString)
-    );
-
-    this.user = user;
+  void setSyncInterval(int interval) async {
+    await LocalStorage.setNumber(_syncIntervalKey,  interval);
+    this.syncInterval = interval;
     notifyListeners();
   }
 
@@ -95,6 +120,24 @@ class UserProvider  extends BaseProvider {
     }
   }
 
+  Future<void> _loadLoginStatus() async {
+    var userStorageString = await LocalStorage.getString(_userStorageKey);
+    if (userStorageString == null) {
+      return null;
+    }
+    var user = User.fromJson(
+        json.decode(userStorageString)
+    );
+
+    this.user = user;
+    notifyListeners();
+  }
+
+
+  Future<void> _loadSyncInterval() async {
+    this.syncInterval = (await LocalStorage.getNumber(_syncIntervalKey)) ?? 0;
+  }
+
   Future<void> _loadFirstOpenStatus() async {
     String firstOpenTimeString = await LocalStorage.getString(_firstOpenKey);
     this.isFirstOpen = firstOpenTimeString == null;
@@ -103,5 +146,6 @@ class UserProvider  extends BaseProvider {
   Future<void> _setFirstOpenTime() async {
     await LocalStorage.setString(_firstOpenKey, DateTime.now().toIso8601String());
   }
+
 
 }

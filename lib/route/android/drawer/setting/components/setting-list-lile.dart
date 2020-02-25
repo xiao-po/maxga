@@ -166,14 +166,16 @@ class DropDownSettingListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var selectOptions = MaxgaSelectOptionsMap[setting.key];
+    var value = selectOptions.firstWhere((option) => option.value == setting.value).title;
     return MaxgaConfigListTile(
         title: Text(setting.title),
 //      contentPadding: SettingListTilePadding,
-//      subtitle: setting.subTitle != null ? Text(setting.subTitle) : null,
+        subTitle: setting.subTitle != null ? Text(setting.subTitle) : null,
         trailing: RichText(
           text: TextSpan(children: [
             TextSpan(
-                text: setting.value, style: TextStyle(color: Colors.grey[400])),
+                text: value, style: TextStyle(color: Colors.grey[400])),
             const WidgetSpan(child: const Icon(Icons.chevron_right))
           ]),
         ),

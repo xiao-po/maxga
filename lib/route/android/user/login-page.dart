@@ -50,6 +50,7 @@ class _LoginPageState extends State<LoginPage> {
                     placeHolder: "请输入用户名", icon: Icons.person),
               ),
               MaxgaTextFiled.fromItem(passwordItem,
+                  obscureText: true,
                   icon: Icons.lock_outline, placeHolder: "请输入密码"),
               Container(
                 alignment: Alignment.centerRight,
@@ -115,8 +116,8 @@ class _LoginPageState extends State<LoginPage> {
         var result = await Future.any([
           Future.wait([
             UserService.login(UserQuery(
-              usernameItem.value,
-              passwordItem.value,
+              usernameItem.value.trim(),
+              passwordItem.value.trim(),
             )),
             Future.delayed(Duration(milliseconds: 300))
           ]),
