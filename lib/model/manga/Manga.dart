@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
-import 'Chapter.dart';
+import 'chapter.dart';
+
 
 class Manga extends MangaBase {
   List<Chapter> chapterList;
