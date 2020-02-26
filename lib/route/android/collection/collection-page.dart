@@ -5,16 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/base/delay.dart';
 import 'package:maxga/base/drawer/menu-item.dart';
-import 'package:maxga/components/MangaCoverImage.dart';
 import 'package:maxga/components/MangaGridItem.dart';
-import 'package:maxga/components/MaxgaButton.dart';
-import 'package:maxga/components/base/WillExitScope.dart';
-import 'package:maxga/components/circular-progress-dialog.dart';
-import 'package:maxga/components/dialog.dart';
+import 'package:maxga/components/base/MangaCoverImage.dart';
+import 'package:maxga/components/base/confirm-exit-scope.dart';
+import 'package:maxga/components/button/MaxgaButton.dart';
+import 'package:maxga/components/dialog/circular-progress-dialog.dart';
+import 'package:maxga/components/dialog/dialog.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/maxga/MaxgaReleaseInfo.dart';
 import 'package:maxga/provider/public/CollectionProvider.dart';
 import 'package:maxga/provider/public/UserProvider.dart';
+import 'package:maxga/route/android/collection/components/banner.dart';
 import 'package:maxga/route/android/user/base/LoginPageResult.dart';
 import 'package:maxga/route/android/user/login-page.dart';
 import 'package:maxga/route/error-page/ErrorPage.dart';
@@ -56,9 +57,7 @@ class _CollectionPageState extends State<CollectionPage> {
     UserProvider.getInstance().isShouldSync().then((v) async {
       await UserProvider.getInstance().setLastRemindSyncTime();
       setState(() {
-
         this.isShowSyncBanner = v;
-
       });
     });
   }
@@ -74,125 +73,12 @@ class _CollectionPageState extends State<CollectionPage> {
       appBar: AppBar(
         title: Text('收藏'),
         elevation: 1,
-        actions: <Widget>[
-          MaxgaSearchButton()
-        ],
+        actions: <Widget>[MaxgaSearchButton()],
       ),
       key: scaffoldKey,
-      body: WillExitScope(
+      body: ConfirmExitScope(
         child: buildBody(),
       ),
-    );
-  }
-
-  Widget buildUpdateBanner() {
-    var body = MaterialBanner(
-      content: const Text('有新版本更新, 点击查看'),
-      leading: const CircleAvatar(child: Icon(Icons.arrow_upward)),
-      actions: <Widget>[
-        FlatButton(
-          child: const Text('查看'),
-          color: Theme.of(context).accentColor,
-          onPressed: () {
-            openUpdateDialog(nextVersion);
-            setState(() {
-              isShowUpdateBanner = false;
-            });
-          },
-        ),
-        FlatButton(
-          color: Theme.of(context).accentColor,
-          child: const Text('忽略'),
-          onPressed: () {
-            UpdateService.ignoreUpdate(nextVersion);
-            setState(() {
-              isShowUpdateBanner = false;
-            });
-          },
-        ),
-      ],
-    );
-    return Padding(
-      padding: EdgeInsets.only(top: 10),
-      child: body,
-    );
-  }
-
-  Widget buildLoginBanner() {
-    var body =  MaterialBanner(
-      content: const Text('登录后即可享受同步多设备间的阅读数据，不丢失阅读记录'),
-      leading: const CircleAvatar(child: Icon(Icons.person_pin)),
-      actions: <Widget>[
-        FlatButton(
-          child: const Text('登录'),
-          onPressed: () async {
-            await AnimationDelay();
-            toLogin();
-          },
-        ),
-        FlatButton(
-          child: const Text('忽略'),
-          onPressed: () async {
-            await AnimationDelay();
-            setState(() {
-              isShowLoginBanner = false;
-            });
-          },
-        ),
-      ],
-    );
-
-    return Padding(
-      padding: EdgeInsets.only(top: 10),
-      child: body,
-    );
-  }
-
-  Widget buildSyncBanner() {
-    var userProvider = Provider.of<UserProvider>(context);
-    var tipText =const Text('是否立即同步的收藏和阅读记录？');
-    if (userProvider.lastRemindSyncTime != null) {
-      tipText = Text('已经超过 ${userProvider.syncInterval} 天未同步数据，是否立即同步的收藏和阅读记录？');
-    }
-    var body = MaterialBanner(
-      content: tipText,
-      leading: const CircleAvatar(child: Icon(Icons.sync)),
-      actions: <Widget>[
-        FlatButton(
-          child: const Text('同步'),
-          onPressed: () async {
-            showDialog(context: context, child: CircularProgressDialog(forbidCancel: true, tip: "同步中",));
-            try {
-              await Future.wait([
-                UserProvider.getInstance().sync(),
-                AnimationDelay()
-              ]);
-              setState(() {
-                isShowSyncBanner = false;
-              });
-            } catch(e) {
-              Scaffold.of(context).showSnackBar(SnackBar(
-                content: Text("同步出现问题"),
-              ));
-            } finally {
-
-              Navigator.of(context).pop();
-            }
-          },
-        ),
-        FlatButton(
-          child: const Text('下次提醒'),
-          onPressed: () {
-            setState(() {
-              isShowSyncBanner = false;
-            });
-          },
-        ),
-      ],
-    );
-    return Padding(
-      padding: EdgeInsets.only(top: 10),
-      child: body,
     );
   }
 
@@ -226,18 +112,14 @@ class _CollectionPageState extends State<CollectionPage> {
     if (!provider.loadOver) {
       return Column(
         children: <Widget>[
-          if (isShowUpdateBanner) buildUpdateBanner(),
-          if (isShowLoginBanner) buildLoginBanner(),
-          if (isShowSyncBanner) buildSyncBanner(),
+          ...buildBannerList(),
           Container(),
         ],
       );
     } else if (provider.loadOver && provider.isEmpty) {
       return Column(
         children: <Widget>[
-          if (isShowUpdateBanner) buildUpdateBanner(),
-          if (isShowLoginBanner) buildLoginBanner(),
-          if (isShowSyncBanner) buildSyncBanner(),
+          ...buildBannerList(),
           Expanded(
             child: ErrorPage('您没有收藏的漫画'),
           ),
@@ -273,18 +155,78 @@ class _CollectionPageState extends State<CollectionPage> {
           onRefresh: () => this.updateCollectedManga(),
           child: CustomScrollView(
             slivers: <Widget>[
-              if (isShowUpdateBanner)
-                SliverToBoxAdapter(
-                  child: buildUpdateBanner(),
-                ),
-              if (isShowLoginBanner)
-                SliverToBoxAdapter(child: buildLoginBanner()),
-              if (isShowSyncBanner)
-                SliverToBoxAdapter(child: buildSyncBanner()),
+              ...buildBannerList()
+                  .map((banner) => SliverToBoxAdapter(
+                        child: banner,
+                      ))
+                  .toList(),
               gridView,
             ],
           ));
     }
+  }
+
+  List<Widget> buildBannerList() {
+    return [
+      if (isShowUpdateBanner)
+        UpdateBanner(
+          onDismiss: () {
+            UpdateService.ignoreUpdate(nextVersion);
+            setState(() {
+              isShowUpdateBanner = false;
+            });
+          },
+          onUpdate: () {
+            openUpdateDialog(nextVersion);
+            setState(() {
+              isShowUpdateBanner = false;
+            });
+          },
+        ),
+      if (isShowLoginBanner)
+        LoginBanner(
+          onSuccess: () async {
+            await AnimationDelay();
+            toLogin();
+          },
+          onIgnore: () async {
+            await AnimationDelay();
+            setState(() {
+              isShowLoginBanner = false;
+            });
+          },
+        ),
+      if (isShowSyncBanner)
+        SyncBanner(
+          onSuccess: () async {
+            showDialog(
+                context: context,
+                child: CircularProgressDialog(
+                  forbidCancel: true,
+                  tip: "同步中",
+                ));
+            try {
+              await Future.wait(
+                  [UserProvider.getInstance().sync(), AnimationDelay()]);
+              setState(() {
+                isShowSyncBanner = false;
+              });
+            } catch (e) {
+              Scaffold.of(context).showSnackBar(SnackBar(
+                content: Text("同步出现问题"),
+              ));
+            } finally {
+              Navigator.of(context).pop();
+            }
+          },
+          onIgnore: () async {
+            UserProvider.getInstance().delayOneDayRemindSync();
+            setState(() {
+              isShowSyncBanner = false;
+            });
+          },
+        ),
+    ];
   }
 
   startRead(Manga item) async {

@@ -1,6 +1,6 @@
 import 'package:maxga/database/collect-status.repo.dart';
-import 'package:maxga/database/mangaData.repo.dart';
-import 'package:maxga/database/readMangaStatus.repo.dart';
+import 'package:maxga/database/manga-data.repo.dart';
+import 'package:maxga/database/read-manga-status.repo.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/maxga/ReadMangaStatus.dart';
 import 'package:maxga/model/maxga/collect-status.dart';

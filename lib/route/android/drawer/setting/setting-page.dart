@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maxga/components/base/ZeroDivider.dart';
-import 'package:maxga/components/list-tile.dart';
+import 'package:maxga/components/form/setting-form/list-tile.dart';
 import 'package:maxga/provider/public/SettingProvider.dart';
 import 'package:provider/provider.dart';
 

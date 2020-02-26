@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:maxga/components/MangaOutlineButton.dart';
+import 'package:maxga/components/button/MangaOutlineButton.dart';
 import 'package:maxga/model/user/User.dart';
 import 'package:maxga/service/LocalStorage.service.dart';
 import 'package:maxga/service/MaxgaServer.service.dart';
@@ -41,7 +41,9 @@ class UserProvider  extends BaseProvider {
 
     final lastRemindSyncTimeString = await LocalStorage.getString(_lastRemindSyncKey);
     if (lastRemindSyncTimeString != null) {
-      this.lastRemindSyncTime = DateTime(2020, 2, 24);
+      this.lastRemindSyncTime = DateTime.parse(lastRemindSyncTimeString);
+    } else {
+      this.lastRemindSyncTime = DateTime.now();
     }
     if (this.isFirstOpen) {
       await this._setFirstOpenTime();
@@ -52,8 +54,11 @@ class UserProvider  extends BaseProvider {
     return LocalStorage.setString(_lastRemindSyncKey, DateTime.now().toIso8601String());
   }
 
-  Future<void> delayOneDayRemindSync() {
-    return LocalStorage.setString(_lastRemindSyncKey, lastRemindSyncTime.add(Duration(days: 1)).toIso8601String());
+  Future<void> delayOneDayRemindSync() async {
+    var lastRemindSyncTime = this.lastRemindSyncTime ?? DateTime.now();
+    await LocalStorage.setString(_lastRemindSyncKey, lastRemindSyncTime.add(Duration(days: 1)).toIso8601String());
+
+    this.lastRemindSyncTime = lastRemindSyncTime;
   }
 
   Future<bool> isShouldSync() async {

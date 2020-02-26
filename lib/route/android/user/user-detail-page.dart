@@ -2,9 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/Utils/DateUtils.dart';
 import 'package:maxga/base/delay.dart';
-import 'package:maxga/base/setting/SettingValue.dart';
+import 'package:maxga/constant/SettingValue.dart';
 import 'package:maxga/components/base/ZeroDivider.dart';
-import 'package:maxga/components/list-tile.dart';
+import 'package:maxga/components/form/setting-form/select-config-page.dart';
+import 'package:maxga/components/form/setting-form/list-tile.dart';
 import 'package:maxga/provider/public/UserProvider.dart';
 import 'package:maxga/route/android/user/modify-password-page.dart';
 import 'package:provider/provider.dart';
@@ -42,31 +43,32 @@ class _UserDetailPageState extends State<UserDetailPage> {
               Container(
                 decoration: ConfigListBoxDecoration(theme),
                 child: Consumer<UserProvider>(
-                  builder: (context, provider, child) => Column(
-                    children: <Widget>[
-                      MaxgaConfigListTile(
-                          title: Text("用户名"),
-                          trailing: Text(provider.user?.username ?? "")),
-                      ZeroDivider(),
-                      MaxgaConfigListTile(
-                          title: Text("邮箱"),
-                          trailing: Text(provider.user?.email ?? "")),
-                      ZeroDivider(),
-                      MaxgaConfigListTile(
-                        title: Text("注册时间"),
-                        trailing: Text(provider.user != null
-                            ? DateUtils.formatTime(
+                  builder: (context, provider, child) =>
+                      Column(
+                        children: <Widget>[
+                          MaxgaConfigListTile(
+                              title: Text("用户名"),
+                              trailing: Text(provider.user?.username ?? "")),
+                          ZeroDivider(),
+                          MaxgaConfigListTile(
+                              title: Text("邮箱"),
+                              trailing: Text(provider.user?.email ?? "")),
+                          ZeroDivider(),
+                          MaxgaConfigListTile(
+                            title: Text("注册时间"),
+                            trailing: Text(provider.user != null
+                                ? DateUtils.formatTime(
                                 time: provider.user.createTime,
                                 template: "YYYY-MM-dd")
-                            : ""),
+                                : ""),
+                          ),
+                          ZeroDivider(),
+                          MaxgaConfigListTile(
+                              onPressed: toModifyPassword,
+                              title: Text("修改密码"),
+                              trailing: Icon(Icons.chevron_right)),
+                        ],
                       ),
-                      ZeroDivider(),
-                      MaxgaConfigListTile(
-                          onPressed: toModifyPassword,
-                          title: Text("修改密码"),
-                          trailing: Icon(Icons.chevron_right)),
-                    ],
-                  ),
                 ),
               ),
               Container(height: 30),
@@ -112,10 +114,12 @@ class UserSyncIntervalTile extends StatelessWidget {
         },
         title: Text("提醒同步周期"),
         trailing: Consumer<UserProvider>(
-            builder: (context, provider, child) => RichText(
+            builder: (context, provider, child) =>
+                RichText(
                   text: TextSpan(children: [
                     TextSpan(
-                        text: SyncIntervalOptions.firstWhere((option) => option.value == provider.syncInterval).title,
+                        text: SyncIntervalOptions.firstWhere((option) =>
+                        option.value == provider.syncInterval).title,
                         style: TextStyle(color: Colors.grey[500])),
                     const WidgetSpan(child: Icon(Icons.keyboard_arrow_right)),
                   ]),
@@ -123,44 +127,22 @@ class UserSyncIntervalTile extends StatelessWidget {
   }
 }
 
-
 class SyncIntervalConfigPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("提醒自动同步周期"),
-      ),
-      body: Padding(
-          padding: EdgeInsets.only(top: 30),
-          child: ListView(children: <Widget>[
-            Container(
-                decoration: ConfigListBoxDecoration(theme),
-                child:
-                    Consumer<UserProvider>(builder: (context, provider, child) {
-                  var children = <Widget>[];
-                  for (var i = 0; i < SyncIntervalOptions.length; i++) {
-                    final option = SyncIntervalOptions[i];
-                    children.add(MaxgaConfigSelectTile(
-                      title: Text(option.title),
-                      active: provider.syncInterval == option.value,
-                      onTap: () {
-                        provider.setSyncInterval(option.value);
-                      },
-                    ));
-                    if ((i + 1) < SyncIntervalOptions.length) {
-                      children.add(ZeroDivider());
-                    }
-                  }
-                  return Column(
-                    children: children,
-                  );
-                }))
-          ])),
+    return Consumer<UserProvider>(builder: (context, provider, child) =>
+        SelectConfigPage<int>(
+          onSelect: (SelectOption option) {
+            provider.setSyncInterval(option.value);
+          },
+          items: SyncIntervalOptions,
+          title: Text("提醒自动同步周期"),
+          active: provider.syncInterval,
+        )
     );
   }
 }
+
 
 class _LogoutListTile extends StatelessWidget {
   const _LogoutListTile({
@@ -178,7 +160,7 @@ class _LogoutListTile extends StatelessWidget {
         onTap: () => logout(context),
         child: Container(
           padding:
-              const EdgeInsets.only(top: 15, right: 25, left: 25, bottom: 15),
+          const EdgeInsets.only(top: 15, right: 25, left: 25, bottom: 15),
           child: Text(
             '退出登录',
             textAlign: TextAlign.center,

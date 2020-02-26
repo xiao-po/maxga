@@ -2,7 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:maxga/components/MangaPageView.dart';
+import 'package:maxga/components/base/MangaPageView.dart';
 
 /// A page view that displays the widget which corresponds to the currently
 /// selected tab.

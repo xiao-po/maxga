@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:maxga/MangaRepoPool.dart';
 import 'package:maxga/Utils/MaxgaUtils.dart';
 import 'package:maxga/base/delay.dart';
-import 'package:maxga/base/setting/SettingValue.dart';
+import 'package:maxga/constant/SettingValue.dart';
 import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
 import 'package:maxga/model/manga/Chapter.dart';
 import 'package:maxga/model/manga/Manga.dart';

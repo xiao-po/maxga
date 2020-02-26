@@ -1,18 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class WillExitScope extends StatefulWidget {
+class ConfirmExitScope extends StatefulWidget {
   final Widget child;
 
-  const WillExitScope({Key key, this.child}) : super(key: key);
+  const ConfirmExitScope({Key key, this.child}) : super(key: key);
 
 
   @override
-  State<StatefulWidget> createState() => _WillExitScopeState();
+  State<StatefulWidget> createState() => _ConfirmExitScopeState();
 
 }
 
-class _WillExitScopeState extends State<WillExitScope> {
+class _ConfirmExitScopeState extends State<ConfirmExitScope> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(

@@ -1,61 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:maxga/constant/icons/antd-icon.dart';
 
-import 'FormItem.dart';
+import 'base/form-item.dart';
 
 const _errorColorLighting = Color(0xfff5222d);
 final _errorColorDark = Colors.red[300];
 
-class UsernameTextFiled extends StatelessWidget {
-  final String errorText;
-
-  const UsernameTextFiled({
-    Key key,
-    this.errorText,
-    @required this.controller,
-  }) : super(key: key);
-
-  final TextEditingController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return MaxgaTextFiled(
-      controller: controller,
-      placeHolder: "账号",
-      icon: Icons.person,
-    );
-  }
-}
-
-class PasswordTextFiled extends StatelessWidget {
-  final String errorText;
-
-  const PasswordTextFiled({
-    Key key,
-    this.errorText,
-    @required this.controller,
-  }) : super(key: key);
-
-  final TextEditingController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return MaxgaTextFiled(
-      controller: controller,
-      placeHolder: "密码",
-      obscureText: true,
-      icon: Icons.lock_outline,
-    );
-  }
-}
-
 class MaxgaTextFiled extends StatelessWidget {
   MaxgaTextFiled.fromItem(
-      FormItem item, {
-        this.obscureText = false,
-        this.icon,
-        this.placeHolder = "请输入",
-        this.tipText = "",
-      })  : this.controller = item.controller,
+    FormItem item, {
+    this.obscureText = false,
+    @required this.icon,
+    this.placeHolder = "请输入",
+    this.tipText = "",
+    this.suffixIcon,
+  })  : this.controller = item.controller,
         this.errorText = item.errorText,
         this.disabled = item.disabled;
 
@@ -63,11 +22,12 @@ class MaxgaTextFiled extends StatelessWidget {
     Key key,
     @required this.controller,
     this.placeHolder = "请输入",
-    this.icon,
+    @required this.icon,
     this.errorText,
     this.disabled = false,
     this.obscureText = false,
     this.tipText = "",
+    this.suffixIcon,
   })  : assert(icon != null),
         super(key: key);
 
@@ -76,8 +36,9 @@ class MaxgaTextFiled extends StatelessWidget {
   final bool disabled;
   final TextEditingController controller;
   final String placeHolder;
-  final IconData icon;
+  final Widget icon;
   final bool obscureText;
+  final Widget suffixIcon;
 
   bool get hasError => errorText != null && errorText != "";
 
@@ -91,10 +52,10 @@ class MaxgaTextFiled extends StatelessWidget {
       style: TextStyle(color: Colors.grey),
     );
     if (hasError) {
-      tip  = Text(
+      tip = Text(
         errorText,
         textAlign: TextAlign.start,
-        style: TextStyle(color: isDark ? _errorColorDark : _errorColorLighting  ),
+        style: TextStyle(color: isDark ? _errorColorDark : _errorColorLighting),
       );
     }
     return Material(
@@ -133,12 +94,15 @@ class MaxgaTextFiled extends StatelessWidget {
     }
     var textColor = disabled ? Colors.grey[500] : null;
     if (isDark) {
-      textColor = disabled ? Colors.grey[500] :  Colors.grey[300];
+      textColor = disabled ? Colors.grey[500] : Colors.grey[300];
     }
+
+    var prefixIconWidget = IconTheme.merge(
+        data: IconThemeData(color: Color(0xffa3a3a3)), child: icon);
+    var suffixIconWidget = IconTheme.merge(
+        data: IconThemeData(color: Color(0xffa3a3a3)), child: suffixIcon);
     return Container(
-      constraints: BoxConstraints(
-        maxHeight: 40
-      ),
+      constraints: BoxConstraints(maxHeight: 40),
       decoration: BoxDecoration(
         color: textFiledColor,
         borderRadius: BorderRadius.circular(5),
@@ -159,17 +123,18 @@ class MaxgaTextFiled extends StatelessWidget {
           prefixIcon: SizedBox(
             child: Center(
               widthFactor: 0.0,
-              child: Icon(icon, color: Color(0xffa3a3a3)),
+              child: prefixIconWidget,
             ),
           ),
+          suffixIcon: suffixIcon != null
+              ?suffixIconWidget
+              : null,
           disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(5),
-              borderSide: BorderSide(
-                  color: Color(0xffa3a3a3))),
+              borderSide: BorderSide(color: Color(0xffa3a3a3))),
           enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(5),
-              borderSide: BorderSide(
-                  color: enabledColor)),
+              borderSide: BorderSide(color: enabledColor)),
           focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(5),
               borderSide: BorderSide(
@@ -179,5 +144,4 @@ class MaxgaTextFiled extends StatelessWidget {
       ),
     );
   }
-
 }

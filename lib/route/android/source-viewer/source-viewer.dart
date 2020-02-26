@@ -2,15 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:maxga/base/drawer/menu-item.dart';
 import 'package:maxga/base/error/MaxgaHttpError.dart';
-import 'package:maxga/base/setting/SettingValue.dart';
-import 'package:maxga/components/Card.dart';
-import 'package:maxga/components/MangaCoverImage.dart';
+import 'package:maxga/constant/SettingValue.dart';
+import 'package:maxga/components/card/Card.dart';
+import 'package:maxga/components/base/MangaCoverImage.dart';
 import 'package:maxga/components/base/MaxgaTabView.dart';
-import 'package:maxga/components/MaxgaButton.dart';
-import 'package:maxga/components/TabBar.dart';
-import 'package:maxga/components/base/WillExitScope.dart';
+import 'package:maxga/components/button/MaxgaButton.dart';
+import 'package:maxga/components/base/confirm-exit-scope.dart';
 import 'package:maxga/components/base/ZeroDivider.dart';
-import 'package:maxga/components/dialog.dart';
+import 'package:maxga/components/dialog/dialog.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/model/maxga/MaxgaReleaseInfo.dart';
@@ -26,6 +25,7 @@ import 'package:provider/provider.dart';
 import '../drawer/drawer.dart';
 import '../mangaInfo/MangaInfoPage.dart';
 import '../search/search-page.dart';
+import 'components/maxga-source-select-button.dart';
 import 'error-page/error-page.dart';
 
 class SourceViewerPage extends StatefulWidget {
@@ -179,7 +179,7 @@ class _SourceViewerPageState extends State<SourceViewerPage>
         loginCallback: toLogin,
       ),
       appBar: appBar,
-      body: WillExitScope(
+      body: ConfirmExitScope(
         child: tabViewer,
       ),
     );

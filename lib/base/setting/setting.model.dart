@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-import 'SettingValue.dart';
+import '../../constant/SettingValue.dart';
 
 class MaxgaSettingItem {
   final MaxgaSettingItemType key;

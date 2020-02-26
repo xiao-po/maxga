@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:maxga/MangaRepoPool.dart';
-import 'package:maxga/base/setting/Setting.model.dart';
-import 'package:maxga/base/setting/SettingValue.dart';
+import 'package:maxga/base/setting/setting.model.dart';
+import 'package:maxga/constant/SettingValue.dart';
 import 'package:maxga/provider/base/BaseProvider.dart';
 import 'package:maxga/service/Setting.service.dart';
 

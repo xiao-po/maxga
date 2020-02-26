@@ -1,5 +1,5 @@
-import 'package:maxga/base/setting/Setting.model.dart';
-import 'package:maxga/base/setting/SettingValue.dart';
+import 'package:maxga/base/setting/setting.model.dart';
+import 'package:maxga/constant/SettingValue.dart';
 
 import 'LocalStorage.service.dart';
 

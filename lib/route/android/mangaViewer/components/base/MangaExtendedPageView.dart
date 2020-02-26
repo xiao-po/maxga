@@ -1,7 +1,7 @@
 import 'package:extended_image/extended_image.dart';
 
 import 'package:flutter/gestures.dart';
-import 'package:maxga/components/MangaPageView.dart';
+import 'package:maxga/components/base/MangaPageView.dart';
 import 'package:flutter/widgets.dart';
 
 final PageController _defaultPageController = PageController();

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maxga/base/delay.dart';
 import 'package:maxga/base/drawer/menu-item.dart';
-import 'package:maxga/components/MangaOutlineButton.dart';
+import 'package:maxga/components/button/MangaOutlineButton.dart';
 import 'package:maxga/constant/DrawerValue.dart';
 import 'package:maxga/model/user/User.dart';
 import 'package:maxga/provider/public/ThemeProvider.dart';

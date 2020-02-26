@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:maxga/base/error/MaxgaHttpError.dart';
-import 'package:maxga/base/setting/SettingValue.dart';
+import 'package:maxga/constant/SettingValue.dart';
 import 'package:maxga/constant/TestValue.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/provider/public/SettingProvider.dart';

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:maxga/base/setting/Setting.model.dart';
-import 'package:maxga/base/setting/SettingValue.dart';
-import 'package:maxga/components/base/ZeroDivider.dart';
-import 'package:maxga/components/list-tile.dart';
+import 'package:maxga/base/setting/setting.model.dart';
+import 'package:maxga/constant/SettingValue.dart';
+import 'package:maxga/components/form/setting-form/select-config-page.dart';
+import 'package:maxga/components/form/setting-form/list-tile.dart';
 import 'package:maxga/provider/public/SettingProvider.dart';
 import 'package:provider/provider.dart';
 
@@ -189,7 +189,7 @@ class DropDownSettingListTile extends StatelessWidget {
             builder: (c) => Consumer<SettingProvider>(
                   builder: (context, value, child) => SelectConfigPage(
                     title: Text(setting.title),
-                    selected: value.getItemValue(setting.key),
+                    active: value.getItemValue(setting.key),
                     items: MaxgaSelectOptionsMap[setting.key],
                     onSelect: (item) {
                       value.modifySetting(setting, item.value);
@@ -199,52 +199,6 @@ class DropDownSettingListTile extends StatelessWidget {
   }
 }
 
-class SelectConfigPage extends StatelessWidget {
-  final Text title;
-  final List<SelectOption<String>> items;
-  final String selected;
-  final ValueChanged<SelectOption<String>> onSelect;
-
-  const SelectConfigPage(
-      {Key key,
-      @required this.title,
-      @required this.items,
-      @required this.selected,
-      @required this.onSelect})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    var theme = Theme.of(context);
-    List<Widget> children = [];
-    for (var index = 0; index < items.length; index++) {
-      children.add(MaxgaConfigSelectTile(
-        title: Text(items[index].title),
-        active: items[index].value == selected,
-        onTap: () => onSelect(items[index]),
-      ));
-      if ((index + 1) < items.length) {
-        children.add(ZeroDivider());
-      }
-    }
-    return Scaffold(
-        appBar: AppBar(
-          title: title,
-        ),
-        body: Padding(
-          padding: EdgeInsets.only(top: 30),
-          child: ListView(
-            children: <Widget>[
-              Container(
-                  decoration: ConfigListBoxDecoration(theme),
-                  child: Column(
-                    children: children,
-                  ))
-            ],
-          ),
-        ));
-  }
-}
 
 class SettingPageListTile extends StatelessWidget {
   final MaxgaSettingPageItem setting;

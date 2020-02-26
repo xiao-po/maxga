@@ -1,4 +1,4 @@
-import 'package:maxga/database/mangaData.repo.dart';
+import 'package:maxga/database/manga-data.repo.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'database-value.dart';

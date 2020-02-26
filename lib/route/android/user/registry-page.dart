@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:maxga/base/delay.dart';
-import 'package:maxga/components/circular-progress-dialog.dart';
+import 'package:maxga/components/dialog/circular-progress-dialog.dart';
+import 'package:maxga/components/form/base/form-item.dart';
+import 'package:maxga/components/form/maxga-text-filed.dart';
+import 'package:maxga/components/form/password-text-filed.dart';
 import 'package:maxga/http/server/base/MaxgaRequestError.dart';
 import 'package:maxga/http/server/base/MaxgaServerResponseStatus.dart';
 import 'package:maxga/model/user/query/user-registry-query.dart';
-import 'package:maxga/route/android/user/base/MaxgaValidator.dart';
+import 'package:maxga/components/form/base/validator.dart';
 import 'package:maxga/service/user.service.dart';
 
-import 'base/FormItem.dart';
 import 'base/RegistryPageResult.dart';
-import 'base/user-page-form-components.dart';
 import 'components/RegistryButton.dart';
 
 class RegistryForm {
@@ -157,26 +158,24 @@ class _RegistryPageState extends State<RegistryPage> {
               child: MaxgaTextFiled.fromItem(
                 form.user,
                 placeHolder: "请输入用户名",
-                icon: Icons.person,
+                icon: Icon(Icons.person),
               ),
             ),
             MaxgaTextFiled.fromItem(
               form.email,
-              icon: Icons.email,
+              icon: Icon(Icons.email),
               placeHolder: "请输入邮箱地址",
               tipText: "例如 : adc123@qq.com",
             ),
-            MaxgaTextFiled.fromItem(
+            PasswordTextFiled.fromItem(
               form.password,
-              icon: Icons.lock_outline,
+              icon: Icon(Icons.lock_outline),
               placeHolder: "请输入密码",
-              obscureText: true,
               tipText: "密码不得少于 6 位，不能多于 20 位",
             ),
-            MaxgaTextFiled.fromItem(form.rePassword,
-                obscureText: true,
+            PasswordTextFiled.fromItem(form.rePassword,
                 placeHolder: "请再次输入密码",
-                icon: Icons.lock_outline),
+                icon: Icon(Icons.lock_outline)),
             Container(
               width: double.infinity,
               height: 40,

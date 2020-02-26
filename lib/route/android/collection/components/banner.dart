@@ -1,51 +1,44 @@
 
 import 'package:flutter/material.dart';
 import 'package:maxga/base/delay.dart';
-import 'package:maxga/components/circular-progress-dialog.dart';
+import 'package:maxga/components/dialog/circular-progress-dialog.dart';
 import 'package:maxga/provider/public/UserProvider.dart';
 import 'package:maxga/route/android/user/base/LoginPageResult.dart';
 import 'package:maxga/route/android/user/login-page.dart';
+import 'package:provider/provider.dart';
 
 class SyncBanner extends StatelessWidget {
-  final VoidCallback onSyncSuccess;
+  final VoidCallback onSuccess;
   final VoidCallback onIgnore;
 
   const SyncBanner(
-      {Key key, @required this.onSyncSuccess, @required this.onIgnore})
+      {Key key, @required this.onSuccess, @required this.onIgnore})
       : assert(onIgnore != null),
-        assert(onSyncSuccess != null),
+        assert(onSuccess != null),
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var userProvider = Provider.of<UserProvider>(context);
+    var tipText = const Text('是否立即同步的收藏和阅读记录？');
+    if (userProvider.lastRemindSyncTime != null) {
+      tipText =
+          Text('已经超过 ${userProvider.syncInterval} 天未同步数据，是否立即同步的收藏和阅读记录？');
+    }
     var body = MaterialBanner(
-      content: const Text('是否立即同步的收藏和阅读记录？'),
+      content: tipText,
       leading: const CircleAvatar(child: Icon(Icons.sync)),
       actions: <Widget>[
         FlatButton(
           child: const Text('同步'),
-          onPressed: () async {
-            showDialog(
-                context: context,
-                child: CircularProgressDialog(forbidCancel: false, tip: "同步中"));
-            await Future.wait([
-              UserProvider.getInstance().sync(),
-              AnimationDelay(),
-            ]);
-            Navigator.pop(context);
-            Scaffold.of(context).showSnackBar(SnackBar(
-              content: Text('同步完成'),
-            ));
-            onSyncSuccess();
-          },
+          onPressed: onSuccess,
         ),
         FlatButton(
-          child: const Text('忽略'),
+          child: const Text('下次提醒'),
           onPressed: onIgnore,
         ),
       ],
     );
-
     return Padding(
       padding: EdgeInsets.only(top: 10),
       child: body,
@@ -109,12 +102,15 @@ class LoginBanner extends StatelessWidget {
 }
 
 class UpdateBanner extends StatelessWidget {
+
+
   const UpdateBanner({
     Key key,
-    @required this.onPressed,
+    @required this.onUpdate,
+    @required this.onDismiss,
   }) : super(key: key);
-
-  final VoidCallback onPressed;
+  final VoidCallback onDismiss;
+  final VoidCallback onUpdate;
 
   @override
   Widget build(BuildContext context) {
@@ -124,11 +120,11 @@ class UpdateBanner extends StatelessWidget {
       actions: <Widget>[
         FlatButton(
           child: const Text('查看'),
-          onPressed: () => updateAction(true),
+          onPressed: onUpdate,
         ),
         FlatButton(
           child: const Text('忽略'),
-          onPressed: () => updateAction(true),
+          onPressed: onDismiss,
         ),
       ],
     );
@@ -140,11 +136,4 @@ class UpdateBanner extends StatelessWidget {
     );
   }
 
-  updateAction(bool canUpdate) {
-    if (canUpdate) {
-    } else {}
-    if (onPressed != null) {
-      onPressed();
-    }
-  }
 }

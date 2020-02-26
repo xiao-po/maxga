@@ -1,8 +1,7 @@
 import 'package:extended_image/extended_image.dart';
 
 import 'package:flutter/material.dart';
-import 'package:maxga/base/icons/maxga-icon.dart';
-import 'package:maxga/model/manga/MangaSource.dart';
+import 'package:maxga/constant/icons/maxga-icon.dart';
 
 import 'MangaTab.dart';
 import 'components/MangaImagePlaceHolder.dart';

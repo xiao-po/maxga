@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/Utils/DateUtils.dart';
 import 'package:maxga/base/delay.dart';
-import 'package:maxga/components/circular-progress-dialog.dart';
-import 'package:maxga/components/list-tile.dart';
+import 'package:maxga/components/dialog/circular-progress-dialog.dart';
+import 'package:maxga/components/form/setting-form/list-tile.dart';
 import 'package:maxga/provider/public/UserProvider.dart';
 import 'package:provider/provider.dart';
 

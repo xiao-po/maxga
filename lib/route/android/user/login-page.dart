@@ -1,17 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:maxga/components/circular-progress-dialog.dart';
+import 'package:maxga/components/dialog/circular-progress-dialog.dart';
+import 'package:maxga/components/form/base/form-item.dart';
+import 'package:maxga/components/form/maxga-text-filed.dart';
+import 'package:maxga/components/form/password-text-filed.dart';
 import 'package:maxga/http/server/base/MaxgaRequestError.dart';
 import 'package:maxga/model/user/User.dart';
 import 'package:maxga/provider/public/UserProvider.dart';
 import 'package:maxga/route/android/user/base/LoginPageResult.dart';
-import 'package:maxga/route/android/user/base/MaxgaValidator.dart';
+import 'package:maxga/components/form/base/validator.dart';
 import 'package:maxga/route/android/user/base/RegistryPageResult.dart';
 import 'package:maxga/route/android/user/registry-page.dart';
 import 'package:maxga/service/user.service.dart';
 
-import 'base/FormItem.dart';
-import 'base/user-page-form-components.dart';
 import 'components/reset-password-button.dart';
 
 class LoginPage extends StatefulWidget {
@@ -47,11 +48,9 @@ class _LoginPageState extends State<LoginPage> {
               Hero(
                 tag: 'username',
                 child: MaxgaTextFiled.fromItem(usernameItem,
-                    placeHolder: "请输入用户名", icon: Icons.person),
+                    placeHolder: "请输入用户名", icon: Icon(Icons.person)),
               ),
-              MaxgaTextFiled.fromItem(passwordItem,
-                  obscureText: true,
-                  icon: Icons.lock_outline, placeHolder: "请输入密码"),
+              PasswordTextFiled.fromItem(passwordItem),
               Container(
                 alignment: Alignment.centerRight,
                 child: ResetPasswordButton(),

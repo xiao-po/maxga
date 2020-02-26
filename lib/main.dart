@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:maxga/base/setting/SettingValue.dart';
+import 'package:maxga/constant/SettingValue.dart';
 import 'package:maxga/provider/public/CollectionProvider.dart';
 import 'package:maxga/provider/public/HistoryProvider.dart';
 import 'package:maxga/provider/public/SettingProvider.dart';

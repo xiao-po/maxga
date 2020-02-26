@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:maxga/components/form/base/form-item.dart';
+import 'package:maxga/components/form/maxga-text-filed.dart';
 import 'package:maxga/http/server/base/MaxgaRequestError.dart';
 import 'package:maxga/http/server/base/MaxgaServerResponseStatus.dart';
-import 'package:maxga/route/android/user/base/FormItem.dart';
-import 'package:maxga/route/android/user/base/MaxgaValidator.dart';
-import 'package:maxga/route/android/user/base/user-page-form-components.dart';
+import 'package:maxga/components/form/base/validator.dart';
 import 'package:maxga/service/user.service.dart';
 
 import 'components/RegistryButton.dart';
@@ -35,7 +35,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           children: <Widget>[
             MaxgaTextFiled.fromItem(
               emailFormItem,
-              icon: Icons.email,
+              icon: Icon(Icons.email),
               tipText: "请输入你需要重置的账号关联的邮箱，然后点击重置密码链接。",
             ),
             Container(height: 20),

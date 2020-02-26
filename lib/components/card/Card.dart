@@ -177,7 +177,7 @@ class MangaListTileLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     final extraTextStyle = TextStyle(fontSize: 13, color: textColor);
     return Padding(
-        padding: EdgeInsets.only(top: 3, bottom: 3),
+        padding: EdgeInsets.only(top: 3),
         child:
         Text(text, softWrap: false,
             overflow: TextOverflow.fade,

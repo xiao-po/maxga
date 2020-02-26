@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maxga/MangaRepoPool.dart';
-import 'package:maxga/components/Card.dart';
-import 'package:maxga/components/MangaCoverImage.dart';
+import 'package:maxga/components/card/Card.dart';
+import 'package:maxga/components/base/MangaCoverImage.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 import 'package:maxga/provider/public/HistoryProvider.dart';

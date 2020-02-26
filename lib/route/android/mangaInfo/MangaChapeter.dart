@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:maxga/components/MangaOutlineButton.dart';
+import 'package:maxga/components/button/MangaOutlineButton.dart';
 import 'package:maxga/constant/SortValue.dart';
 import 'package:maxga/model/manga/Chapter.dart';
 import 'package:maxga/model/manga/Manga.dart';

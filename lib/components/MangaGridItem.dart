@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:maxga/model/manga/Manga.dart';
 import 'package:maxga/model/manga/MangaSource.dart';
 
-import 'MangaCoverImage.dart';
+import 'base/MangaCoverImage.dart';
 
 class MangaGridItem extends StatelessWidget {
   final Manga manga;

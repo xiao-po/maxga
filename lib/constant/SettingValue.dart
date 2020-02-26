@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:maxga/base/setting/Setting.model.dart';
+import 'package:maxga/base/setting/setting.model.dart';
 import 'package:maxga/http/repo/dmzj/constants/DmzjMangaSource.dart';
 import 'package:maxga/http/repo/hanhan/constant/HanhanRepoValue.dart';
 import 'package:maxga/http/repo/manhuadui/constants/ManhuaduiMangaSource.dart';
@@ -40,8 +40,9 @@ enum DefaultIndexPage {
 class SelectOption<T> {
   final String title;
   final T value;
+  final String content;
 
-  const SelectOption({@required this.title,@required this.value});
+  const SelectOption({@required this.title,@required this.value, this.content});
 
 }
 

@@ -1,4 +1,5 @@
-import 'FormItem.dart';
+
+import 'form-item.dart';
 
 class MaxgaValidator {
 
