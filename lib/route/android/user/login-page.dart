@@ -4,12 +4,12 @@ import 'package:maxga/components/dialog/circular-progress-dialog.dart';
 import 'package:maxga/components/form/base/form-item.dart';
 import 'package:maxga/components/form/maxga-text-filed.dart';
 import 'package:maxga/components/form/password-text-filed.dart';
-import 'package:maxga/http/server/base/MaxgaRequestError.dart';
-import 'package:maxga/model/user/User.dart';
-import 'package:maxga/provider/public/UserProvider.dart';
-import 'package:maxga/route/android/user/base/LoginPageResult.dart';
+import 'package:maxga/http/server/base/maxga-request-error.dart';
+import 'package:maxga/model/user/user.dart';
+import 'package:maxga/provider/public/user-provider.dart';
+import 'package:maxga/route/android/user/base/login-page-result.dart';
 import 'package:maxga/components/form/base/validator.dart';
-import 'package:maxga/route/android/user/base/RegistryPageResult.dart';
+import 'package:maxga/route/android/user/base/registry-page-result.dart';
 import 'package:maxga/route/android/user/registry-page.dart';
 import 'package:maxga/service/user.service.dart';
 

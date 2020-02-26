@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:maxga/MangaRepoPool.dart';
-import 'package:maxga/components/card/Card.dart';
-import 'package:maxga/components/base/MangaCoverImage.dart';
-import 'package:maxga/model/manga/Manga.dart';
-import 'package:maxga/model/manga/MangaSource.dart';
-import 'package:maxga/provider/public/HistoryProvider.dart';
-import 'package:maxga/route/error-page/EmptyPage.dart';
+import 'package:maxga/manga-repo-pool.dart';
+import 'package:maxga/components/card/card.dart';
+import 'package:maxga/components/base/manga-cover-image.dart';
+import 'package:maxga/model/manga/manga.dart';
+import 'package:maxga/model/manga/manga-source.dart';
+import 'package:maxga/provider/public/history-provider.dart';
+import 'package:maxga/route/error-page/empty-page.dart';
 import 'package:provider/provider.dart';
 
-import '../../mangaInfo/MangaInfoPage.dart';
+import '../../mangaInfo/manga-info-page.dart';
 
 class HistoryPage extends StatefulWidget {
   final name = 'history_page';

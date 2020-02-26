@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:maxga/constant/SettingValue.dart';
-import 'package:maxga/provider/public/CollectionProvider.dart';
-import 'package:maxga/provider/public/HistoryProvider.dart';
-import 'package:maxga/provider/public/SettingProvider.dart';
-import 'package:maxga/provider/public/ThemeProvider.dart';
-import 'package:maxga/provider/public/UserProvider.dart';
+import 'package:maxga/constant/setting-value.dart';
+import 'package:maxga/provider/public/collection-provider.dart';
+import 'package:maxga/provider/public/history-provider.dart';
+import 'package:maxga/provider/public/setting-provider.dart';
+import 'package:maxga/provider/public/theme-provider.dart';
+import 'package:maxga/provider/public/user-provider.dart';
 import 'package:maxga/route/android/collection/collection-page.dart';
 import 'package:maxga/route/android/source-viewer/source-viewer.dart';
 import 'package:provider/provider.dart';

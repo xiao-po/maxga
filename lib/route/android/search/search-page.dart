@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:maxga/http/repo/dmzj/DmzjDataRepo.dart';
-import 'package:maxga/service/LocalStorage.service.dart';
+import 'package:maxga/http/repo/dmzj/dmzj-data-repo.dart';
+import 'package:maxga/service/local-storage.service.dart';
 
 import './search-result-page.dart';
 

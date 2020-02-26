@@ -1,16 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:maxga/components/card/Card.dart';
-import 'package:maxga/components/base/MangaCoverImage.dart';
-import 'package:maxga/model/manga/Manga.dart';
-import 'package:maxga/model/manga/MangaSource.dart';
-import 'package:maxga/provider/public/HistoryProvider.dart';
-import 'package:maxga/MangaRepoPool.dart';
+import 'package:maxga/components/card/card.dart';
+import 'package:maxga/components/base/manga-cover-image.dart';
+import 'package:maxga/model/manga/manga.dart';
+import 'package:maxga/model/manga/manga-source.dart';
+import 'package:maxga/provider/public/history-provider.dart';
+import 'package:maxga/manga-repo-pool.dart';
 import 'package:provider/provider.dart';
 
-import '../mangaInfo/MangaInfoCover.dart';
-import '../mangaInfo/MangaInfoPage.dart';
+import '../mangaInfo/manga-info-cover.dart';
+import '../mangaInfo/manga-info-page.dart';
 
 enum _LoadingState { loading, over, error, empty }
 

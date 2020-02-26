@@ -4,14 +4,14 @@ import 'package:maxga/components/dialog/circular-progress-dialog.dart';
 import 'package:maxga/components/form/base/form-item.dart';
 import 'package:maxga/components/form/maxga-text-filed.dart';
 import 'package:maxga/components/form/password-text-filed.dart';
-import 'package:maxga/http/server/base/MaxgaRequestError.dart';
-import 'package:maxga/http/server/base/MaxgaServerResponseStatus.dart';
+import 'package:maxga/http/server/base/maxga-request-error.dart';
+import 'package:maxga/http/server/base/maxga-server-response-status.dart';
 import 'package:maxga/model/user/query/user-registry-query.dart';
 import 'package:maxga/components/form/base/validator.dart';
 import 'package:maxga/service/user.service.dart';
 
-import 'base/RegistryPageResult.dart';
-import 'components/RegistryButton.dart';
+import 'base/registry-page-result.dart';
+import 'components/registry-button.dart';
 
 class RegistryForm {
   final FormItem user;

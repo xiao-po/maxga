@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:maxga/Utils/DateUtils.dart';
+import 'package:maxga/utils/date-utils.dart';
 import 'package:maxga/base/delay.dart';
-import 'package:maxga/constant/SettingValue.dart';
-import 'package:maxga/components/base/ZeroDivider.dart';
+import 'package:maxga/constant/setting-value.dart';
+import 'package:maxga/components/base/zero-divider.dart';
 import 'package:maxga/components/form/setting-form/select-config-page.dart';
 import 'package:maxga/components/form/setting-form/list-tile.dart';
-import 'package:maxga/provider/public/UserProvider.dart';
+import 'package:maxga/provider/public/user-provider.dart';
 import 'package:maxga/route/android/user/modify-password-page.dart';
 import 'package:provider/provider.dart';
 

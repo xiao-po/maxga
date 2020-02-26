@@ -1,7 +1,8 @@
 import 'package:maxga/base/setting/setting.model.dart';
-import 'package:maxga/constant/SettingValue.dart';
+import 'package:maxga/constant/setting-value.dart';
 
-import 'LocalStorage.service.dart';
+import 'local-storage.service.dart';
+
 
 class SettingService {
   static String _key = 'Setting_Value';

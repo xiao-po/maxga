@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:maxga/Utils/DateUtils.dart';
+import 'package:maxga/utils/date-utils.dart';
 import 'package:maxga/components/skeleton.dart';
-import 'package:maxga/model/manga/Manga.dart';
-import 'package:maxga/model/manga/MangaSource.dart';
+import 'package:maxga/model/manga/manga.dart';
+import 'package:maxga/model/manga/manga-source.dart';
 
 typedef CoverBuilder = Widget Function(BuildContext context);
 

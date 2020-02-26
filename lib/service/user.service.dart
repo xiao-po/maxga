@@ -1,5 +1,5 @@
-import 'package:maxga/http/server/UserHttp.repo.dart';
-import 'package:maxga/model/user/User.dart';
+import 'package:maxga/http/server/user-http.repo.dart';
+import 'package:maxga/model/user/user.dart';
 import 'package:maxga/model/user/query/user-registry-query.dart';
 
 class UserService {

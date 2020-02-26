@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:maxga/components/base/ZeroDivider.dart';
-import 'package:maxga/model/maxga/MaxgaReleaseInfo.dart';
-import 'package:maxga/service/UpdateService.dart';
+import 'package:maxga/components/base/zero-divider.dart';
+import 'package:maxga/model/maxga/maxga-release-info.dart';
+import 'package:maxga/service/update-service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const RepoUrl = 'https://github.com/xiao-po/maxga';

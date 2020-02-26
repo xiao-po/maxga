@@ -5,7 +5,7 @@ import 'package:maxga/components/form/base/validator.dart';
 import 'package:maxga/components/form/maxga-text-filed.dart';
 import 'package:maxga/components/form/password-text-filed.dart';
 
-import 'components/RegistryButton.dart';
+import 'components/registry-button.dart';
 
 class ModifyPasswordPage extends StatefulWidget {
   @override

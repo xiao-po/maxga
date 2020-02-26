@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/constant/icons/maxga-icon.dart';
-import 'package:maxga/model/manga/MangaSource.dart';
+import 'package:maxga/model/manga/manga-source.dart';
 import 'package:maxga/provider/source-viewer/source-viwer-provider.dart';
 
 class CupertinoSourceViewer extends StatefulWidget {

@@ -2,12 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/components/form/base/form-item.dart';
 import 'package:maxga/components/form/maxga-text-filed.dart';
-import 'package:maxga/http/server/base/MaxgaRequestError.dart';
-import 'package:maxga/http/server/base/MaxgaServerResponseStatus.dart';
+import 'package:maxga/http/server/base/maxga-request-error.dart';
+import 'package:maxga/http/server/base/maxga-server-response-status.dart';
 import 'package:maxga/components/form/base/validator.dart';
 import 'package:maxga/service/user.service.dart';
 
-import 'components/RegistryButton.dart';
+import 'components/registry-button.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   @override

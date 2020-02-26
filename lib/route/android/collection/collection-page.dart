@@ -2,28 +2,28 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:maxga/MangaRepoPool.dart';
+import 'package:maxga/manga-repo-pool.dart';
 import 'package:maxga/base/delay.dart';
 import 'package:maxga/base/drawer/menu-item.dart';
-import 'package:maxga/components/MangaGridItem.dart';
-import 'package:maxga/components/base/MangaCoverImage.dart';
+import 'package:maxga/components/manga-grid-item.dart';
+import 'package:maxga/components/base/manga-cover-image.dart';
 import 'package:maxga/components/base/confirm-exit-scope.dart';
-import 'package:maxga/components/button/MaxgaButton.dart';
+import 'package:maxga/components/button/maxga-button.dart';
 import 'package:maxga/components/dialog/circular-progress-dialog.dart';
 import 'package:maxga/components/dialog/dialog.dart';
-import 'package:maxga/model/manga/Manga.dart';
-import 'package:maxga/model/maxga/MaxgaReleaseInfo.dart';
-import 'package:maxga/provider/public/CollectionProvider.dart';
-import 'package:maxga/provider/public/UserProvider.dart';
+import 'package:maxga/model/manga/manga.dart';
+import 'package:maxga/model/maxga/maxga-release-info.dart';
+import 'package:maxga/provider/public/collection-provider.dart';
+import 'package:maxga/provider/public/user-provider.dart';
 import 'package:maxga/route/android/collection/components/banner.dart';
-import 'package:maxga/route/android/user/base/LoginPageResult.dart';
+import 'package:maxga/route/android/user/base/login-page-result.dart';
 import 'package:maxga/route/android/user/login-page.dart';
-import 'package:maxga/route/error-page/ErrorPage.dart';
-import 'package:maxga/service/UpdateService.dart';
+import 'package:maxga/route/error-page/error-page.dart';
+import 'package:maxga/service/update-service.dart';
 import 'package:provider/provider.dart';
 
 import '../drawer/drawer.dart';
-import '../mangaInfo/MangaInfoPage.dart';
+import '../mangaInfo/manga-info-page.dart';
 
 class CollectionPage extends StatefulWidget {
   final String name = 'index_page';

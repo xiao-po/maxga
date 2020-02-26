@@ -1,8 +1,7 @@
 import 'package:maxga/database/database-value.dart';
 import 'package:maxga/database/database.utils.dart';
-import 'package:maxga/model/manga/Manga.dart';
-import 'package:maxga/model/maxga/ReadMangaStatus.dart';
-import 'package:maxga/model/maxga/utils/ReadMangaStatusUtils.dart';
+import 'package:maxga/model/maxga/read-manga-status.dart';
+import 'package:maxga/model/maxga/utils/read-manga-status-utils.dart';
 import 'package:sqflite/sqflite.dart';
 
 class MangaReadStatusRepository {

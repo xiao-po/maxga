@@ -1,4 +1,4 @@
-import 'package:maxga/base/error/MaxgaSqlError.dart';
+import 'package:maxga/base/error/maxga-sql-error.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'database-value.dart';

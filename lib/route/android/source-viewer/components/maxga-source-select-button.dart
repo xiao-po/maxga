@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:maxga/MangaRepoPool.dart';
-import 'package:maxga/model/manga/MangaSource.dart';
+import 'package:maxga/manga-repo-pool.dart';
+import 'package:maxga/model/manga/manga-source.dart';
 
 typedef OnMangaSelected = void Function(MangaSource source);
 

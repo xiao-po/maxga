@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
-import 'package:maxga/base/error/MaxgaHttpError.dart';
-import 'package:maxga/http/repo/MaxgaDataHttpRepo.dart';
-import 'package:maxga/model/manga/Manga.dart';
-import 'package:maxga/model/manga/MangaSource.dart';
+import 'package:maxga/base/error/maxga-http-error.dart';
+import 'package:maxga/http/repo/maxga-data-http-repo.dart';
+import 'package:maxga/model/manga/manga.dart';
+import 'package:maxga/model/manga/manga-source.dart';
 
-import '../../MangaRepoPool.dart';
+import '../../manga-repo-pool.dart';
 
 enum SourceViewType {
   latestUpdate,

@@ -1,6 +1,6 @@
 import 'package:maxga/database/database.utils.dart';
-import 'package:maxga/model/manga/Manga.dart';
-import 'package:maxga/model/manga/utils/MangaModelUtils.dart';
+import 'package:maxga/model/manga/manga.dart';
+import 'package:maxga/model/manga/utils/manga-model-utils.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'database-value.dart';

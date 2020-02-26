@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:maxga/base/delay.dart';
 import 'package:maxga/components/dialog/circular-progress-dialog.dart';
-import 'package:maxga/provider/public/UserProvider.dart';
-import 'package:maxga/route/android/user/base/LoginPageResult.dart';
+import 'package:maxga/provider/public/user-provider.dart';
+import 'package:maxga/route/android/user/base/login-page-result.dart';
 import 'package:maxga/route/android/user/login-page.dart';
 import 'package:provider/provider.dart';
 

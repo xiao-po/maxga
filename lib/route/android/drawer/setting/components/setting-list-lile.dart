@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:maxga/base/setting/setting.model.dart';
-import 'package:maxga/constant/SettingValue.dart';
+import 'package:maxga/constant/setting-value.dart';
 import 'package:maxga/components/form/setting-form/select-config-page.dart';
 import 'package:maxga/components/form/setting-form/list-tile.dart';
-import 'package:maxga/provider/public/SettingProvider.dart';
+import 'package:maxga/provider/public/setting-provider.dart';
 import 'package:provider/provider.dart';
 
 const SettingListTilePadding = const EdgeInsets.only(left: 24, right: 20);
