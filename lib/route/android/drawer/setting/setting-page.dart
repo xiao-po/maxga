@@ -27,23 +27,26 @@ class _SettingState extends State<SettingPage> {
           title: const Text('设置'),
         ),
         body: ListView(
-          children: groups
-              .map((group) => Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                        padding: EdgeInsets.only(left: 20, top: 20, bottom: 15),
-                        child: Text(group.title, style: TextStyle(color: Colors.grey[600]),),
-                      ),
-                      Container(
-                        decoration: ConfigListBoxDecoration(theme),
-                        child: Column(
-                          children: buildGroupOptions(group),
-                        ),
-                      ),
-                    ],
-                  ))
-              .toList(growable: false),
+          children: [
+            ...groups
+                .map((group) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.only(left: 20, top: 20, bottom: 15),
+                  child: Text(group.title, style: TextStyle(color: Colors.grey[600]),),
+                ),
+                Container(
+                  decoration: ConfigListBoxDecoration(theme),
+                  child: Column(
+                    children: buildGroupOptions(group),
+                  ),
+                ),
+              ],
+            ))
+                .toList(growable: false),
+            const SizedBox(height: 20),
+          ],
         ));
   }
 

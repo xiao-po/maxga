@@ -58,10 +58,10 @@ class MangaInfoCover extends StatelessWidget {
     var messageBoxBackground = BoxDecoration(
       gradient: new LinearGradient(
           begin: Alignment.bottomCenter,
-          end: Alignment.topCenter,
+          end:  Alignment(0.0, -0.25),
           colors: [
-            Color(0x5b000000),
-            Color(0x3b8e8e8e),
+            Color(0xcc000000),
+            Color(0x118e8e8e),
           ]),
     );
     var mangaTitle = Text(
