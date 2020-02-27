@@ -224,7 +224,8 @@ class MaxgaLoginTipDrawerHeader extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(5.0),
                   ),
-                  color: isDark ? theme.accentColor : theme.accentColor,
+                  splashColor:   Colors.black12,
+                  color: theme.accentColor,
                   onPressed: () => toLogin(context),
                   child: Text('登录',
                       textAlign: TextAlign.center,

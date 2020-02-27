@@ -75,7 +75,6 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     Widget mangaInfoChapter;
     MangaInfoBottomBar mangaInfoBottomBar;
     bool loadOver = false;
-    loading = _MangaInfoPageStatus.error;
     switch (loading) {
       case _MangaInfoPageStatus.over:
         {
