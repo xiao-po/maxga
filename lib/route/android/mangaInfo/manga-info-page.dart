@@ -115,7 +115,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
       title: manga?.title ?? '',
       appbarActions: <Widget>[
         IconButton(
-          icon: Icon(Icons.share, color: Colors.grey[500]),
+          icon: Icon(Icons.share),
           onPressed: () => this.shareLink(),
         )
       ],

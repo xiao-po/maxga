@@ -2,18 +2,18 @@
 import 'package:dio/dio.dart';
 import 'package:maxga/base/error/maxga-http-error.dart';
 import 'package:maxga/constant/setting-value.dart';
+import 'package:maxga/manga-repo-pool.dart';
 import 'package:maxga/model/manga/manga-source.dart';
 import 'package:maxga/provider/public/setting-provider.dart';
 
-import '../../manga-repo-pool.dart';
 
 
 
 
-class MaxgaHttpUtils {
+class MangaHttpUtils {
   final MangaSource source;
 
-  MaxgaHttpUtils(this.source);
+  MangaHttpUtils(this.source);
 
   Future<T> requestMangaSourceApi<T>(String url,
       {T Function(Response<String> response) parser}) async {

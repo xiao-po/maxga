@@ -9,7 +9,8 @@ class MangaInfoWrapper extends StatefulWidget {
 
   final List<Widget> appbarActions;
 
-  const MangaInfoWrapper({Key key, this.title, this.children, this.bottomBar, this.appbarActions})
+  const MangaInfoWrapper(
+      {Key key, this.title, this.children, this.bottomBar, this.appbarActions})
       : super(key: key);
 
   @override
@@ -23,7 +24,8 @@ class _MangaInfoWrapperState extends State<MangaInfoWrapper> {
   @override
   void initState() {
     super.initState();
-    scrollController.addListener(() => listenScrollTopForModifyBackgroundColor());
+    scrollController
+        .addListener(() => listenScrollTopForModifyBackgroundColor());
   }
 
   @override
@@ -31,10 +33,11 @@ class _MangaInfoWrapperState extends State<MangaInfoWrapper> {
     Color originColor = Theme.of(context).primaryColor;
     Color appbarColor = Color.fromARGB((opacity * 0xff).floor(),
         originColor.red, originColor.green, originColor.blue);
-    var titleColor = Colors.grey[500];
-    Color appbarTitleColor = Color.fromARGB(
-        (opacity * 0xff).floor(), titleColor.red, titleColor.green, titleColor.blue);
+    var titleColor = Color(0xFF9E9E9E);
+    Color appbarTitleColor = Color.fromARGB((opacity * 0xff).floor(),
+        titleColor.red, titleColor.green, titleColor.blue);
 
+    var iconColor = Color.lerp(Colors.white, Colors.grey[400], opacity);
     return Stack(
       children: <Widget>[
         Column(
@@ -64,12 +67,15 @@ class _MangaInfoWrapperState extends State<MangaInfoWrapper> {
               removeBottom: true,
               child: AppBar(
                 backgroundColor: appbarColor,
-                iconTheme: IconThemeData(color: Colors.grey[400]),
+                iconTheme: IconThemeData(color: iconColor),
                 leading: BackButton(),
                 elevation: 0,
                 title: Text(widget.title,
                     style: TextStyle(color: appbarTitleColor)),
-                actions: widget.appbarActions,
+                actions: widget.appbarActions.map(((actionButton) =>
+                    IconTheme.merge(
+                        data: IconThemeData(color: iconColor),
+                        child: actionButton))).toList(growable: false),
               )),
         ),
       ],

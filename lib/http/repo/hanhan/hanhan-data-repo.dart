@@ -1,4 +1,4 @@
-import 'package:maxga/http/utils/maxga-http-utils.dart';
+import 'package:maxga/http/repo/utils/manga-http-utils.dart';
 import 'package:maxga/model/manga/manga.dart';
 
 import 'package:maxga/model/manga/manga-source.dart';
@@ -10,7 +10,7 @@ import 'parser/hanhan-html-parser.dart';
 
 class HanhanDateRepo extends MaxgaDataHttpRepo {
   MangaSource _source = HanhanMangaSource;
-  MaxgaHttpUtils _httpUtils = MaxgaHttpUtils(HanhanMangaSource);
+  MangaHttpUtils _httpUtils = MangaHttpUtils(HanhanMangaSource);
 
   List<String> _imageServerUrl;
 

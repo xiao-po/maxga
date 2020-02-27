@@ -1,23 +1,39 @@
 import 'package:flutter/cupertino.dart';
 import 'package:maxga/constant/setting-value.dart';
 
-
 class MaxgaSettingItem {
+  /// 具体相关项目
   final MaxgaSettingItemType key;
+
+  /// 设定 form 种类
   final MaxgaSettingListTileType type;
+
+  /// 设定的 title
   final String title;
+
+  /// 设定非激活时的小标题
   final String subTitle;
-  final String description;
+
+  /// 设定激活时的标题
+  final String activeSubTitle;
+
+  /// 设定归属大类
   final MaxgaSettingCategoryType category;
+
+  /// 是否隐藏
+  /// 该配置是准备给相关需要隐藏的设置选项准备的
   final bool hidden;
+
+  /// value
   final String value;
+
 
   const MaxgaSettingItem(
       {@required this.type,
       @required this.key,
       this.subTitle,
       this.hidden = false,
-      this.description,
+      this.activeSubTitle,
       @required this.category,
       this.value,
       @required this.title})
@@ -25,10 +41,10 @@ class MaxgaSettingItem {
 
   const MaxgaSettingItem.title(
       {this.key,
+      this.activeSubTitle,
       MaxgaSettingListTileType type,
       this.title,
       @required this.subTitle,
-      this.description,
       @required this.category,
       this.hidden,
       this.value})
@@ -45,31 +61,7 @@ class MaxgaSettingItem {
         type: type,
         hidden: hidden ?? this.hidden,
         subTitle: subTitle,
-        description: description,
         category: category,
         value: value ?? this.value);
   }
-}
-
-class MaxgaSettingPageItem extends MaxgaSettingItem {
-  final WidgetBuilder pageBuilder;
-
-  MaxgaSettingPageItem({
-    @required MaxgaSettingItemType key,
-    String title,
-    String subTitle,
-    String description,
-    @required MaxgaSettingCategoryType category,
-    bool hidden,
-    String value,
-    this.pageBuilder,
-  }) : super(
-            key: key,
-            title: title,
-            type: MaxgaSettingListTileType.page,
-            hidden: hidden,
-            subTitle: subTitle,
-            description: description,
-            category: category,
-            value: value);
 }

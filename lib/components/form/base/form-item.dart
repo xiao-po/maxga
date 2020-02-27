@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class FormItem extends ChangeNotifier {
   final TextEditingController controller;
-  bool isDirty = false;
+  bool _isDirty = false;
   bool _isDisabled = false;
   String errorText;
 
@@ -14,7 +14,7 @@ class FormItem extends ChangeNotifier {
 
   bool get disabled => _isDisabled;
   bool get enabled => !_isDisabled;
-  bool get invalid => isDirty && this.errorText != null;
+  bool get invalid => _isDirty && this.errorText != null;
   bool get valid => !invalid;
   bool get isEmpty => this.value == "";
 
@@ -24,7 +24,7 @@ class FormItem extends ChangeNotifier {
   }) : this.controller = TextEditingController(text: text) {
     this.controller.addListener(() {
       if (!isEmpty) {
-        this.isDirty = true;
+        this._isDirty = true;
       }
     });
     this.controller.addListener(validateValue);
@@ -45,8 +45,16 @@ class FormItem extends ChangeNotifier {
     }
   }
 
+  setDirty() {
+    this._isDirty = true;
+  }
+
+  clearDirty() {
+    this._isDirty = false;
+  }
+
   setError(String error) {
-    this.isDirty = true;
+    this._isDirty = true;
     this.errorText = error;
     this.notifyListeners();
   }
@@ -71,7 +79,7 @@ class FormItem extends ChangeNotifier {
     if (_validators.length == 0) {
       return null;
     }
-    if (!isDirty) {
+    if (!_isDirty) {
       return null;
     }
     for (var validator in _validators) {

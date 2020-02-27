@@ -120,16 +120,13 @@ class UserProvider  extends BaseProvider {
     notifyListeners();
   }
 
-  refreshTokenAndSave() async {
-    try {
-      String token = await UserService.refreshToken(this.user.refreshToken);
-      var json = this.user.toJson();
-      json['token'] = token;
-      User user = User.fromJson(json);
-      this.setLoginStatus(user);
-    }catch(e) {
-      print(e);
-    }
+  refreshToken(String token) async {
+    assert(token != null);
+
+    var json = this.user.toJson();
+    json['token'] = token;
+    User user = User.fromJson(json);
+    this.setLoginStatus(user);
   }
 
   Future<void> _loadLoginStatus() async {

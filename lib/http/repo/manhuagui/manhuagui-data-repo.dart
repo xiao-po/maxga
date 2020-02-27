@@ -1,7 +1,7 @@
 import 'package:maxga/http/repo/maxga-data-http-repo.dart';
 import 'package:maxga/http/repo/manhuagui/crypto/manhuagui-crypto.dart';
 import 'package:maxga/http/repo/manhuagui/parser/manhuagui-html-parser.dart';
-import 'package:maxga/http/utils/maxga-http-utils.dart';
+import 'package:maxga/http/repo/utils/manga-http-utils.dart';
 import 'package:maxga/model/manga/manga.dart';
 import 'package:maxga/model/manga/manga-source.dart';
 
@@ -11,7 +11,7 @@ import 'constants/manhuagui-manga-source.dart';
 class ManhuaguiDataRepo extends MaxgaDataHttpRepo {
   MangaSource _source = ManhuaguiMangaSource;
   ManhuaguiHtmlParser parser = ManhuaguiHtmlParser.getInstance();
-  MaxgaHttpUtils _httpUtils = MaxgaHttpUtils(ManhuaguiMangaSource);
+  MangaHttpUtils _httpUtils = MangaHttpUtils(ManhuaguiMangaSource);
 
   @override
   Future<List<String>> getChapterImageList(String url) async {

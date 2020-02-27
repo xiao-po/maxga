@@ -6,7 +6,7 @@ import 'package:maxga/http/repo/dmzj/model/dmzj-latest-update-manga.dart';
 import 'package:maxga/http/repo/dmzj/model/dmzj-manga-info.dart';
 import 'package:maxga/http/repo/dmzj/model/dmzj-manga-search-result.dart';
 import 'package:maxga/http/repo/dmzj/model/dmzj-ranked-manga-info.dart';
-import 'package:maxga/http/utils/maxga-http-utils.dart';
+import 'package:maxga/http/repo/utils/manga-http-utils.dart';
 import 'package:maxga/model/manga/chapter.dart';
 import 'package:maxga/model/manga/manga.dart';
 import 'package:maxga/model/manga/manga-source.dart';
@@ -16,7 +16,7 @@ import 'model/dmzj-search-suggestion.dart';
 
 class DmzjDataRepo extends MaxgaDataHttpRepo {
   MangaSource _source = DmzjMangaSource;
-  MaxgaHttpUtils _httpUtils = MaxgaHttpUtils(DmzjMangaSource);
+  MangaHttpUtils _httpUtils = MangaHttpUtils(DmzjMangaSource);
 
   @override
   Future<Manga> getMangaInfo(String url) async {
