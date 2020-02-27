@@ -109,7 +109,7 @@ class RegistryForm {
 
   void setDirtyAndValidate() {
     for (var value in this.allItem) {
-      value.isDirty = true;
+      value.setDirty();
       value.validateValue();
     }
   }

@@ -1,6 +1,6 @@
 import 'package:maxga/http/repo/manhuadui/parser/manhuadui-html-parser.dart';
 
-import 'package:maxga/http/utils/maxga-http-utils.dart';
+import 'package:maxga/http/repo/utils/manga-http-utils.dart';
 import 'package:maxga/model/manga/manga.dart';
 import 'package:maxga/model/manga/manga-source.dart';
 
@@ -13,7 +13,7 @@ import 'constants/manhuadui-manga-source.dart';
 class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
   MangaSource _source = ManhuaduiMangaSource;
   ManhuaduiHtmlParser parser = ManhuaduiHtmlParser.getInstance();
-  MaxgaHttpUtils _httpUtils = MaxgaHttpUtils(ManhuaduiMangaSource);
+  MangaHttpUtils _httpUtils = MangaHttpUtils(ManhuaduiMangaSource);
 
   @override
   Future<List<String>> getSuggestion(String words) {

@@ -66,7 +66,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     if (emailFormItem.invalid) {
       return null;
     }
-    emailFormItem.isDirty = true;
+    emailFormItem.setDirty();
     emailFormItem.validateValue();
     if (emailFormItem.invalid) {
       return null;

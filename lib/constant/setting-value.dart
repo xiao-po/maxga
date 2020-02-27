@@ -12,7 +12,6 @@ enum MaxgaSettingCategoryType {
 }
 
 enum MaxgaSettingListTileType {
-  page,
   checkbox,
   text,
   select,

@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:maxga/base/error/maxga-http-error.dart';
-import 'package:maxga/constant/test-value.dart';
+import 'package:maxga/http/server/base/maxga-server.contants.dart';
+import 'package:maxga/http/server/user-http.repo.dart';
 import 'package:maxga/provider/public/user-provider.dart';
 
 import '../../../manga-repo-pool.dart';
@@ -11,23 +11,29 @@ import 'maxga-server-response-status.dart';
 
 typedef _ModelFactory<T> = T Function(dynamic json);
 
+const MaxgaServer = "http://xiaopo.xyz:8080";
 
 class MaxgaServerHttpUtils {
 
   static Future<T> get<T>(String url, {_ModelFactory<T> factory,bool needAuth = false}) {
     String token = UserProvider.getInstance()?.token;
-    if (token == null) {
+    if (needAuth && token == null) {
       throw MaxgaRequestError(
           MaxgaServerResponseStatus.SHOULD_LOGIN
       );
     }
-    return requestMaxgaServer(url, null, factory, method: 'get');
+    return _requestMaxgaServer(url, null, factory, method: 'get');
   }
 
   static Future<T> post<T>(String url, data, { _ModelFactory<T> factory,bool needAuth = false}) {
-    return requestMaxgaServer(url, data, factory, method: 'post');
+    return _requestMaxgaServer(url, data, factory);
   }
-  static Future<T> requestMaxgaServer<T>(String url, data, _ModelFactory<T> factory, {String method = 'post'}) async {
+
+
+
+
+
+  static Future<T> _requestMaxgaServer<T>(String url, data, _ModelFactory<T> factory, {String method = 'post'}) async {
 
     var jsonMap;
     Dio dio = MangaRepoPool.getInstance().dio;
@@ -35,7 +41,7 @@ class MaxgaServerHttpUtils {
     MaxgaServerResponseStatus status;
     while (retryTimes > 0) {
       try {
-        Response<String> response = await dio.request('http://xiaopo.xyz:8080$url',
+        Response<String> response = await dio.request('$MaxgaServer$url',
             data: data,
             options: Options(
               method: method,
@@ -47,7 +53,10 @@ class MaxgaServerHttpUtils {
         jsonMap = json.decode(response.data);
         status = _getStatusFromCode(jsonMap['status']);
         if (status == MaxgaServerResponseStatus.JWT_TIMEOUT) {
-
+          final userProvider = UserProvider.getInstance();
+          final token = await UserHttpRepo.refreshToken(userProvider.user.refreshToken);
+          userProvider.refreshToken(token);
+          continue;
         } else if (status != MaxgaServerResponseStatus.SUCCESS) {
           throw MaxgaRequestError(status, jsonMap['message']);
         }

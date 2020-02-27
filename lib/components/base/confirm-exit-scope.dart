@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+
 class ConfirmExitScope extends StatefulWidget {
   final Widget child;
 
@@ -30,7 +31,6 @@ class _ConfirmExitScopeState extends State<ConfirmExitScope> {
   Future<bool> onBack() async {
     if (_lastPressedAt == null ||
         DateTime.now().difference(_lastPressedAt) > Duration(seconds: 2)) {
-      //两次点击间隔超过1秒则重新计时
       _lastPressedAt = DateTime.now();
       showSnack('再按一次退出程序');
       return false;

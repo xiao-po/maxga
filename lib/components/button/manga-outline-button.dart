@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 typedef VoidCallback = void Function();
 
 class MangaOutlineButton extends StatelessWidget {
-  final Text text;
-  final bool active;
-  final VoidCallback onPressed;
-
   const MangaOutlineButton({Key key, this.text, this.active, this.onPressed})
       : super(key: key);
+
+  final Widget text;
+
+  final bool active;
+
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {

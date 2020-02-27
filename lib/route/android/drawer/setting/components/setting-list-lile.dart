@@ -26,14 +26,6 @@ class SettingListTile extends StatelessWidget {
         return CommandSettingListTile(setting: setting);
       case MaxgaSettingListTileType.confirmCommand:
         return AlertCommandSettingListTile(setting: setting);
-      case MaxgaSettingListTileType.page:
-        if (setting is MaxgaSettingPageItem) {
-          return SettingPageListTile(
-              setting: (setting as MaxgaSettingPageItem));
-        }
-        return ListTile(
-            title: const Text('没有类型的选项'),
-            subtitle: Text(setting?.value ?? '') ?? null);
       case MaxgaSettingListTileType.text:
       default:
         {
@@ -199,24 +191,3 @@ class DropDownSettingListTile extends StatelessWidget {
   }
 }
 
-
-class SettingPageListTile extends StatelessWidget {
-  final MaxgaSettingPageItem setting;
-
-  const SettingPageListTile({Key key, @required this.setting})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(setting.title),
-      contentPadding: SettingListTilePadding,
-      subtitle: setting.subTitle != null ? Text(setting.subTitle) : null,
-      trailing: Icon(Icons.chevron_right),
-      onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => setting.pageBuilder(context))),
-    );
-  }
-}

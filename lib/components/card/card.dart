@@ -40,7 +40,7 @@ class MangaListTile extends StatelessWidget {
     var edgeInsets = EdgeInsets.only(top: 0, left: 10);
     var bodyColumn = <Widget>[
       Padding(
-        padding: EdgeInsets.only(bottom: 8),
+        padding: EdgeInsets.only(bottom: 3),
         child: title,
       )
     ];

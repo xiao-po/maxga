@@ -99,9 +99,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void login() async {
-    this.usernameItem.isDirty = true;
+    this.usernameItem.setDirty();
     this.usernameItem.validateValue();
-    this.passwordItem.isDirty = true;
+    this.usernameItem.setDirty();
     this.passwordItem.validateValue();
     FocusScope.of(context).requestFocus(new FocusNode());
 
