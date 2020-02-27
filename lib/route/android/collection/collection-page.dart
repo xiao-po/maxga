@@ -24,6 +24,7 @@ import 'package:provider/provider.dart';
 
 import '../drawer/drawer.dart';
 import '../mangaInfo/manga-info-page.dart';
+import 'components/collect-empty-tip-body.dart';
 
 class CollectionPage extends StatefulWidget {
   final String name = 'index_page';
@@ -121,7 +122,7 @@ class _CollectionPageState extends State<CollectionPage> {
         children: <Widget>[
           ...buildBannerList(),
           Expanded(
-            child: ErrorPage('您没有收藏的漫画'),
+            child: CollectEmptyTipBody(),
           ),
         ],
       );
@@ -235,13 +236,14 @@ class _CollectionPageState extends State<CollectionPage> {
       return MangaInfoPage(
           infoUrl: item.infoUrl,
           sourceKey: item.sourceKey,
+          title: item.title,
           coverImageBuilder: (context) => MangaCoverImage(
                 source: MangaRepoPool.getInstance()
                     .getMangaSourceByKey(item.sourceKey),
                 url: item.coverImgUrl,
                 tagPrefix: widget.name,
                 fit: BoxFit.cover,
-              ));
+              ), );
     }));
   }
 

@@ -5,6 +5,11 @@ import 'package:maxga/manga-repo-pool.dart';
 import 'package:maxga/base/setting/setting.model.dart';
 import 'package:maxga/constant/setting-value.dart';
 import 'package:maxga/provider/base/base-provider.dart';
+import 'package:maxga/provider/public/collection-provider.dart';
+import 'package:maxga/provider/public/history-provider.dart';
+import 'package:maxga/provider/public/user-provider.dart';
+import 'package:maxga/route/android/drawer/history/history-page.dart';
+import 'package:maxga/service/manga-read-storage.service.dart';
 import 'package:maxga/service/setting.service.dart';
 
 class SettingGroup {
@@ -97,6 +102,12 @@ class SettingProvider extends BaseProvider {
           return this.init();
         }
         return Future.value(true);
+      case MaxgaSettingItemType.clearData:
+        await UserProvider.getInstance().clearData();
+        await HistoryProvider.getInstance().clearHistory();
+        await MangaStorageService.clearDatabase();
+        CollectionProvider.getInstance().clearData();
+        break;
       case MaxgaSettingItemType.readOnlyOnWiFi:
       case MaxgaSettingItemType.useMaxgaProxy:
       default:

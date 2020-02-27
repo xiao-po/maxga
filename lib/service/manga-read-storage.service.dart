@@ -111,8 +111,9 @@ class MangaStorageService {
 
 //  }
 
-  static Future<void> clearStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove(_key);
+  static Future<void> clearDatabase() async {
+    await CollectStatusRepo.deleteAll();
+    await MangaDataRepository.deleteAll();
+    await MangaReadStatusRepository.deleteAll();
   }
 }

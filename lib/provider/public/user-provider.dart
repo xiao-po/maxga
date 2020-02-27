@@ -72,7 +72,7 @@ class UserProvider  extends BaseProvider {
     if (diffDays.inDays - this.syncInterval > 1) {
       return true;
     } else  {
-      return DateTime.now().day - this.lastRemindSyncTime.day == 1;
+      return DateTime.now().day - this.lastRemindSyncTime.day >= 1;
     }
   }
 
@@ -154,6 +154,13 @@ class UserProvider  extends BaseProvider {
 
   Future<void> _setFirstOpenTime() async {
     await LocalStorage.setString(_firstOpenKey, DateTime.now().toIso8601String());
+  }
+
+  clearData() async {
+    await this.logout();
+
+
+    notifyListeners();
   }
 
 

@@ -382,6 +382,7 @@ class _SourceViewerPageState extends State<SourceViewerPage>
         MangaRepoPool.getInstance().getMangaSourceByKey(manga.sourceKey);
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return MangaInfoPage(
+        title: manga.title,
         coverImageBuilder: (context) => MangaCoverImage(
           source: source,
           url: manga.coverImgUrl,

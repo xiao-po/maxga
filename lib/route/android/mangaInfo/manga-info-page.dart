@@ -8,16 +8,16 @@ import 'package:maxga/model/manga/manga.dart';
 import 'package:maxga/model/maxga/read-manga-status.dart';
 import 'package:maxga/provider/public/collection-provider.dart';
 import 'package:maxga/route/android/search/search-result-page.dart';
-import 'package:maxga/route/android/error-page/error-page.dart';
 import 'package:maxga/service/manga-read-storage.service.dart';
 import 'package:maxga/utils/maxga-utils.dart';
 
-import '../mangaInfo/magan-info-wrapper.dart';
-import '../mangaInfo/manga-info-cover.dart';
 import '../mangaViewer/manga-viewer.dart';
-import 'manga-chapeter.dart';
-import 'manga-info-bottom-bar.dart';
-import 'manga-info-intro.dart';
+import 'components/magan-info-wrapper.dart';
+import 'components/manga-chapeter.dart';
+import 'components/manga-info-bottom-bar.dart';
+import 'components/manga-info-cover.dart';
+import 'components/manga-info-intro.dart';
+import 'error-page/manga-info-error-page.dart';
 
 enum _MangaInfoPageStatus {
   loading,
@@ -28,13 +28,15 @@ enum _MangaInfoPageStatus {
 class MangaInfoPage extends StatefulWidget {
   final String sourceKey;
   final String infoUrl;
+  final String title;
   final CoverImageBuilder coverImageBuilder;
 
   const MangaInfoPage(
       {Key key,
       @required this.coverImageBuilder,
       @required this.sourceKey,
-      @required this.infoUrl})
+      @required this.infoUrl,
+      @required this.title})
       : super(key: key);
 
   @override
@@ -73,6 +75,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     Widget mangaInfoChapter;
     MangaInfoBottomBar mangaInfoBottomBar;
     bool loadOver = false;
+    loading = _MangaInfoPageStatus.error;
     switch (loading) {
       case _MangaInfoPageStatus.over:
         {
@@ -95,14 +98,10 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
         }
       case _MangaInfoPageStatus.error:
         {
-          return Scaffold(
-            appBar: AppBar(
-              leading: BackButton(color: Colors.black45),
-              elevation: 0,
-            ),
-            body: ErrorPage("读取漫画信息发生了错误呢~~~", onTap: () {
-              debugPrint('error page on tap');
-            }),
+          return MangaInfoErrorPage(
+            source: source,
+            title: widget.title,
+            message: "读取漫画信息发生错误了呢~~~",
           );
         }
       case _MangaInfoPageStatus.loading:

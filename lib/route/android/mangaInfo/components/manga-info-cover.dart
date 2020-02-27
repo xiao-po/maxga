@@ -5,7 +5,7 @@ import 'package:maxga/model/manga/manga.dart';
 import 'package:maxga/model/manga/manga-source.dart';
 
 
-import '../search/search-result-page.dart';
+import '../../search/search-result-page.dart';
 
 typedef CoverImageBuilder = Widget Function(BuildContext context);
 

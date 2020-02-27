@@ -70,6 +70,7 @@ class _HistToryPageState extends State<HistoryPage> {
   goMangaInfoPage(SimpleMangaInfo item) {
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return MangaInfoPage(
+          title: item.title,
           coverImageBuilder: (c) => MangaCoverImage(
                 url: item.coverImgUrl,
                 source: MangaRepoPool.getInstance()

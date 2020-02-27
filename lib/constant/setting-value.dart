@@ -26,6 +26,7 @@ enum MaxgaSettingItemType {
   cleanCache,
   useMaxgaProxy,
   resetSetting,
+  clearData,
   defaultIndexPage,
   defaultMangaSource,
 }
@@ -175,7 +176,13 @@ class SettingItemListValue {
       type: MaxgaSettingListTileType.confirmCommand,
       title: '重置设置',
       category: MaxgaSettingCategoryType.other,
-    )
+    ),
+    MaxgaSettingItem(
+      key: MaxgaSettingItemType.clearData,
+      type: MaxgaSettingListTileType.confirmCommand,
+      title: '清除数据',
+      category: MaxgaSettingCategoryType.other,
+    ),
   ];
 
   static get value => _value.toList()..removeWhere((item) => item.hidden);

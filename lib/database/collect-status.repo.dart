@@ -77,4 +77,14 @@ class CollectStatusRepo {
       database: database,
     );
   }
+
+  static Future<bool> deleteAll({Database database}) {
+    return MaxgaDataBaseUtils.openUpdateTransaction(
+      action: (database) async {
+        await database.delete(DatabaseTables.collect_status);
+        return true;
+      },
+      database: database,
+    );
+  }
 }

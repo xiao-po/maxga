@@ -62,4 +62,14 @@ class MangaReadStatusRepository {
       database: database,
     );
   }
+
+  static Future<bool> deleteAll({Database database}) {
+    return MaxgaDataBaseUtils.openUpdateTransaction(
+      action: (database) async {
+        await database.delete(DatabaseTables.mangaReadStatus);
+        return true;
+      },
+      database: database,
+    );
+  }
 }

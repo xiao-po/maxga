@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:maxga/components/button/copy-action-button.dart';
 import 'package:maxga/components/card/card.dart';
 import 'package:maxga/components/base/manga-cover-image.dart';
 import 'package:maxga/model/manga/manga.dart';
@@ -9,7 +10,7 @@ import 'package:maxga/provider/public/history-provider.dart';
 import 'package:maxga/manga-repo-pool.dart';
 import 'package:provider/provider.dart';
 
-import '../mangaInfo/manga-info-cover.dart';
+import '../mangaInfo/components/manga-info-cover.dart';
 import '../mangaInfo/manga-info-page.dart';
 
 enum _LoadingState { loading, over, error, empty }
@@ -83,16 +84,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
       appBar: AppBar(
         title: Text(widget.keyword),
         actions: <Widget>[
-          IconButton(
-            onPressed: () {
-              Clipboard.setData(ClipboardData(text: widget.keyword));
-              scaffoldKey.currentState.hideCurrentSnackBar();
-              scaffoldKey.currentState.showSnackBar(SnackBar(
-                content: const Text("已经复制关键词"),
-              ));
-            },
-              icon: Icon(Icons.content_copy, size: 16,),
-          )
+          CopyActionButton(keyword: widget.keyword)
         ],
       ),
       body: buildBodyByState(),
@@ -119,6 +111,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
             lastUpdateChapter: manga.lastUpdateChapter));
     Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
       return MangaInfoPage(
+        title: manga.title,
         coverImageBuilder: (context) => MangaCoverImage(
           source:
               MangaRepoPool.getInstance().getMangaSourceByKey(manga.sourceKey),
@@ -303,3 +296,4 @@ class _SearchResultPageState extends State<SearchResultPage> {
     });
   }
 }
+

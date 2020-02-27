@@ -97,9 +97,11 @@ class MangaDataRepository {
     );
   }
 
-  static Future<bool> clearDataBase({Database database}) {
-    return MaxgaDataBaseUtils.openSearchTransaction<bool>(
-      action: (db) async {
+
+  static Future<bool> deleteAll({Database database}) {
+    return MaxgaDataBaseUtils.openUpdateTransaction(
+      action: (database) async {
+        await database.delete(DatabaseTables.manga);
         return true;
       },
       database: database,

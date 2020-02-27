@@ -122,6 +122,11 @@ class CollectionProvider extends BaseProvider {
         ._collectedMangaList
         .firstWhere((item) => item.infoUrl == infoUrl);
   }
+
+  clearData() {
+    this._collectedMangaList = [];
+    notifyListeners();
+  }
 }
 
 class CollectionMangaUpdateResult {
