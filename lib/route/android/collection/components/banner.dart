@@ -66,7 +66,7 @@ class LoginBanner extends StatelessWidget {
           child: const Text('登录'),
           onPressed: () async {
             await AnimationDelay();
-            toLogin(context);
+            onSuccess();
           },
         ),
         FlatButton(
@@ -87,18 +87,6 @@ class LoginBanner extends StatelessWidget {
     );
   }
 
-  void toLogin(BuildContext context) async {
-    LoginPageResult result = await Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => LoginPage()));
-    if (result != null && result.success) {
-      Scaffold.of(context).showSnackBar(SnackBar(
-        content: Text('登录成功'),
-      ));
-      if (onSuccess != null) {
-        onSuccess();
-      }
-    }
-  }
 }
 
 class UpdateBanner extends StatelessWidget {
