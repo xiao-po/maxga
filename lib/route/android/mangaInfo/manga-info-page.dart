@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:maxga/manga-repo-pool.dart';
-import 'package:maxga/utils/maxga-utils.dart';
+import 'package:maxga/base/delay.dart';
 import 'package:maxga/http/repo/maxga-data-http-repo.dart';
+import 'package:maxga/manga-repo-pool.dart';
 import 'package:maxga/model/manga/chapter.dart';
-import 'package:maxga/model/manga/manga.dart';
 import 'package:maxga/model/manga/manga-source.dart';
+import 'package:maxga/model/manga/manga.dart';
 import 'package:maxga/model/maxga/read-manga-status.dart';
 import 'package:maxga/provider/public/collection-provider.dart';
-import 'package:maxga/route/error-page/error-page.dart';
+import 'package:maxga/route/android/search/search-result-page.dart';
+import 'package:maxga/route/android/error-page/error-page.dart';
 import 'package:maxga/service/manga-read-storage.service.dart';
+import 'package:maxga/utils/maxga-utils.dart';
 
 import '../mangaInfo/magan-info-wrapper.dart';
 import '../mangaInfo/manga-info-cover.dart';
 import '../mangaViewer/manga-viewer.dart';
-
 import 'manga-chapeter.dart';
 import 'manga-info-bottom-bar.dart';
 import 'manga-info-intro.dart';
@@ -85,9 +86,10 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
           loadOver = true;
           mangaInfoBottomBar = MangaInfoBottomBar(
             onResume: () => onResumeProcess(),
-            readed: readMangaStatus.chapterId != null,
+            isRead: readMangaStatus.chapterId != null,
             collected: isCollected,
             onCollect: () => collectManga(),
+            onSearchMangaName: searchMangaName,
           );
           break;
         }
@@ -257,5 +259,14 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
         MangaRepoPool.getInstance().getRepo(key: widget.sourceKey);
     String shareUrl = await repo.generateShareLink(manga);
     MaxgaUtils.shareUrl(shareUrl);
+  }
+
+  void searchMangaName() async {
+    await AnimationDelay();
+    Navigator.push(context, MaterialPageRoute<void>(builder: (context) {
+      return SearchResultPage(
+        keyword: manga.title,
+      );
+    }));
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:maxga/base/error/maxga-http-error.dart';
 import 'package:maxga/model/manga/manga-source.dart';
-import 'package:maxga/route/error-page/error-page.dart';
+import 'package:maxga/route/android/error-page/error-page.dart';
 
 class MangaSourceViewerErrorPage extends StatelessWidget {
   final MangaHttpErrorType errorType;

@@ -18,7 +18,7 @@ import 'package:maxga/provider/public/user-provider.dart';
 import 'package:maxga/route/android/collection/components/banner.dart';
 import 'package:maxga/route/android/user/base/login-page-result.dart';
 import 'package:maxga/route/android/user/login-page.dart';
-import 'package:maxga/route/error-page/error-page.dart';
+import 'package:maxga/route/android/error-page/error-page.dart';
 import 'package:maxga/service/update-service.dart';
 import 'package:provider/provider.dart';
 

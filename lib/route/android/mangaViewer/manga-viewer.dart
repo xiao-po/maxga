@@ -11,7 +11,7 @@ import 'package:maxga/http/repo/maxga-data-http-repo.dart';
 import 'package:maxga/model/manga/chapter.dart';
 import 'package:maxga/model/manga/manga.dart';
 import 'package:maxga/provider/public/setting-provider.dart';
-import 'package:maxga/route/error-page/error-page.dart';
+import 'package:maxga/route/android/error-page/error-page.dart';
 import 'package:provider/provider.dart';
 
 import '../mangaViewer/manga-image.dart';
