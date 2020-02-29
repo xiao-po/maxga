@@ -142,13 +142,13 @@ class _AboutPageState extends State<AboutPage> {
   checkUpdateStatus() async {
     this.checkUpdateLoading = CheckUpdateStatus.loading;
     setState(() {});
-    final nextVersion = await UpdateService.checkUpdateStatusWithoutIgnore();
-    if (nextVersion != null) {
+    final result = await UpdateService.checkUpdateStatusWithoutIgnore();
+    if (result != null) {
       this.checkUpdateLoading = CheckUpdateStatus.shouldUpdate;
     } else {
       this.checkUpdateLoading = CheckUpdateStatus.notUpdate;
     }
-    this.nextVersion = nextVersion;
+    this.nextVersion = result.releaseInfo;
     if (mounted) {
       setState(() {});
     }

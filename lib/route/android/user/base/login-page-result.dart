@@ -1,5 +1,5 @@
-class LoginPageResult {
+class AuthPageResult {
   final bool success;
 
-  LoginPageResult(this.success);
+  AuthPageResult(this.success);
 }

@@ -8,7 +8,7 @@ import 'package:maxga/provider/public/theme-provider.dart';
 import 'package:maxga/provider/public/user-provider.dart';
 import 'package:maxga/route/android/hidden-manga/hidden-manga-page.dart';
 import 'package:maxga/route/android/user/base/login-page-result.dart';
-import 'package:maxga/route/android/user/login-page.dart';
+import 'package:maxga/route/android/user/auth-page.dart';
 import 'package:maxga/route/android/user/user-detail-page.dart';
 import 'package:provider/provider.dart';
 
@@ -226,7 +226,7 @@ class MaxgaLoginTipDrawerHeader extends StatelessWidget {
                     side: BorderSide(color: Colors.grey[300]),
                     borderRadius: new BorderRadius.circular(5.0),
                   ),
-                  onPressed: () {},
+                  onPressed: () => toRegistry(context),
                   child: Text('注册',
                       style: TextStyle(
                           color: isDark ? Colors.grey[200] : theme.accentColor)),
@@ -253,11 +253,18 @@ class MaxgaLoginTipDrawerHeader extends StatelessWidget {
       ],
     );
   }
+  toRegistry(BuildContext context) async {
+    var result = await Navigator.of(context).push<AuthPageResult>(
+        MaterialPageRoute(builder: (context) => AuthPage.registry()));
+    if (result is AuthPageResult && result.success) {
+      print("login success");
+    }
+  }
 
   toLogin(BuildContext context) async {
-    var result = await Navigator.of(context).push<LoginPageResult>(
-        MaterialPageRoute(builder: (context) => LoginPage()));
-    if (result is LoginPageResult && result.success) {
+    var result = await Navigator.of(context).push<AuthPageResult>(
+        MaterialPageRoute(builder: (context) => AuthPage()));
+    if (result is AuthPageResult && result.success) {
       print("login success");
     }
   }

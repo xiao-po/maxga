@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:maxga/model/user/user.dart';
 import 'package:maxga/utils/date-utils.dart';
 import 'package:maxga/base/delay.dart';
 import 'package:maxga/constant/setting-value.dart';
@@ -23,85 +24,103 @@ const List<SelectOption<int>> SyncIntervalOptions = [
   SelectOption(title: '一周', value: 7),
 ];
 
-class UserDetailPage extends StatefulWidget {
+class UserDetailPage extends StatelessWidget {
   @override
-  State<StatefulWidget> createState() => _UserDetailPageState();
+  Widget build(BuildContext context) {
+    return Consumer<UserProvider>(
+        builder: (context, provider, child) =>
+            _UserDetailPage(user: provider.user,));
+  }
+
 }
 
-class _UserDetailPageState extends State<UserDetailPage> {
+class _UserDetailPage extends StatelessWidget {
+  final User user;
+  const _UserDetailPage({Key key, @required this.user}) : super(key: key);
+
+  bool get isLogin => user != null;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    var body;
+    if (!isLogin) {
+      body = Align(
+        child: const Text('登录状态失效，请重新登录'),
+      );
+    } else {
+      body = Padding(
+        padding: EdgeInsets.only(top: 20),
+        child: ListView(
+          children: <Widget>[
+            Container(
+              decoration: ConfigListBoxDecoration(theme),
+              child:
+              Column(
+                children: <Widget>[
+                  MaxgaConfigListTile(
+                      title: Text("用户名"),
+                      trailing: Text(user?.username ?? "")),
+                  ZeroDivider(),
+                  MaxgaConfigListTile(
+                      title: Text("邮箱"),
+                      trailing: Text(user?.email ?? "")),
+                  ZeroDivider(),
+                  MaxgaConfigListTile(
+                    title: Text("注册时间"),
+                    trailing: Text(user != null
+                        ? DateUtils.formatTime(
+                        time: user.createTime,
+                        template: "YYYY-MM-dd")
+                        : ""),
+                  ),
+                  ZeroDivider(),
+                  MaxgaConfigListTile(
+                      onPressed: () => toModifyPassword(context),
+                      title: Text("修改密码"),
+                      trailing: Icon(Icons.chevron_right)),
+                ],
+              ),
+            ),
+            Container(height: 30),
+            Container(
+              width: double.infinity,
+              decoration: ConfigListBoxDecoration(theme),
+              child: Column(
+                children: <Widget>[
+                  UserSyncTimeListTile(),
+                  ZeroDivider(),
+                  UserSyncIntervalTile(),
+                  ZeroDivider(),
+                  UserSyncTile()
+                ],
+              ),
+            ),
+            Container(height: 30),
+            Container(
+              width: double.infinity,
+              decoration: ConfigListBoxDecoration(theme),
+              child: _LogoutListTile(),
+            )
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
         appBar: AppBar(
           title: const Text('用户信息'),
         ),
-        body: Padding(
-          padding: EdgeInsets.only(top: 20),
-          child: ListView(
-            children: <Widget>[
-              Container(
-                decoration: ConfigListBoxDecoration(theme),
-                child: Consumer<UserProvider>(
-                  builder: (context, provider, child) =>
-                      Column(
-                        children: <Widget>[
-                          MaxgaConfigListTile(
-                              title: Text("用户名"),
-                              trailing: Text(provider.user?.username ?? "")),
-                          ZeroDivider(),
-                          MaxgaConfigListTile(
-                              title: Text("邮箱"),
-                              trailing: Text(provider.user?.email ?? "")),
-                          ZeroDivider(),
-                          MaxgaConfigListTile(
-                            title: Text("注册时间"),
-                            trailing: Text(provider.user != null
-                                ? DateUtils.formatTime(
-                                time: provider.user.createTime,
-                                template: "YYYY-MM-dd")
-                                : ""),
-                          ),
-                          ZeroDivider(),
-                          MaxgaConfigListTile(
-                              onPressed: toModifyPassword,
-                              title: Text("修改密码"),
-                              trailing: Icon(Icons.chevron_right)),
-                        ],
-                      ),
-                ),
-              ),
-              Container(height: 30),
-              Container(
-                width: double.infinity,
-                decoration: ConfigListBoxDecoration(theme),
-                child: Column(
-                  children: <Widget>[
-                    UserSyncTimeListTile(),
-                    ZeroDivider(),
-                    UserSyncIntervalTile(),
-                    ZeroDivider(),
-                    UserSyncTile()
-                  ],
-                ),
-              ),
-              Container(height: 30),
-              Container(
-                width: double.infinity,
-                decoration: ConfigListBoxDecoration(theme),
-                child: _LogoutListTile(),
-              )
-            ],
-          ),
-        ));
+        body: body
+    );
   }
 
-  void toModifyPassword() async {
+  void toModifyPassword(BuildContext context) async {
     await AnimationDelay();
-    await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => ModifyPasswordPage()));
+    await Navigator.push(context, MaterialPageRoute(builder: (context) => ModifyPasswordPage()));
   }
 }
+
 
 class UserSyncIntervalTile extends StatelessWidget {
   @override

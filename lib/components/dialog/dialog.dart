@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -32,6 +34,49 @@ class UpdateDialog extends StatelessWidget {
               if (await canLaunch(this.url)) {
                 await launch(url);
                 Navigator.pop(context);
+              }
+            }
+        )
+      ],
+    );
+  }
+}
+
+class ForceUpdateDialog extends StatelessWidget{
+  final String url;
+
+
+  ForceUpdateDialog({
+    this.url,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('当前版本过于落后', style: TextStyle()),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text('当前的版本已经落后于主线版本过多，我们需要升级之后才能正常使用。'),
+          const SizedBox(height: 8.0),
+          Text('因为落后过多，建议您登录同步数据之后继续升级'),
+          const SizedBox(height: 8.0),
+          Text('升级通知将每次打开 APP 时都会提醒。')
+        ],
+      ),
+      actions: <Widget>[
+        FlatButton(
+            child: const Text('放弃升级'),
+            onPressed: () {
+              Navigator.pop(context);
+
+            }
+        ),
+        FlatButton(
+            child: const Text('更新'),
+            onPressed: () async{
+              if (await canLaunch(this.url)) {
+                await launch(url);
               }
             }
         )

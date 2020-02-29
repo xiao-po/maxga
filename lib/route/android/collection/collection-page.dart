@@ -17,7 +17,7 @@ import 'package:maxga/provider/public/collection-provider.dart';
 import 'package:maxga/provider/public/user-provider.dart';
 import 'package:maxga/route/android/collection/components/banner.dart';
 import 'package:maxga/route/android/user/base/login-page-result.dart';
-import 'package:maxga/route/android/user/login-page.dart';
+import 'package:maxga/route/android/user/auth-page.dart';
 import 'package:maxga/route/android/error-page/error-page.dart';
 import 'package:maxga/service/update-service.dart';
 import 'package:provider/provider.dart';
@@ -89,8 +89,10 @@ class _CollectionPageState extends State<CollectionPage> {
 
   checkUpdate() async {
     try {
-      final nextVersion = await UpdateService.checkUpdateStatus();
-      if (nextVersion != null) {
+      final result = await UpdateService.checkUpdateStatus();
+      if (result.status == MaxgaUpdateStatus.mustUpdate) {
+        showDialog(context: context, child: ForceUpdateDialog(url: result.releaseInfo.url));
+      } else if (result.status == MaxgaUpdateStatus.hasUpdate) {
         isShowUpdateBanner = true;
       }
     } catch (e) {
@@ -274,8 +276,8 @@ class _CollectionPageState extends State<CollectionPage> {
   }
 
   void toLogin() async {
-    LoginPageResult result = await Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => LoginPage()));
+    AuthPageResult result = await Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => AuthPage()));
     if (result != null && result.success) {
       scaffoldKey.currentState.showSnackBar(SnackBar(
         content: Text('登录成功'),

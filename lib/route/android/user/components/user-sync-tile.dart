@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:maxga/utils/date-utils.dart';
 import 'package:maxga/base/delay.dart';
 import 'package:maxga/components/dialog/circular-progress-dialog.dart';
 import 'package:maxga/components/form/setting-form/list-tile.dart';
+import 'package:maxga/http/server/base/maxga-request-error.dart';
+import 'package:maxga/http/server/base/maxga-server-response-status.dart';
 import 'package:maxga/provider/public/user-provider.dart';
+import 'package:maxga/utils/date-utils.dart';
 import 'package:provider/provider.dart';
 
 class UserSyncTile extends StatelessWidget {
@@ -29,7 +31,20 @@ class UserSyncTile extends StatelessWidget {
       Scaffold.of(context).showSnackBar(SnackBar(
         content: Text('同步结束'),
       ));
-    }catch(e) {
+    } on MaxgaRequestError catch(e) {
+      switch(e. status) {
+        case MaxgaServerResponseStatus.TOKEN_INVALID:
+        case MaxgaServerResponseStatus.ACTIVE_TOKEN_OUT_OF_DATE:
+          Scaffold.of(context).showSnackBar(SnackBar(
+            content: Text('登录信息已经过期，请重新登录继续操作'),
+          ));
+          break;
+        default:
+          Scaffold.of(context).showSnackBar(SnackBar(
+            content: Text('同步失败'),
+          ));
+      }
+    } catch(e) {
       Scaffold.of(context).showSnackBar(SnackBar(
         content: Text('同步失败'),
       ));

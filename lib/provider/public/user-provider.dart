@@ -1,6 +1,9 @@
 import 'dart:convert';
 
 import 'package:maxga/components/button/manga-outline-button.dart';
+import 'package:maxga/http/server/base/maxga-request-error.dart';
+import 'package:maxga/http/server/base/maxga-server-response-status.dart';
+import 'package:maxga/http/server/user-http.repo.dart';
 import 'package:maxga/model/user/user.dart';
 import 'package:maxga/service/local-storage.service.dart';
 import 'package:maxga/service/maxga-server.service.dart';
@@ -91,10 +94,11 @@ class UserProvider  extends BaseProvider {
     await MaxgaServerService.syncReadStatus();
     await LocalStorage.setString(_syncTimeKey, syncTime.toIso8601String());
     this.lastSyncTime = syncTime;
+    this.lastRemindSyncTime = syncTime;
     notifyListeners();
   }
 
-  void setLoginStatus(User user) async {
+  Future<void> setLoginStatus(User user) async {
     await LocalStorage.setString(_userStorageKey, json.encode(user));
     await setSyncInterval(7);
     isFirstOpen = false;
@@ -107,12 +111,18 @@ class UserProvider  extends BaseProvider {
     notifyListeners();
   }
 
-  Future<void> logout() async {
+  Future<void> logout([bool tokenInvalid]) async {
     await LocalStorage.clearItem(_userStorageKey);
     await LocalStorage.clearItem(_syncIntervalKey);
     await LocalStorage.clearItem(_syncTimeKey);
     await LocalStorage.clearItem(_lastRemindSyncKey);
-//    await UserService.logout(user.refreshToken);
+    if (!tokenInvalid) {
+      try {
+        await UserService.logout(user.refreshToken);
+      } catch(e) {
+        print('清除 refresh token 失败');
+      }
+    }
     this.syncInterval = 0;
     this.lastRemindSyncTime = null;
     this.lastSyncTime = null;
@@ -120,13 +130,26 @@ class UserProvider  extends BaseProvider {
     notifyListeners();
   }
 
-  refreshToken(String token) async {
-    assert(token != null);
+  refreshToken() async {
 
-    var json = this.user.toJson();
-    json['token'] = token;
-    User user = User.fromJson(json);
-    this.setLoginStatus(user);
+    try {
+      final token = await UserHttpRepo.refreshToken(this.user.refreshToken);
+      var json = this.user.toJson();
+      json['token'] = token;
+      User user = User.fromJson(json);
+      this.setLoginStatus(user);
+    } on MaxgaRequestError catch(e) {
+      switch(e. status) {
+        case MaxgaServerResponseStatus.TOKEN_INVALID:
+        case MaxgaServerResponseStatus.ACTIVE_TOKEN_OUT_OF_DATE:
+          await this.logout(true);
+          break;
+        default:
+      }
+      rethrow;
+    } catch(e) {
+      rethrow;
+    }
   }
 
   Future<void> _loadLoginStatus() async {

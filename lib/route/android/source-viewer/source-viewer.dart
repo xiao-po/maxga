@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:maxga/base/drawer/drawer-menu-item.dart';
 import 'package:maxga/base/error/maxga-http-error.dart';
+import 'package:maxga/components/card/maxga-list-view-loading-footer.dart';
 import 'package:maxga/constant/setting-value.dart';
 import 'package:maxga/components/card/card.dart';
 import 'package:maxga/components/base/manga-cover-image.dart';
@@ -17,7 +19,7 @@ import 'package:maxga/provider/public/history-provider.dart';
 import 'package:maxga/provider/public/setting-provider.dart';
 import 'package:maxga/provider/source-viewer/source-viwer-provider.dart';
 import 'package:maxga/route/android/user/base/login-page-result.dart';
-import 'package:maxga/route/android/user/login-page.dart';
+import 'package:maxga/route/android/user/auth-page.dart';
 import 'package:maxga/service/update-service.dart';
 import 'package:maxga/manga-repo-pool.dart';
 import 'package:provider/provider.dart';
@@ -58,8 +60,10 @@ class _SourceViewerPageState extends State<SourceViewerPage>
 
   checkUpdate() async {
     try {
-      final nextVersion = await UpdateService.checkUpdateStatus();
-      if (nextVersion != null) {
+      final result = await UpdateService.checkUpdateStatus();
+      if (result.status == MaxgaUpdateStatus.mustUpdate) {
+        showDialog(context: context, child: ForceUpdateDialog(url: result.releaseInfo.url));
+      } else if (result.status == MaxgaUpdateStatus.hasUpdate) {
         final buttonPadding = const EdgeInsets.fromLTRB(15, 5, 15, 5);
         scaffoldKey.currentState.showSnackBar(SnackBar(
             duration: Duration(seconds: 3),
@@ -70,14 +74,14 @@ class _SourceViewerPageState extends State<SourceViewerPage>
               ),
               onTap: () {
                 hiddenSnack();
-                openUpdateDialog(nextVersion);
+                openUpdateDialog(result.releaseInfo);
               },
             ),
             action: SnackBarAction(
               label: '忽略',
               textColor: Colors.greenAccent,
               onPressed: () {
-                openUpdateDialog(nextVersion);
+                openUpdateDialog(result.releaseInfo);
               },
             )));
       }
@@ -109,6 +113,13 @@ class _SourceViewerPageState extends State<SourceViewerPage>
     final source = MangaRepoPool.getInstance().getMangaSourceByKey(sourceKey);
     setMangaSource(source);
     tabController = TabController(vsync: this, length: 2, initialIndex: 0);
+    if (Platform.isAndroid) {
+      UpdateService.isTodayChecked().then((v) {
+        if (!v) {
+          this.checkUpdate();
+        }
+      });
+    }
   }
 
   @override
@@ -398,8 +409,8 @@ class _SourceViewerPageState extends State<SourceViewerPage>
 
 
   void toLogin() async {
-    LoginPageResult result = await Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => LoginPage()));
+    AuthPageResult result = await Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => AuthPage()));
     if (result != null && result.success) {
       scaffoldKey.currentState.showSnackBar(SnackBar(
         content: Text('登录成功'),
@@ -407,3 +418,4 @@ class _SourceViewerPageState extends State<SourceViewerPage>
     }
   }
 }
+

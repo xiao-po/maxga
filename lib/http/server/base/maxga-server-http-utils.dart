@@ -11,7 +11,7 @@ import 'maxga-server-response-status.dart';
 
 typedef _ModelFactory<T> = T Function(dynamic json);
 
-const MaxgaServer = "http://xiaopo.xyz:8080";
+const MaxgaServer = "http://192.168.3.227:8080";
 
 class MaxgaServerHttpUtils {
 
@@ -53,9 +53,7 @@ class MaxgaServerHttpUtils {
         jsonMap = json.decode(response.data);
         status = _getStatusFromCode(jsonMap['status']);
         if (status == MaxgaServerResponseStatus.JWT_TIMEOUT) {
-          final userProvider = UserProvider.getInstance();
-          final token = await UserHttpRepo.refreshToken(userProvider.user.refreshToken);
-          userProvider.refreshToken(token);
+          await UserProvider.getInstance().refreshToken();
           continue;
         } else if (status != MaxgaServerResponseStatus.SUCCESS) {
           throw MaxgaRequestError(status, jsonMap['message']);
@@ -79,25 +77,26 @@ class MaxgaServerHttpUtils {
   }
 
 
+
   static MaxgaServerResponseStatus _getStatusFromCode(int code) {
     switch(code) {
       case 200: return MaxgaServerResponseStatus.SUCCESS;
 
       case 10000: return MaxgaServerResponseStatus.PARAM_ERROR;
+      case 33002: return MaxgaServerResponseStatus.PAGE_INVALID;
       case 50001: return MaxgaServerResponseStatus.SHOULD_LOGIN;
       case 50002: return MaxgaServerResponseStatus.AUTH_PASSWORD_ERROR;
       case 50003: return MaxgaServerResponseStatus.JWT_TIMEOUT;
       case 50004: return MaxgaServerResponseStatus.USER_NOT_EXIST;
-      case 51002: return MaxgaServerResponseStatus.USERNAME_INVALID;
+      case 51001: return MaxgaServerResponseStatus.USERNAME_INVALID;
       case 51002: return MaxgaServerResponseStatus.PASSWORD_INVALID;
       case 51003: return MaxgaServerResponseStatus.EMAIL_INVALID;
+      case 52002: return MaxgaServerResponseStatus.TOKEN_INVALID;
       case 52003: return MaxgaServerResponseStatus.ACTIVE_TOKEN_OUT_OF_DATE;
       case 52004: return MaxgaServerResponseStatus.ANOTHER_ACTIVE_TOKEN_EXIST;
       case 52005: return MaxgaServerResponseStatus.RESET_EMAIL_LIMITED;
-      case 70100: return MaxgaServerResponseStatus.UPDATE_VALUE_EXIST;
-      case 70101: return MaxgaServerResponseStatus.UPDATE_VALUE_OUT_OF_DATE;
       case 70900: return MaxgaServerResponseStatus.OPERATION_NOT_PERMIT;
-      case 99999:
+      case 99999: return MaxgaServerResponseStatus.SERVICE_FAILED;
       default:return MaxgaServerResponseStatus.SERVICE_FAILED;
     }
   }

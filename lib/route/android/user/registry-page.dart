@@ -8,8 +8,11 @@ import 'package:maxga/http/server/base/maxga-request-error.dart';
 import 'package:maxga/http/server/base/maxga-server-response-status.dart';
 import 'package:maxga/model/user/query/user-registry-query.dart';
 import 'package:maxga/components/form/base/validator.dart';
+import 'package:maxga/model/user/user.dart';
+import 'package:maxga/provider/public/user-provider.dart';
 import 'package:maxga/service/user.service.dart';
 
+import 'base/login-page-result.dart';
 import 'base/registry-page-result.dart';
 import 'components/registry-button.dart';
 
@@ -93,8 +96,6 @@ class RegistryForm {
     if (this.password.value != "" &&
         this.rePassword.value != "" &&
         this.password.value != this.rePassword.value) {
-      print(
-          'password is ${this.password.value}, repassword is ${this.rePassword.value}');
       return "两次输入密码不一致";
     } else {
       return null;
@@ -133,7 +134,7 @@ class RegistryPage extends StatefulWidget {
 
 class _RegistryPageState extends State<RegistryPage> {
   RegistryForm form;
-  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
 
   @override
   void initState() {
@@ -144,52 +145,46 @@ class _RegistryPageState extends State<RegistryPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: scaffoldKey,
-      appBar: AppBar(
-        title: const Text('注册'),
-      ),
-      body: Container(
-        padding: EdgeInsets.only(right: 10, left: 10, top: 30),
-        child: ListView(
-          children: <Widget>[
-            Hero(
-              tag: 'username',
-              child: MaxgaTextFiled.fromItem(
-                form.user,
-                placeHolder: "请输入用户名",
-                icon: Icon(Icons.person),
+    return Container(
+      padding: EdgeInsets.only(right: 10, left: 10, top: 30),
+      child: ListView(
+        children: <Widget>[
+          Hero(
+            tag: 'username',
+            child: MaxgaTextFiled.fromItem(
+              form.user,
+              placeHolder: "请输入用户名",
+              icon: Icon(Icons.person),
+            ),
+          ),
+          MaxgaTextFiled.fromItem(
+            form.email,
+            icon: Icon(Icons.email),
+            placeHolder: "请输入邮箱地址",
+            tipText: "例如 : adc123@qq.com",
+          ),
+          PasswordTextFiled.fromItem(
+            form.password,
+            icon: Icon(Icons.lock_outline),
+            placeHolder: "请输入密码",
+            tipText: "密码不得少于 6 位，不能多于 20 位",
+          ),
+          PasswordTextFiled.fromItem(form.rePassword,
+              placeHolder: "请再次输入密码",
+              icon: Icon(Icons.lock_outline)),
+          Container(
+            width: double.infinity,
+            height: 40,
+            child: PrimaryButton(
+              onPressed: registry,
+              content: Text(
+                '注册',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white),
               ),
             ),
-            MaxgaTextFiled.fromItem(
-              form.email,
-              icon: Icon(Icons.email),
-              placeHolder: "请输入邮箱地址",
-              tipText: "例如 : adc123@qq.com",
-            ),
-            PasswordTextFiled.fromItem(
-              form.password,
-              icon: Icon(Icons.lock_outline),
-              placeHolder: "请输入密码",
-              tipText: "密码不得少于 6 位，不能多于 20 位",
-            ),
-            PasswordTextFiled.fromItem(form.rePassword,
-                placeHolder: "请再次输入密码",
-                icon: Icon(Icons.lock_outline)),
-            Container(
-              width: double.infinity,
-              height: 40,
-              child: PrimaryButton(
-                onPressed: registry,
-                content: Text(
-                  '注册',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            )
-          ],
-        ),
+          )
+        ],
       ),
     );
   }
@@ -197,14 +192,14 @@ class _RegistryPageState extends State<RegistryPage> {
   void registry() async {
     FocusScope.of(context).requestFocus(new FocusNode());
     if (form.hasError) {
-      scaffoldKey.currentState.showSnackBar(SnackBar(
+      Scaffold.of(context).showSnackBar(SnackBar(
         content: Text('注册信息存在错误'),
       ));
       return;
     }
     form.setDirtyAndValidate();
     if (form.hasError) {
-      scaffoldKey.currentState.showSnackBar(SnackBar(
+      Scaffold.of(context).showSnackBar(SnackBar(
         content: Text(form.errorText),
       ));
     } else {
@@ -215,9 +210,11 @@ class _RegistryPageState extends State<RegistryPage> {
 
       try {
         await UserService.registry(query);
-        Navigator.pop(context);
         await AnimationDelay();
-        Navigator.pop(context, RegistryPageResult(true, query.username));
+        var user = await UserService.login(UserQuery(query.username, query.password));
+        await UserProvider.getInstance().setLoginStatus(user);
+        Navigator.pop(context);
+        Navigator.pop(context, AuthPageResult(true));
       } on MaxgaRequestError catch (e) {
         Navigator.of(context).pop();
         switch (e.status) {
@@ -227,7 +224,7 @@ class _RegistryPageState extends State<RegistryPage> {
             });
             break;
           case MaxgaServerResponseStatus.SERVICE_FAILED:
-            scaffoldKey.currentState.showSnackBar(SnackBar(
+            Scaffold.of(context).showSnackBar(SnackBar(
               content: Text('服务器异常'),
             ));
             break;
@@ -242,24 +239,12 @@ class _RegistryPageState extends State<RegistryPage> {
             });
             break;
 
-          case MaxgaServerResponseStatus.SUCCESS:
-          case MaxgaServerResponseStatus.TIMEOUT:
-          case MaxgaServerResponseStatus.PARAM_ERROR:
-          case MaxgaServerResponseStatus.SHOULD_LOGIN:
-          case MaxgaServerResponseStatus.AUTH_PASSWORD_ERROR:
-          case MaxgaServerResponseStatus.USER_NOT_EXIST:
-          case MaxgaServerResponseStatus.JWT_TIMEOUT:
-          case MaxgaServerResponseStatus.UPDATE_VALUE_EXIST:
-          case MaxgaServerResponseStatus.UPDATE_VALUE_OUT_OF_DATE:
-          case MaxgaServerResponseStatus.OPERATION_NOT_PERMIT:
-          case MaxgaServerResponseStatus.ACTIVE_TOKEN_OUT_OF_DATE:
-          case MaxgaServerResponseStatus.ANOTHER_ACTIVE_TOKEN_EXIST:
-          case MaxgaServerResponseStatus.RESET_EMAIL_LIMITED:
+          default:
             break;
         }
       } catch (e) {
         Navigator.of(context).pop();
-        scaffoldKey.currentState.showSnackBar(SnackBar(
+        Scaffold.of(context).showSnackBar(SnackBar(
           content: Text('服务器异常'),
         ));
       }

@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:maxga/base/delay.dart';
 import 'package:maxga/components/base/manga-cover-image.dart';
 import 'package:maxga/components/base/zero-divider.dart';
 import 'package:maxga/components/card/card.dart';
+import 'package:maxga/components/card/maxga-list-view-loading-footer.dart';
 import 'package:maxga/http/repo/dmzj/constants/dmzj-manga-source.dart';
 import 'package:maxga/http/server/maxga-http.repo.dart';
 import 'package:maxga/manga-repo-pool.dart';
@@ -32,6 +34,13 @@ class _HiddenMangaPageState extends State<HiddenMangaPage> {
   ScrollController controller = ScrollController();
 
   List<HiddenManga> hiddenMangaList = [];
+
+  @override
+  void setState(VoidCallback fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
 
   @override
   void initState() {
@@ -84,7 +93,18 @@ class _HiddenMangaPageState extends State<HiddenMangaPage> {
             itemCount: hiddenMangaList.length + 1,
             itemBuilder: (context, index) {
               if (index == hiddenMangaList.length) {
-                return Text('加载中');
+                switch(pageLoadStatus) {
+                  case _ListLoadingStatus.error:
+                    return Text('加载错误');
+                    break;
+                  case _ListLoadingStatus.loading:
+                    return MaxgaListViewLoadingFooter();
+                    break;
+                  case _ListLoadingStatus.noMore:
+                  case _ListLoadingStatus.over:
+                  default:
+                    return null;
+                }
               } else {
                 var mangaInfo = hiddenMangaList[index];
                 var tagPrefix = '$index';
@@ -138,7 +158,7 @@ class _HiddenMangaPageState extends State<HiddenMangaPage> {
   }
 
   void loadMoreHiddenManga() async {
-    if (this.pageLoadStatus == _ListLoadingStatus.loading) {
+    if (this.pageLoadStatus != _ListLoadingStatus.over) {
       return null;
     }
     try {
@@ -147,13 +167,16 @@ class _HiddenMangaPageState extends State<HiddenMangaPage> {
       });
       var list = await MaxgaMangaHttpRepo.getHiddenManga(page);
       if (list == null || list.length == 0) {
-        this.pageLoadStatus = _ListLoadingStatus.noMore;
+        setState(() {
+          this.pageLoadStatus = _ListLoadingStatus.noMore;
+        });
+      } else {
+        setState(() {
+          this.hiddenMangaList.addAll(list);
+          this.page++;
+          this.pageLoadStatus = _ListLoadingStatus.over;
+        });
       }
-      setState(() {
-        this.hiddenMangaList.addAll(list);
-        this.page++;
-        this.pageLoadStatus = _ListLoadingStatus.over;
-      });
     } catch (e) {
       this.pageLoadStatus = _ListLoadingStatus.error;
     }

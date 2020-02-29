@@ -2,18 +2,67 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/components/dialog/circular-progress-dialog.dart';
 import 'package:maxga/components/form/base/form-item.dart';
+import 'package:maxga/components/form/base/validator.dart';
 import 'package:maxga/components/form/maxga-text-filed.dart';
 import 'package:maxga/components/form/password-text-filed.dart';
 import 'package:maxga/http/server/base/maxga-request-error.dart';
 import 'package:maxga/model/user/user.dart';
 import 'package:maxga/provider/public/user-provider.dart';
 import 'package:maxga/route/android/user/base/login-page-result.dart';
-import 'package:maxga/components/form/base/validator.dart';
-import 'package:maxga/route/android/user/base/registry-page-result.dart';
 import 'package:maxga/route/android/user/registry-page.dart';
 import 'package:maxga/service/user.service.dart';
 
 import 'components/reset-password-button.dart';
+
+enum _AuthType { login, registry }
+
+class AuthPage extends StatefulWidget {
+  final initType;
+
+  AuthPage.registry(): this.initType = _AuthType.registry;
+  AuthPage(): this.initType = _AuthType.login;
+
+  @override
+  State<StatefulWidget> createState() => _AuthPageState();
+}
+
+class _AuthPageState extends State<AuthPage> {
+  var type;
+
+  bool get isLogin => type == _AuthType.login;
+
+  @override
+  void initState() {
+    super.initState();
+    this.type = widget.initType;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    var body = isLogin ? LoginPage() : RegistryPage();
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(isLogin ? '登录' : '注册'),
+          actions: <Widget>[
+            GestureDetector(
+              onTapUp: (details) {
+                setState(() {
+                  type = isLogin ? _AuthType.registry : _AuthType.login;
+                });
+              },
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding:
+                    EdgeInsets.only(top: 15, bottom: 15, left: 20, right: 20),
+                child: Text(isLogin ? "注册账号" : "登录账号"),
+              ),
+            ),
+          ],
+        ),
+        body: body);
+  }
+}
 
 class LoginPage extends StatefulWidget {
   @override
@@ -21,8 +70,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-
   final usernameItem = FormItem(validators: [MaxgaValidator.emptyValidator]);
   final passwordItem = FormItem(validators: [MaxgaValidator.emptyValidator]);
 
@@ -36,66 +83,32 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Scaffold(
-        key: scaffoldKey,
-        appBar: AppBar(
-          title: const Text('登录'),
-        ),
-        body: Padding(
-          padding: EdgeInsets.only(left: 10, right: 10, top: 50),
-          child: Column(
-            children: <Widget>[
-              Hero(
-                tag: 'username',
-                child: MaxgaTextFiled.fromItem(usernameItem,
-                    placeHolder: "请输入用户名", icon: Icon(Icons.person)),
-              ),
-              PasswordTextFiled.fromItem(passwordItem),
-              Container(
-                alignment: Alignment.centerRight,
-                child: ResetPasswordButton(),
-              ),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.only(right: 10),
-                      height: 40,
-                      child: _RegistryButton(
-                        onPressed: () => this.goRegistryPage(),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.only(left: 10),
-                      height: 40,
-                      child: _LoginButton(
-                        onPressed: login,
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            ],
+    return Padding(
+      padding: EdgeInsets.only(left: 10, right: 10, top: 50),
+      child: Column(
+        children: <Widget>[
+          MaxgaTextFiled.fromItem(usernameItem,
+              placeHolder: "请输入用户名", icon: Icon(Icons.person)),
+          PasswordTextFiled.fromItem(passwordItem),
+          Container(
+            alignment: Alignment.centerRight,
+            child: ResetPasswordButton(),
           ),
-        ));
-  }
-
-  goRegistryPage() async {
-    setState(() {
-      usernameItem.clearError();
-    });
-    FocusScope.of(context).requestFocus(new FocusNode());
-    RegistryPageResult result = await Navigator.of(context).push(
-        MaterialPageRoute(
-            builder: (context) => RegistryPage(username: usernameItem.value)));
-    if (result is RegistryPageResult && result.success) {
-      this.usernameItem.controller.text = result.username;
-      scaffoldKey.currentState.showSnackBar(const SnackBar(
-        content: Text('注册成功'),
-      ));
-    }
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Container(
+                  height: 40,
+                  child: _LoginButton(
+                    onPressed: login,
+                  ),
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
   }
 
   void login() async {
@@ -106,7 +119,7 @@ class _LoginPageState extends State<LoginPage> {
     FocusScope.of(context).requestFocus(new FocusNode());
 
     if (usernameItem.invalid || passwordItem.invalid) {
-      scaffoldKey.currentState.showSnackBar(SnackBar(
+      Scaffold.of(context).showSnackBar(SnackBar(
         content: Text(usernameItem.errorText ?? passwordItem.errorText),
       ));
     } else {
@@ -123,19 +136,18 @@ class _LoginPageState extends State<LoginPage> {
           showDialog(context: context, child: CircularProgressDialog())
         ]);
         if (result == null) {
-          scaffoldKey.currentState.showSnackBar(SnackBar(
+          Scaffold.of(context).showSnackBar(SnackBar(
             content: Text("取消登录"),
           ));
         }
-        Navigator.pop(context);
         var user = result[0] as User;
-        print('token is ${user?.token ?? ''}');
-        UserProvider.getInstance().setLoginStatus(user);
-        Navigator.pop(context, LoginPageResult(true));
+        await UserProvider.getInstance().setLoginStatus(user);
+        Navigator.pop(context);
+        Navigator.pop(context, AuthPageResult(true));
       } catch (e) {
         Navigator.pop(context);
         if (e is MaxgaRequestError) {
-          scaffoldKey.currentState.showSnackBar(SnackBar(
+          Scaffold.of(context).showSnackBar(SnackBar(
             content: Text(e.message),
           ));
         }
@@ -150,7 +162,6 @@ class _LoginPageState extends State<LoginPage> {
     this.passwordItem.dispose();
   }
 }
-
 
 class _LoginButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -196,7 +207,7 @@ class _RegistryButton extends StatelessWidget {
       color: isDark ? Colors.grey[800] : Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: new BorderRadius.circular(5.0),
-        side: BorderSide(color:  Colors.grey[300]),
+        side: BorderSide(color: Colors.grey[300]),
       ),
       onPressed: onPressed,
       child: Text(
