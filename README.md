@@ -41,7 +41,7 @@ MaxGa 是由 Flutter 框架制作的漫画在线阅读器，目前 Android 和 I
  
 ## 截图
 
-<img src="./screenshot/01.png" width="250">
+<img src="./screen-shot/screen_shot_1.jpg" width="250">
 
 ## IOS 相关
 
