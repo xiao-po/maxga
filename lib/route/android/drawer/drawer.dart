@@ -6,6 +6,7 @@ import 'package:maxga/constant/drawer-value.dart';
 import 'package:maxga/model/user/user.dart';
 import 'package:maxga/provider/public/theme-provider.dart';
 import 'package:maxga/provider/public/user-provider.dart';
+import 'package:maxga/route/android/hidden-manga/hidden-manga-page.dart';
 import 'package:maxga/route/android/user/base/login-page-result.dart';
 import 'package:maxga/route/android/user/login-page.dart';
 import 'package:maxga/route/android/user/user-detail-page.dart';
@@ -32,12 +33,6 @@ class MaxgaDrawerState extends State<MaxgaDrawer> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).copyWith(primaryColor: Colors.cyan);
-    final list = DrawerMenuList.map((menuItem) => ListTile(
-            title: Text(menuItem.title),
-            leading: Icon(menuItem.icon),
-            selected: menuItem.type == widget.active,
-            onTap: () => _handleMenuItemChoose(menuItem.type)))
-        .toList(growable: false);
     return Drawer(
       child: Column(
         children: <Widget>[
@@ -47,8 +42,20 @@ class MaxgaDrawerState extends State<MaxgaDrawer> {
               child: Expanded(
                 child: Theme(
                   data: theme,
-                  child: ListView(
-                    children: list,
+                  child: Consumer<UserProvider>(
+                    builder: (context, provider, child)  {
+                      final isLogin = provider.isLogin;
+                      final itemList = DrawerMenuList.toList()..removeWhere((item) => item.shouldLogin && !isLogin);
+                      final list = itemList.map((menuItem) => ListTile(
+                          title: Text(menuItem.title),
+                          leading: Icon(menuItem.icon),
+                          selected: menuItem.type == widget.active,
+                          onTap: () => _handleMenuItemChoose(menuItem.type)))
+                          .toList(growable: false);
+                      return ListView(
+                        children: list,
+                      );
+                    },
                   ),
                 ),
               )),
@@ -109,6 +116,14 @@ class MaxgaDrawerState extends State<MaxgaDrawer> {
             context,
             MaterialPageRoute(
               builder: (context) => AboutPage(),
+            ));
+        break;
+      case MaxgaMenuItemType.hiddenMangaViewer:
+        Navigator.pop(context);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HiddenMangaPage(),
             ));
         break;
     }

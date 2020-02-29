@@ -25,6 +25,8 @@ class MangaInfoBottomBar extends StatelessWidget {
     final iconActiveColor = theme.brightness == Brightness.dark
         ? Colors.orange
         : Colors.orangeAccent;
+
+    final textColor = theme.brightness == Brightness.light ? Color(0xFF424242) : Colors.white54;
     return Container(
       decoration: BoxDecoration(
           color: theme.brightness == Brightness.dark
@@ -45,9 +47,10 @@ class MangaInfoBottomBar extends StatelessWidget {
                           color: theme.hintColor,
                         )
                       : Icon(Icons.star, color: iconActiveColor),
-                  label: const Text('收藏',
-                      style: TextStyle(color: Color(0xFF424242)))),
+                  label: Text('收藏',
+                      style: TextStyle(color: textColor))),
               _SearchOtherSourceButton(
+                textColor: textColor,
                 onPressed: onSearchMangaName,
               )
             ],
@@ -68,9 +71,9 @@ class MangaInfoBottomBar extends StatelessWidget {
 
 class _SearchOtherSourceButton extends StatelessWidget {
   final VoidCallback onPressed;
-
+  final Color textColor;
   const _SearchOtherSourceButton({
-    Key key, this.onPressed,
+    Key key, this.onPressed, this.textColor,
   }) : super(key: key);
 
   @override
@@ -88,8 +91,8 @@ class _SearchOtherSourceButton extends StatelessWidget {
             color: theme.accentColor,
           ),
           const SizedBox(width: 4.0),
-          const Text('搜索其他网站',
-              style: TextStyle(color: Color(0xFF424242), fontSize: 13)),
+          Text('搜索其他网站',
+              style: TextStyle(color: textColor, fontSize: 13)),
         ],
       ),
     );

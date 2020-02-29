@@ -75,7 +75,7 @@ class MangaListTile extends StatelessWidget {
               ),
             ),
           ),
-          extra
+          if (extra != null) extra
         ],
       ),
     );

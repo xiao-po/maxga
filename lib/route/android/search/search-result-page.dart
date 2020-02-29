@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:maxga/components/base/zero-divider.dart';
 import 'package:maxga/components/button/copy-action-button.dart';
 import 'package:maxga/components/card/card.dart';
 import 'package:maxga/components/base/manga-cover-image.dart';
@@ -144,7 +145,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
                         child: ListView.separated(
                           shrinkWrap: true,
                           itemCount: item.mangaList.length,
-                          separatorBuilder: (context, index) => Divider(),
+                          separatorBuilder: (context, index) => ZeroDivider(),
                           physics: NeverScrollableScrollPhysics(),
                           itemBuilder: (context, index) =>
                               buildMangaTile(item.mangaList[index]),

@@ -24,7 +24,7 @@ class UserHttpRepo {
 
   static Future<String> refreshToken(String refreshToken) {
     return MaxgaServerHttpUtils.get<String>(
-      MaxgaServerApi.refreshToken + '?refreshToken=$refreshToken'
+      MaxgaServerApi.refreshToken + '?refreshToken=${Uri.encodeComponent(refreshToken)}'
     );
   }
 

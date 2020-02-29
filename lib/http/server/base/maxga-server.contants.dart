@@ -8,6 +8,8 @@ class MaxgaServerApi {
 
   static const String resetPassword = "/user/password/reset?email={email}";
 
+  static const String hiddenManga = '/manga/{page}?keywords={keywords}';
+
   static const String logout = "/user/logout";
 }
 

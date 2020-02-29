@@ -14,7 +14,7 @@ class CollectEmptyTipBody extends StatelessWidget {
         children: <Widget>[
           Text('居然一个收藏的漫画都没有...', style: TextStyle(color: Colors.grey[500])),
           const SizedBox(height: 8),
-          Text('那...那我给你两个建议 :', style: TextStyle(color: Colors.grey[500])),
+          Text('那...那我给你三个建议 :', style: TextStyle(color: Colors.grey[500])),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -46,7 +46,7 @@ class CollectEmptyTipBody extends StatelessWidget {
               )
             ],
           ),
-//          Text('等...等等，第三个呢？ :',style: TextStyle(color: Colors.grey[500])),
+          Text('等...等等，第三个呢？',style: TextStyle(color: Colors.grey[500])),
         ],
       ),
     );
