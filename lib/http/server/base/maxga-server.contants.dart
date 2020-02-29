@@ -11,5 +11,7 @@ class MaxgaServerApi {
   static const String hiddenManga = '/manga/{page}?keywords={keywords}';
 
   static const String logout = "/logout?refreshToken={refreshToken}";
-}
 
+  static const String changePassword =
+      "/user/password/change?password={password}&oldPassword={oldPassword}";
+}

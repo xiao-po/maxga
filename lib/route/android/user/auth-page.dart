@@ -9,6 +9,7 @@ import 'package:maxga/http/server/base/maxga-request-error.dart';
 import 'package:maxga/model/user/user.dart';
 import 'package:maxga/provider/public/user-provider.dart';
 import 'package:maxga/route/android/user/base/login-page-result.dart';
+import 'package:maxga/route/android/user/components/registry-button.dart';
 import 'package:maxga/route/android/user/registry-page.dart';
 import 'package:maxga/service/user.service.dart';
 
@@ -176,13 +177,9 @@ class _LoginButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     var isDark = theme.brightness == Brightness.dark;
-    return FlatButton(
-      shape: RoundedRectangleBorder(
-        borderRadius: new BorderRadius.circular(5.0),
-      ),
-      color: theme.accentColor,
+    return PrimaryButton(
       onPressed: onPressed,
-      child: Text(
+      content: Text(
         '登录',
         textAlign: TextAlign.center,
         style: TextStyle(color: Colors.white),

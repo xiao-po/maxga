@@ -30,26 +30,32 @@ class FormItem extends ChangeNotifier {
     this.controller.addListener(validateValue);
     this._validators.addAll(validators ?? []);
   }
+  clear() {
+    this.controller?.text = "";
+    this._isDirty = false;
+    this.errorText = null;
+    this.notifyListeners();
+  }
 
-  disable() {
+  void disable() {
     if (!this._isDisabled) {
       this._isDisabled = true;
       this.notifyListeners();
     }
   }
 
-  enable() {
+  void enable() {
     if (this._isDisabled) {
       this._isDisabled = false;
       this.notifyListeners();
     }
   }
 
-  setDirty() {
+  void setDirty() {
     this._isDirty = true;
   }
 
-  clearDirty() {
+  void clearDirty() {
     this._isDirty = false;
   }
 
@@ -90,4 +96,5 @@ class FormItem extends ChangeNotifier {
     }
     this.clearError();
   }
+
 }

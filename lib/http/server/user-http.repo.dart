@@ -41,4 +41,13 @@ class UserHttpRepo {
       null,
     );
   }
+
+  static Future<void> changePassword(String oldPassword, String newPassword) {
+    return MaxgaServerHttpUtils.post<String>(
+      MaxgaServerApi.changePassword
+          .replaceFirst("{password}", newPassword)
+          .replaceFirst("{oldPassword}", oldPassword),
+      null,
+    );
+  }
 }

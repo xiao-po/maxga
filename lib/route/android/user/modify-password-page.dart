@@ -2,8 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maxga/components/form/base/form-item.dart';
 import 'package:maxga/components/form/base/validator.dart';
-import 'package:maxga/components/form/maxga-text-filed.dart';
 import 'package:maxga/components/form/password-text-filed.dart';
+import 'package:maxga/http/server/base/maxga-request-error.dart';
+import 'package:maxga/http/server/base/maxga-server-response-status.dart';
+import 'package:maxga/service/user.service.dart';
 
 import 'components/registry-button.dart';
 
@@ -13,6 +15,8 @@ class ModifyPasswordPage extends StatefulWidget {
 }
 
 class _ModifyPasswordPageState extends State<ModifyPasswordPage> {
+  var scaffoldKey = GlobalKey<ScaffoldState>();
+
   FormItem oldPasswordItem;
   FormItem newPasswordItem;
   FormItem newRePasswordItem;
@@ -62,8 +66,6 @@ class _ModifyPasswordPageState extends State<ModifyPasswordPage> {
     if (this.newPasswordItem.value != "" &&
         this.newRePasswordItem.value != "" &&
         this.newPasswordItem.value != this.newRePasswordItem.value) {
-      print(
-          'password is ${this.newPasswordItem.value}, repassword is ${this.newRePasswordItem.value}');
       return "两次输入密码不一致";
     } else {
       return null;
@@ -73,6 +75,7 @@ class _ModifyPasswordPageState extends State<ModifyPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         title: const Text("修改密码"),
       ),
@@ -101,7 +104,7 @@ class _ModifyPasswordPageState extends State<ModifyPasswordPage> {
                 width: double.infinity,
                 height: 40,
                 child: PrimaryButton(
-                  onPressed: () {},
+                  onPressed: changePassword,
                   content: Text(
                     '修改密码',
                     textAlign: TextAlign.center,
@@ -122,5 +125,69 @@ class _ModifyPasswordPageState extends State<ModifyPasswordPage> {
     for (final item in this.allItem) {
       item.dispose();
     }
+  }
+
+  void changePassword() async {
+    var errorText = _validateForm();
+    if (errorText != null) {
+      scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text(errorText),
+      ));
+      return null;
+    }
+    var oldPassword = oldPasswordItem.value;
+    var newPassword = newPasswordItem.value;
+    if (oldPassword == newPassword) {
+      oldPasswordItem.setError("新密码和旧密码禁止一样");
+      scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: const Text("新密码和旧密码禁止一样"),
+      ));
+      return null;
+    }
+    try {
+      await UserService.changePassword(oldPassword, newPassword);
+      scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text('修改成功'),
+      ));
+      allItem.forEach((item) => item.clear());
+    } on MaxgaRequestError catch (e) {
+      switch (e.status) {
+        case MaxgaServerResponseStatus.PASSWORD_INVALID:
+          scaffoldKey.currentState.showSnackBar(SnackBar(
+            content: Text(e.message),
+          ));
+          oldPasswordItem.setError(e.message);
+          break;
+        case MaxgaServerResponseStatus.TOKEN_INVALID:
+        case MaxgaServerResponseStatus.ACTIVE_TOKEN_OUT_OF_DATE:
+          scaffoldKey.currentState.showSnackBar(SnackBar(
+            content: Text('登录信息已经过期，请重新登录继续操作'),
+          ));
+          break;
+        default:
+          scaffoldKey.currentState.showSnackBar(SnackBar(
+            content: Text('修改失败'),
+          ));
+      }
+    } catch (e) {
+      scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text('修改失败'),
+      ));
+    }
+  }
+
+  _validateForm() {
+    var errorText;
+    allItem.forEach((item) {
+      item.setDirty();
+      item.validateValue();
+    });
+    for (var i = 0; i < allItem.length; i++) {
+      var item = allItem[i];
+      if (item.invalid) {
+        errorText = item.errorText;
+      }
+    }
+    return errorText;
   }
 }

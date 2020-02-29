@@ -20,4 +20,9 @@ class UserService {
   static Future<void> logout(String refreshToken) {
     return UserHttpRepo.logout(refreshToken);
   }
+
+  static Future<void> changePassword(String oldPassword, String newPassword) {
+    return UserHttpRepo.changePassword(oldPassword, newPassword);
+
+  }
 }

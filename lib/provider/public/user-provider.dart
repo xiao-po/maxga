@@ -111,7 +111,7 @@ class UserProvider  extends BaseProvider {
     notifyListeners();
   }
 
-  Future<void> logout([bool tokenInvalid]) async {
+  Future<void> logout([bool tokenInvalid = false]) async {
     await LocalStorage.clearItem(_userStorageKey);
     await LocalStorage.clearItem(_syncIntervalKey);
     await LocalStorage.clearItem(_syncTimeKey);

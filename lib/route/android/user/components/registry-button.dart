@@ -14,6 +14,8 @@ class PrimaryButton extends StatelessWidget {
     final theme = Theme.of(context);
     return FlatButton(
       color: theme.accentColor,
+      splashColor: Colors.black12,
+      disabledColor: theme.accentColor.withAlpha(0x77),
       shape: RoundedRectangleBorder(
         borderRadius: new BorderRadius.circular(5.0),
       ),
