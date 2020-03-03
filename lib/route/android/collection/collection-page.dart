@@ -12,6 +12,7 @@ import 'package:maxga/components/button/search-button.dart';
 import 'package:maxga/components/dialog/circular-progress-dialog.dart';
 import 'package:maxga/components/dialog/dialog.dart';
 import 'package:maxga/model/manga/manga.dart';
+import 'package:maxga/model/maxga/collected-manga.dart';
 import 'package:maxga/model/maxga/maxga-release-info.dart';
 import 'package:maxga/provider/public/collection-provider.dart';
 import 'package:maxga/provider/public/user-provider.dart';
@@ -66,6 +67,7 @@ class _CollectionPageState extends State<CollectionPage> {
   @override
   Widget build(BuildContext context) {
     Color textColor = Colors.grey[500];
+
     return Scaffold(
       drawer: MaxgaDrawer(
         active: MaxgaMenuItemType.collect,
@@ -74,7 +76,7 @@ class _CollectionPageState extends State<CollectionPage> {
       appBar: AppBar(
         title: Text('收藏'),
         elevation: 1,
-        actions: <Widget>[MaxgaSearchButton()],
+        actions: <Widget>[MaxgaSearchButton(),MaxgaTestButton()],
       ),
       key: scaffoldKey,
       body: ConfirmExitScope(
@@ -232,7 +234,7 @@ class _CollectionPageState extends State<CollectionPage> {
     ];
   }
 
-  startRead(Manga item) async {
+  startRead(CollectedManga item) async {
     Provider.of<CollectionProvider>(context).setMangaNoUpdate(item);
     await Navigator.push(context, MaterialPageRoute(builder: (context) {
       return MangaInfoPage(

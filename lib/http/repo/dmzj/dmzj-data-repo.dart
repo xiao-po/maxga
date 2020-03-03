@@ -8,6 +8,7 @@ import 'package:maxga/http/repo/dmzj/model/dmzj-manga-search-result.dart';
 import 'package:maxga/http/repo/dmzj/model/dmzj-ranked-manga-info.dart';
 import 'package:maxga/http/repo/utils/manga-http-utils.dart';
 import 'package:maxga/model/manga/chapter.dart';
+import 'package:maxga/model/manga/simple-manga-info.dart';
 import 'package:maxga/model/manga/manga.dart';
 import 'package:maxga/model/manga/manga-source.dart';
 
@@ -22,8 +23,7 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
   Future<Manga> getMangaInfo(String url) async {
     return _httpUtils.requestMangaSourceApi<Manga>(url,
         parser: (response) =>
-            DmzjMangaInfo.fromJson(json.decode(response.data)).convertToManga()
-              ..infoUrl = url);
+            DmzjMangaInfo.fromJson(json.decode(response.data)).convertToManga().copyWith(infoUrl: url));
   }
 
   @override

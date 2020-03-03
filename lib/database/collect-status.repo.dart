@@ -5,6 +5,7 @@ import 'database-value.dart';
 import 'database.utils.dart';
 
 class CollectStatusRepo {
+
   static Future<List<CollectStatus>> findAllCollect({Database database}) {
     return MaxgaDataBaseUtils.openSearchTransaction<List<CollectStatus>>(
         action: (database) async {
@@ -41,7 +42,7 @@ class CollectStatusRepo {
         action: (database) async {
           List<Map> maps = await database.query(
             DatabaseTables.collect_status,
-            where: "${CollectStatusTableColumns.infoUrl} = ? ",
+            where: "${MangaReadStatusTableColumns.infoUrl} = ? ",
             whereArgs: [infoUrl],
           );
           if (maps.isEmpty) {

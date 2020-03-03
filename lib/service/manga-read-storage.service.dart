@@ -1,10 +1,12 @@
+import 'package:maxga/base/error/maxga-sql-error.dart';
+import 'package:maxga/database/collect-manga-data.repo.dart';
 import 'package:maxga/database/collect-status.repo.dart';
 import 'package:maxga/database/manga-data.repo.dart';
 import 'package:maxga/database/read-manga-status.repo.dart';
 import 'package:maxga/model/manga/manga.dart';
+import 'package:maxga/model/maxga/collected-manga.dart';
 import 'package:maxga/model/maxga/read-manga-status.dart';
 import 'package:maxga/model/maxga/collect-status.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class MangaStorageService {
   static final String _key = 'manga_process_';
@@ -20,12 +22,24 @@ class MangaStorageService {
     return isSaveToMangaTableSuccess;
   }
 
+  static Future<bool> updateManga(Manga manga) async {
+    final isMangaExist = await MangaDataRepository.isExist(manga.infoUrl);
+    bool isSaveToMangaTableSuccess = false;
+    if (isMangaExist) {
+      isSaveToMangaTableSuccess = await MangaDataRepository.update(manga);
+      isSaveToMangaTableSuccess = await updateMangaUpdateTime(manga);
+    } else {
+      throw MaxgaSqlError();
+    }
+    return isSaveToMangaTableSuccess;
+  }
+
   static Future<Manga> getMangaByUrl(String url) {
     return MangaDataRepository.findByUrl(url);
   }
 
-  static Future<List<Manga>> getCollectedManga() {
-    return MangaDataRepository.findByIsCollected(true);
+  static Future<List<CollectedManga>> getCollectedManga() {
+    return CollectMangaDataRepository.findAll();
   }
 
   static Future<ReadMangaStatus> getMangaStatusByUrl(String url) async {
@@ -62,7 +76,7 @@ class MangaStorageService {
     final isExist = collectStatus != null;
     if (isExist) {
       collectStatus.sourceKey = manga.sourceKey;
-      collectStatus.updateTime = DateTime.now();
+      collectStatus.collectUpdateTime = DateTime.now();
       collectStatus.collected = isCollected;
       return CollectStatusRepo.update(collectStatus);
     } else {
@@ -70,7 +84,7 @@ class MangaStorageService {
           infoUrl: manga.infoUrl,
           collected: isCollected,
           sourceKey: manga.sourceKey,
-          updateTime: DateTime.now()));
+          collectUpdateTime: DateTime.now()));
     }
   }
 
@@ -115,5 +129,13 @@ class MangaStorageService {
     await CollectStatusRepo.deleteAll();
     await MangaDataRepository.deleteAll();
     await MangaReadStatusRepository.deleteAll();
+  }
+
+  static updateMangaUpdateTime(MangaBase mangaBase) async {
+    await MangaReadStatusRepository.updateMangaUpdateTimeByInfoUrl(mangaBase.infoUrl, DateTime.now());
+  }
+
+  static updateReadTime(MangaBase mangaBase) async {
+    await MangaReadStatusRepository.updateReadUpdateTimeByInfoUrl(mangaBase.infoUrl, DateTime.now());
   }
 }

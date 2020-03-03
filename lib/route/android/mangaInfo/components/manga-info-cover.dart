@@ -71,7 +71,7 @@ class MangaInfoCover extends StatelessWidget {
     );
     var mangaUpdateTime = Text(
         '${lastUpdateChapter.updateTime != null ? DateUtils.formatTime(
-            timestamp: lastUpdateChapter.updateTime,
+            time: lastUpdateChapter.updateTime,
             template: "YYYY-MM-dd") : ''}',
         style: TextStyle(color: coverStringColor, fontSize: subtitleTextSize),
         textAlign: TextAlign.left);

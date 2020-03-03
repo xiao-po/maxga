@@ -22,8 +22,7 @@ class DateUtils {
     result = result.replaceAll('ss', '${resultTime.second < 10 ? '0${resultTime.second}' : resultTime.second}');
     return result;
   }
-
-  static int convertTimeStringToTimestamp(String time, String template) {
+  static DateTime convertTimeStringToDateTime(String time, String template) {
     try {
       int yearTemplateIndex = template.indexOf('YYYY');
       int yearValue = yearTemplateIndex >= 0 ? int.parse(
@@ -59,10 +58,13 @@ class DateUtils {
           hourValue,
           minuteValue,
           secondValue
-      ).millisecondsSinceEpoch;
+      );
     } catch(e) {
       throw DateUtilError('转换时间错误');
     }
+  }
+  static int convertTimeStringToTimestamp(String time, String template) {
+    return convertTimeStringToDateTime(time, template).millisecondsSinceEpoch;
 
 
   }

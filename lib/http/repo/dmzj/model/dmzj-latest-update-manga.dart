@@ -1,6 +1,6 @@
 import 'package:maxga/http/repo/dmzj/constants/dmzj-manga-source.dart';
 import 'package:maxga/model/manga/chapter.dart';
-import 'package:maxga/model/manga/manga.dart';
+import 'package:maxga/model/manga/simple-manga-info.dart';
 
 class DmzjLatestUpdateManga {
   int id;
@@ -59,10 +59,10 @@ class DmzjLatestUpdateManga {
     final Chapter latestChapter = Chapter();
     latestChapter.id = lastUpdateChapterId;
     latestChapter.title = lastUpdateChapterName;
-    latestChapter.updateTime = lastUpdatetime * 1000;
+    latestChapter.updateTime = DateTime.fromMillisecondsSinceEpoch(lastUpdatetime * 1000);
     return SimpleMangaInfo.fromMangaRepo(
         sourceKey: DmzjMangaSource.key,
-        id: id,
+        id: '$id',
         infoUrl: 'http://v3api.dmzj.com/comic/comic_$id.json',
         coverImgUrl: cover,
         title: title,

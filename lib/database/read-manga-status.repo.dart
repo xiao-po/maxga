@@ -13,7 +13,7 @@ class MangaReadStatusRepository {
             where: '${MangaReadStatusTableColumns.infoUrl} = ?',
             limit: 1,
             whereArgs: [url]);
-        return result.length != 0 ? ReadMangaStatusUtils.fromMangaReadStatusTable(result[0]) : null;
+        return result.length != 0 ? ReadMangaStatus.fromSql(Map.from(result[0])) : null;
       },
       database: database,
     );
@@ -34,7 +34,11 @@ class MangaReadStatusRepository {
   static Future<bool> update(ReadMangaStatus status, {Database database}) {
     return MaxgaDataBaseUtils.openUpdateTransaction(
       action: (db) async {
-        await db.update(DatabaseTables.mangaReadStatus, ReadMangaStatusUtils.toMangaReadStatusTableEntity(status),where: '${MangaReadStatusTableColumns.infoUrl} = ?',whereArgs: [status.infoUrl] );
+        await db.update(
+            DatabaseTables.mangaReadStatus,
+            ReadMangaStatusUtils.toMangaReadStatusTableEntity(status),
+            where: '${MangaReadStatusTableColumns.infoUrl} = ?',
+            whereArgs: [status.infoUrl] );
         return true;
       },
       database: database,
@@ -57,7 +61,7 @@ class MangaReadStatusRepository {
       action: (db) async {
         final List<Map<String, dynamic>> result = await db.query(
             DatabaseTables.mangaReadStatus);
-        return result.length != 0 ? result.map((item) => ReadMangaStatusUtils.fromMangaReadStatusTable(item)).toList() : null;
+        return result.length != 0 ? result.map((item) => ReadMangaStatus.fromSql(Map.from(item))).toList() : null;
       },
       database: database,
     );
@@ -67,6 +71,38 @@ class MangaReadStatusRepository {
     return MaxgaDataBaseUtils.openUpdateTransaction(
       action: (database) async {
         await database.delete(DatabaseTables.mangaReadStatus);
+        return true;
+      },
+      database: database,
+    );
+  }
+
+  static updateReadUpdateTimeByInfoUrl(String infoUrl, DateTime dateTime, {Database database}) {
+    return MaxgaDataBaseUtils.openUpdateTransaction(
+      action: (database) async {
+        await database.update(
+            DatabaseTables.mangaReadStatus,
+            {MangaReadStatusTableColumns.readUpdateTime: dateTime.toIso8601String()},
+            where: '${MangaReadStatusTableColumns.infoUrl} = ?',
+            whereArgs: [infoUrl]
+        );
+        var data = await findByUrl(infoUrl);
+        return true;
+      },
+      database: database,
+    );
+  }
+
+  static updateMangaUpdateTimeByInfoUrl(String infoUrl, DateTime dateTime, {Database database}) {
+    return MaxgaDataBaseUtils.openUpdateTransaction(
+      action: (database) async {
+        await database.update(
+            DatabaseTables.mangaReadStatus,
+            {MangaReadStatusTableColumns.mangaUpdateTime: dateTime.toIso8601String()},
+            where: '${MangaReadStatusTableColumns.infoUrl} = ?',
+            whereArgs: [infoUrl]
+        );
+        var data = await findByUrl(infoUrl);
         return true;
       },
       database: database,

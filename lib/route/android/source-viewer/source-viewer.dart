@@ -14,6 +14,7 @@ import 'package:maxga/components/base/zero-divider.dart';
 import 'package:maxga/components/dialog/dialog.dart';
 import 'package:maxga/model/manga/manga.dart';
 import 'package:maxga/model/manga/manga-source.dart';
+import 'package:maxga/model/manga/simple-manga-info.dart';
 import 'package:maxga/model/maxga/maxga-release-info.dart';
 import 'package:maxga/provider/public/history-provider.dart';
 import 'package:maxga/provider/public/setting-provider.dart';
@@ -381,7 +382,7 @@ class _SourceViewerPageState extends State<SourceViewerPage>
     Provider.of<HistoryProvider>(context).addToHistory(
         SimpleMangaInfo.fromMangaInfo(
             sourceKey: manga.sourceKey,
-            author: manga.authors,
+            authors: manga.authors,
             id: manga.id,
             infoUrl: manga.infoUrl,
             status: manga.status,

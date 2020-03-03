@@ -16,7 +16,7 @@ class DmzjChapterData {
         chapter.id = v['chapter_id'];
         chapter.title = v['chapter_title'];
         chapter.order = v['chapter_order'];
-        chapter.updateTime = v['updatetime'] * 1000;
+        chapter.updateTime = DateTime.fromMillisecondsSinceEpoch( v['updatetime'] * 1000);
         data.add(chapter);
       });
     }

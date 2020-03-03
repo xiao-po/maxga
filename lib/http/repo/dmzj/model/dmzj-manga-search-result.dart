@@ -1,6 +1,7 @@
 import 'package:maxga/http/repo/dmzj/constants/dmzj-manga-source.dart';
 import 'package:maxga/model/manga/chapter.dart';
 import 'package:maxga/model/manga/manga.dart';
+import 'package:maxga/model/manga/simple-manga-info.dart';
 
 class DmzjMangaSearchResult {
   String sBiz;
@@ -83,7 +84,7 @@ class DmzjMangaSearchResult {
     latestChapter.title = lastName;
     return SimpleMangaInfo.fromMangaRepo(sourceKey: DmzjMangaSource.key,
         authors: authors.split('/'),
-        id: id,
+        id: '$id',
         infoUrl: '${DmzjMangaSource.apiDomain}/comic/comic_$id.json',
         coverImgUrl: cover,
         title: title,

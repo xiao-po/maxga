@@ -1,21 +1,21 @@
-import 'dart:convert';
+import 'package:maxga/model/manga/chapter.dart';
 
 import '../manga.dart';
 
 class MangaModelDatabaseUtils {
   static Map<String, dynamic> toSqlEntity(Manga manga) {
-    return  {
+    return {
       'sourceKey': manga.sourceKey,
-      'authors': json.encode(manga.authors),
+      'authors': manga.authors.join(','),
       'id': manga.id,
       'infoUrl': manga.infoUrl,
       'status': manga.status,
       'coverImgUrl': manga.coverImgUrl,
       'title': manga.title,
       'introduce': manga.introduce,
-      'hasUpdate': manga.hasUpdate ? 1 : 0,
-      'typeList': json.encode(manga.typeList),
-      'chapterList': json.encode(manga.chapterList)
+      'typeList': manga.typeList.join(','),
+      'lastChapterTitle': manga.latestChapter.title,
+      'lastChapterUpdateTime': manga.latestChapter.updateTime.toIso8601String(),
     };
   }
 
@@ -23,9 +23,12 @@ class MangaModelDatabaseUtils {
     Map<String, dynamic> value = Map.from(map);
 
     value['hasUpdate'] = map['hasUpdate'] == 1;
-    value['authors'] = json.decode(map['authors']);
-    value['typeList'] = json.decode(map['typeList']);
-    value['chapterList'] = json.decode(map['chapterList']);
+    value['authors'] = (map['authors'] as String).split(',');
+    value['typeList'] = (map['typeList'] as String).split(',');
+    value['latestChapter'] = Chapter.fromJson({
+      'title': value['lastChapterTitle'],
+      'updateTime': DateTime.parse(value['lastChapterUpdateTime'])
+    });
     return Manga.fromJson(value);
   }
 }

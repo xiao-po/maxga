@@ -1,22 +1,22 @@
 import 'package:flutter/cupertino.dart';
-import 'package:maxga/manga-repo-pool.dart';
 import 'package:maxga/http/repo/maxga-data-http-repo.dart';
+import 'package:maxga/manga-repo-pool.dart';
 import 'package:maxga/model/manga/manga.dart';
+import 'package:maxga/model/maxga/collected-manga.dart';
 import 'package:maxga/provider/base/base-provider.dart';
 import 'package:maxga/service/manga-read-storage.service.dart';
 
 enum CollectionLoadingState { loading, over, error, empty }
 
 class CollectionProvider extends BaseProvider {
-  List<Manga> _collectedMangaList;
+  List<CollectedManga> _collectedMangaList;
 
-  List<Manga> get collectionMangaList => _collectedMangaList;
+  List<CollectedManga> get collectionMangaList => _collectedMangaList;
 
   bool get loadOver => this._collectedMangaList != null;
 
   bool get isEmpty => this._collectedMangaList?.length == 0 ?? true;
   bool _isOnUpdate = false;
-
 
   static CollectionProvider _instance;
 
@@ -55,16 +55,19 @@ class CollectionProvider extends BaseProvider {
       var infoUrl = manga.infoUrl;
       var i = index++;
       Manga currentMangaInfo = await _getCurrentMangaStatus(sourceKey, infoUrl);
-      if (currentMangaInfo.chapterList.length != manga.chapterList.length) {
-        currentMangaInfo.hasUpdate = true;
-        await MangaStorageService.saveManga(currentMangaInfo);
-        this._collectedMangaList[i] = currentMangaInfo;
-        notifyListeners();
+      if (currentMangaInfo.latestChapter.updateTime.isAfter(manga.lastUpdateChapter.updateTime)) {
+        await MangaStorageService.updateManga(currentMangaInfo);
+        this._collectedMangaList[i] = CollectedManga.fromMangaInfo(
+          mangaUpdateTime: DateTime.now(),
+          manga: currentMangaInfo,
+          readUpdateTime: manga.readUpdateTime,
+        );
       }
       return currentMangaInfo;
     }));
 
     this._isOnUpdate = false;
+    notifyListeners();
     return result;
   }
 
@@ -87,23 +90,34 @@ class CollectionProvider extends BaseProvider {
     return manga;
   }
 
-  Future<bool> setMangaNoUpdate(Manga manga) async {
-    manga.hasUpdate = false;
-    await MangaStorageService.saveManga(manga);
+  Future<bool> setMangaNoUpdate(CollectedManga manga) async {
+    await MangaStorageService.updateReadTime(manga);
+    var index = this._collectedMangaList.indexOf(manga);
+    this._collectedMangaList[index] = manga.copyWith(readUpdateTime: DateTime.now());
+    notifyListeners();
     return true;
   }
 
   Future<bool> setMangaCollectStatus(Manga manga, {isCollected = true}) async {
     try {
       if (isCollected) {
-        final index = this.collectionMangaList.indexWhere((item) => manga.infoUrl == item.infoUrl);
-        if (index ==  -1) {
-          this._collectedMangaList.add(manga);
+        final index = this
+            .collectionMangaList
+            .indexWhere((item) => manga.infoUrl == item.infoUrl);
+        if (index == -1) {
+          this._collectedMangaList.add(CollectedManga.fromMangaInfo(
+                mangaUpdateTime: manga.chapterList.first.updateTime,
+                manga: manga,
+                readUpdateTime: DateTime.now(),
+              ));
         }
       } else {
-        this._collectedMangaList.removeWhere((item) => item.infoUrl == manga.infoUrl);
+        this
+            ._collectedMangaList
+            .removeWhere((item) => item.infoUrl == manga.infoUrl);
       }
-      await MangaStorageService.setMangaCollectedStatus(manga, isCollected: isCollected);
+      await MangaStorageService.setMangaCollectedStatus(manga,
+          isCollected: isCollected);
       notifyListeners();
       return true;
     } catch (e) {
@@ -117,7 +131,7 @@ class CollectionProvider extends BaseProvider {
     super.dispose();
   }
 
-  Manga getMangaFromInfoUrl(String infoUrl) {
+  CollectedManga getMangaFromInfoUrl(String infoUrl) {
     return this
         ._collectedMangaList
         .firstWhere((item) => item.infoUrl == infoUrl);

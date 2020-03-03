@@ -4,6 +4,7 @@ import 'package:maxga/components/card/card.dart';
 import 'package:maxga/components/base/manga-cover-image.dart';
 import 'package:maxga/model/manga/manga.dart';
 import 'package:maxga/model/manga/manga-source.dart';
+import 'package:maxga/model/manga/simple-manga-info.dart';
 import 'package:maxga/provider/public/history-provider.dart';
 import 'package:maxga/route/android/error-page/empty-page.dart';
 import 'package:provider/provider.dart';

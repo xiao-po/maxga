@@ -106,6 +106,12 @@ class DmzjMangaInfo {
   }
 
   Manga convertToManga() {
+    var chapterList = chapters.singleWhere((item) => item.title == '连载').data
+      ..forEach((chapter) {
+        chapter.url =
+            '${DmzjMangaSource.apiDomain}/chapter/$id/${chapter.id}.json';
+      })
+      ..sort((a, b) => b.order - a.order);
     return Manga.fromMangaInfoRequest(
       infoUrl: '',
       introduce: description,
@@ -113,14 +119,11 @@ class DmzjMangaInfo {
       status: status[0].tagName,
       types: types.map((type) => type.tagName).toList(),
       coverImgUrl: cover,
-      chapterList: chapters.singleWhere((item) => item.title == '连载').data
-        ..forEach((chapter) {
-          chapter.url =
-              '${DmzjMangaSource.apiDomain}/chapter/$id/${chapter.id}.json';
-        }),
-      id: id,
+      chapterList: chapterList,
+      id: '$id',
       title: title,
       sourceKey: DmzjMangaSource.key,
+      latestChapter: chapterList.first,
     );
   }
 }

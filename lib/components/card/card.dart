@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maxga/utils/date-utils.dart';
 import 'package:maxga/components/skeleton.dart';
 import 'package:maxga/model/manga/manga.dart';
+import 'package:maxga/model/manga/simple-manga-info.dart';
 import 'package:maxga/model/manga/manga-source.dart';
 
 typedef CoverBuilder = Widget Function(BuildContext context);
@@ -202,7 +203,7 @@ class MangaListTileExtra extends StatelessWidget {
   Widget build(BuildContext context) {
     final textStyle = TextStyle(color: textColor);
     final updateTime = manga.lastUpdateChapter.updateTime != null
-        ? DateUtils.formatTime(timestamp: manga.lastUpdateChapter.updateTime, template: 'YYYY-MM-dd')
+        ? DateUtils.formatTime(time: manga.lastUpdateChapter.updateTime, template: 'YYYY-MM-dd')
         : '';
     var bottomText;
     if (manga.lastUpdateChapter != null) {

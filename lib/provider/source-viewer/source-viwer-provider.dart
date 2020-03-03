@@ -3,6 +3,7 @@ import 'package:maxga/base/error/maxga-http-error.dart';
 import 'package:maxga/http/repo/maxga-data-http-repo.dart';
 import 'package:maxga/model/manga/manga.dart';
 import 'package:maxga/model/manga/manga-source.dart';
+import 'package:maxga/model/manga/simple-manga-info.dart';
 
 import '../../manga-repo-pool.dart';
 

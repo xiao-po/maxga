@@ -3,8 +3,7 @@ const MaxgaDataBaseName = 'maxga';
 class DatabaseTables {
   static const String manga = 'manga';
   static const String mangaReadStatus = 'manga_read_status';
-
-  static const String collect_status = 'collect_status';
+  static const String collect_status = 'manga_read_status';
 }
 
 class MangaTableColumns {
@@ -17,8 +16,8 @@ class MangaTableColumns {
   static const String title = 'title';
   static const String introduce = 'introduce';
   static const String typeList = 'typeList';
-  static const String chapterList = 'chapterList';
-  static const String hasUpdate = 'hasUpdate';
+  static const String lastChapterTitle = 'lastChapterTitle';
+  static const String lastChapterUpdateTime = 'lastChapterUpdateTime';
 
   static List<String> values() {
     return [
@@ -31,8 +30,8 @@ class MangaTableColumns {
       MangaTableColumns.title,
       MangaTableColumns.introduce,
       MangaTableColumns.typeList,
-      MangaTableColumns.chapterList,
-      MangaTableColumns.hasUpdate
+      MangaTableColumns.lastChapterTitle,
+      MangaTableColumns.lastChapterUpdateTime
     ];
   }
 
@@ -43,7 +42,10 @@ class MangaReadStatusTableColumns {
   static const String sourceKey = 'sourceKey';
   static const String lastReadChapterId = 'chapterId';
   static const String lastReadImageIndex = 'pageIndex';
-  static const String updateTime = 'updateTime';
+  static const String readUpdateTime = 'updateTime';
+  static const String collected = 'collected';
+  static const String collectUpdateTime = 'collectUpdateTime';
+  static const String mangaUpdateTime = 'mangaUpdateTime';
 
 
   static List<String> values() {
@@ -52,24 +54,26 @@ class MangaReadStatusTableColumns {
       MangaReadStatusTableColumns.lastReadChapterId,
       MangaReadStatusTableColumns.infoUrl,
       MangaReadStatusTableColumns.lastReadImageIndex,
-      MangaReadStatusTableColumns.updateTime,
+      MangaReadStatusTableColumns.readUpdateTime,
+      MangaReadStatusTableColumns.collected,
+      MangaReadStatusTableColumns.collectUpdateTime,
+      MangaReadStatusTableColumns.mangaUpdateTime
     ];
   }
 }
 
 class CollectStatusTableColumns {
-
   static const String infoUrl = 'infoUrl';
   static const String sourceKey = 'sourceKey';
   static const String collected = 'collected';
-  static const String updateTime = 'updateTime';
+  static const String collectUpdateTime = 'updateTime';
 
   static List<String> values() {
     return [
       CollectStatusTableColumns.sourceKey,
-      CollectStatusTableColumns.collected,
       CollectStatusTableColumns.infoUrl,
-      CollectStatusTableColumns.updateTime,
+      CollectStatusTableColumns.collected,
+      CollectStatusTableColumns.collectUpdateTime,
     ];
   }
 }

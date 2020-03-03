@@ -1,4 +1,5 @@
 import 'package:maxga/model/manga/manga.dart';
+import 'package:maxga/model/manga/simple-manga-info.dart';
 import 'package:maxga/model/manga/manga-source.dart';
 
 abstract class MaxgaDataHttpRepo {

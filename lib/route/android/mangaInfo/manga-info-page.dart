@@ -50,6 +50,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   MangaSource source;
   bool isCollected;
   List<Chapter> chapterList = [];
+  var scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -111,27 +112,28 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
         }
     }
     return Scaffold(
+        key: scaffoldKey,
         body: MangaInfoWrapper(
-      title: manga?.title ?? '',
-      appbarActions: <Widget>[
-        IconButton(
-          icon: Icon(Icons.share),
-          onPressed: () => this.shareLink(),
-        )
-      ],
-      children: [
-        MangaInfoCover(
-          manga: manga,
-          loadEnd: loadOver,
-          lastUpdateChapter: manga?.chapterList?.first ?? Chapter(),
-          source: source,
-          coverImageBuilder: widget.coverImageBuilder,
-        ),
-        mangaInfoIntro,
-        mangaInfoChapter ?? Container(),
-      ],
-      bottomBar: mangaInfoBottomBar ?? Container(),
-    ));
+          title: manga?.title ?? '',
+          appbarActions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.share),
+              onPressed: () => this.shareLink(),
+            )
+          ],
+          children: [
+            MangaInfoCover(
+              manga: manga,
+              loadEnd: loadOver,
+              lastUpdateChapter: manga?.chapterList?.first ?? Chapter(),
+              source: source,
+              coverImageBuilder: widget.coverImageBuilder,
+            ),
+            mangaInfoIntro,
+            mangaInfoChapter ?? Container(),
+          ],
+          bottomBar: mangaInfoBottomBar ?? Container(),
+        ));
   }
 
   Row buildChapterLoading() {
@@ -162,7 +164,8 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
               await MangaStorageService.getMangaStatusByUrl(url);
           final Manga resultMangaData = manga;
           chapterList = resultMangaData.chapterList;
-          if (manga.chapterList.length > preMangaData.chapterList.length) {
+          if (!preMangaData.latestChapter.updateTime
+              .isBefore(preMangaData.latestChapter.updateTime)) {
             await MangaStorageService.saveManga(resultMangaData);
           }
           loading = _MangaInfoPageStatus.over;
@@ -190,10 +193,11 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
                   initIndex: imagePage,
                 )));
     if (result != null) {
-      readMangaStatus.sourceKey = source.key;
-      readMangaStatus.chapterId = result.chapter.id;
-      readMangaStatus.pageIndex = result.pageIndex;
-      readMangaStatus.updateTime = DateTime.now();
+      readMangaStatus = readMangaStatus.copyWith(
+          sourceKey: source.key,
+          chapterId: result.chapter.id,
+          pageIndex: result.pageIndex,
+          updateTime: DateTime.now());
       await Future.wait([
         MangaStorageService.saveMangaStatus(readMangaStatus),
       ]);
@@ -236,7 +240,6 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
   collectManga() async {
     try {
       await Future.wait([
-        MangaStorageService.saveManga(manga),
         CollectionProvider.getInstance()
             .setMangaCollectStatus(manga, isCollected: !isCollected),
       ]);
@@ -246,7 +249,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
         });
     } catch (e) {
       print(e);
-      Scaffold.of(context).showSnackBar(SnackBar(
+      scaffoldKey.currentState.showSnackBar(SnackBar(
         content: const Text('发生错误，收藏失败'),
       ));
     }

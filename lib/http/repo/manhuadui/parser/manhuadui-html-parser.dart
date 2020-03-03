@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart';
 import 'package:maxga/utils/date-utils.dart';
+import 'package:maxga/model/manga/simple-manga-info.dart';
 import 'package:maxga/http/repo/manhuadui/constants/manhuadui-manga-source.dart';
 import 'package:maxga/http/repo/manhuadui/crypto/manhuadui-crypto.dart';
 import 'package:maxga/model/manga/chapter.dart';
@@ -218,7 +219,7 @@ class ManhuaduiHtmlParser {
       final mangaInfoUrl = titleNode.attributes['href'];
       final mangaAuthors = infoNode.children[1].text.trim().split(',');
       final mangaTypeList = infoNode.children[2].text.trim().split('|');
-      final mangaUpdateTime = DateUtils.convertTimeStringToTimestamp(
+      final mangaUpdateTime = DateUtils.convertTimeStringToDateTime(
           infoNode.children[3].querySelector('.date').innerHtml,
           'YYYY-MM-dd HH:mm');
 
@@ -228,7 +229,7 @@ class ManhuaduiHtmlParser {
 
       return SimpleMangaInfo.fromMangaRepo(
         sourceKey: ManhuaduiMangaSource.key,
-        id: int.parse(mangaId),
+        id: mangaId,
         infoUrl: mangaInfoUrl,
         coverImgUrl: mangaCoverUrl,
         title: mangaTitle,
@@ -290,7 +291,8 @@ class ManhuaduiHtmlParser {
         status: status,
         coverImgUrl: coverImageUrl,
         sourceKey: ManhuaduiMangaSource.key,
-        chapterList: chapterList);
+        chapterList: chapterList,
+        latestChapter: chapterList.first);
   }
 
   SimpleMangaInfo _parseMangaFromUpdate(Element comicNode) {
@@ -412,6 +414,7 @@ Manga getMangaInfo(String body) {
       status: status,
       coverImgUrl: coverImageUrl,
       sourceKey: ManhuaduiMangaSource.key,
-      chapterList: chapterList);
+      chapterList: chapterList,
+      latestChapter: chapterList.first);
 }
 //}

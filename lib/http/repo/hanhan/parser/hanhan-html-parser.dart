@@ -1,10 +1,11 @@
-import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart';
-import 'package:maxga/utils/date-utils.dart';
+import 'package:html/parser.dart' show parse;
 import 'package:maxga/http/repo/hanhan/constant/hanhan-repo-value.dart';
 import 'package:maxga/http/repo/hanhan/crypto/hanhan-crypto.dart';
 import 'package:maxga/model/manga/chapter.dart';
 import 'package:maxga/model/manga/manga.dart';
+import 'package:maxga/model/manga/simple-manga-info.dart';
+import 'package:maxga/utils/date-utils.dart';
 
 class HanhanHtmlParser {
   static HanhanHtmlParser _instance;
@@ -38,8 +39,7 @@ class HanhanHtmlParser {
         .querySelector('.main')
         .querySelector('.section3')
         .querySelector('.pic');
-    final int mangaId =
-        int.parse(document.querySelector('#hdID').attributes['value']);
+    final String mangaId = document.querySelector('#hdID').attributes['value'];
     final coverImageUrl = mangaInfoEl.querySelector('img').attributes['src'];
     final mangaTextInfoEl = mangaInfoEl.querySelector('.con');
     final title = mangaTextInfoEl.children[0].text;
@@ -89,7 +89,8 @@ class HanhanHtmlParser {
         status: chapterStatusList[0],
         coverImgUrl: coverImageUrl,
         sourceKey: HanhanMangaSource.key,
-        chapterList: chapterList);
+        chapterList: chapterList,
+        latestChapter: chapterList.first);
   }
 
   List<String> getChapterImageList(String body, List<String> imageServerList) {
@@ -116,13 +117,13 @@ class HanhanHtmlParser {
     String title;
     List<String> authors;
     List<String> type;
-    int time;
+    DateTime time;
     String lastChapterTitle;
     if (mangaInfoEl.children.length > 2) {
       title = mangaInfoEl.children[0].innerHtml;
       authors = mangaInfoEl.children[1].innerHtml.split(' ');
       type = [mangaInfoEl.children[2].innerHtml];
-      time = DateUtils.convertTimeStringToTimestamp(
+      time = DateUtils.convertTimeStringToDateTime(
           mangaInfoEl.children[4].text, 'YYYY-MM-dd HH:mm');
       lastChapterTitle = el.querySelector('.tool').children[1].innerHtml;
     } else {
@@ -135,12 +136,11 @@ class HanhanHtmlParser {
     lastChapter.title = lastChapterTitle;
     lastChapter.updateTime = time;
 
-    var id = int.parse(mangaId);
     return SimpleMangaInfo.fromMangaRepo(
         sourceKey: null,
-        id: id,
+        id: mangaId,
         authors: authors ?? [],
-        infoUrl: '${HanhanMangaSource.apiDomain}/comic/18$id/',
+        infoUrl: '${HanhanMangaSource.apiDomain}/comic/18$mangaId/',
         coverImgUrl: coverImageUrl,
         typeList: type ?? [],
         lastUpdateChapter: lastChapter,

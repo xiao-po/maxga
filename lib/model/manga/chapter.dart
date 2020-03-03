@@ -1,9 +1,9 @@
 class Chapter {
   int id;
   int order;
-  int comicId;
+  String comicId;
   String title;
-  int updateTime;
+  DateTime updateTime;
   bool isLatestUpdate;
   String url;
   List<String> imgUrlList;

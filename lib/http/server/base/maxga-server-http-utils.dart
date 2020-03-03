@@ -11,7 +11,7 @@ import 'maxga-server-response-status.dart';
 
 typedef _ModelFactory<T> = T Function(dynamic json);
 
-const MaxgaServer = "http://xiaopo.xyz:8080";
+const MaxgaServer = "http://192.168.3.227:8080";
 
 class MaxgaServerHttpUtils {
 
@@ -41,7 +41,9 @@ class MaxgaServerHttpUtils {
     MaxgaServerResponseStatus status;
     while (retryTimes > 0) {
       try {
-        Response<String> response = await dio.request('$MaxgaServer$url',
+        var requestUrl = '$MaxgaServer$url';
+        print(requestUrl);
+        Response<String> response = await dio.request(requestUrl,
             data: data,
             options: Options(
               method: method,
@@ -65,6 +67,7 @@ class MaxgaServerHttpUtils {
           throw MaxgaRequestError(MaxgaServerResponseStatus.TIMEOUT, jsonMap['message']);
         }
         if (retryTimes == 0 || e.type == DioErrorType.DEFAULT) {
+          print(e);
           throw MaxgaRequestError(MaxgaServerResponseStatus.SERVICE_FAILED, '请求失败');
         }
       }

@@ -1,6 +1,6 @@
 import 'package:maxga/http/repo/dmzj/constants/dmzj-manga-source.dart';
 import 'package:maxga/model/manga/chapter.dart';
-import 'package:maxga/model/manga/manga.dart';
+import 'package:maxga/model/manga/simple-manga-info.dart';
 
 class DmzjRankedMangaInfo {
   String comicId;
@@ -15,17 +15,18 @@ class DmzjRankedMangaInfo {
   String num;
   String tagId;
 
-  DmzjRankedMangaInfo({this.comicId,
-    this.title,
-    this.authors,
-    this.status,
-    this.cover,
-    this.types,
-    this.lastUpdatetime,
-    this.lastUpdateChapterName,
-    this.comicPy,
-    this.num,
-    this.tagId});
+  DmzjRankedMangaInfo(
+      {this.comicId,
+      this.title,
+      this.authors,
+      this.status,
+      this.cover,
+      this.types,
+      this.lastUpdatetime,
+      this.lastUpdateChapterName,
+      this.comicPy,
+      this.num,
+      this.tagId});
 
   DmzjRankedMangaInfo.fromJson(Map<String, dynamic> json) {
     comicId = json['comic_id'];
@@ -61,9 +62,11 @@ class DmzjRankedMangaInfo {
   SimpleMangaInfo convertToSimpleMangaInfoForRank() {
     final Chapter latestChapter = Chapter();
     latestChapter.title = lastUpdateChapterName;
-    latestChapter.updateTime = int.parse(lastUpdatetime) * 1000;
-    return SimpleMangaInfo.fromMangaRepo(sourceKey: DmzjMangaSource.key,
-        id:  int.parse(comicId),
+    latestChapter.updateTime =
+        DateTime.fromMillisecondsSinceEpoch(int.parse(lastUpdatetime) * 1000);
+    return SimpleMangaInfo.fromMangaRepo(
+        sourceKey: DmzjMangaSource.key,
+        id: comicId,
         infoUrl: 'http://v3api.dmzj.com/comic/comic_$comicId.json',
         coverImgUrl: cover,
         authors: authors.split('/'),

@@ -10,7 +10,7 @@ class MaxgaMangaHttpRepo {
           .replaceFirst('{page}', '$page')
           .replaceFirst('{keywords}', keywords),
       factory: (v) => (v as List<dynamic>)
-          .map((v) => HiddenManga.fromJson(v as Map<String, dynamic>))
+          .map((v) => HiddenManga.fromServerJson(v as Map<String, dynamic>))
           .toList(growable: false),
     );
   }

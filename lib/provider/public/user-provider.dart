@@ -91,7 +91,6 @@ class UserProvider  extends BaseProvider {
   Future<void> sync() async {
     final syncTime = DateTime.now();
     await MaxgaServerService.sync();
-    await MaxgaServerService.syncReadStatus();
     await LocalStorage.setString(_syncTimeKey, syncTime.toIso8601String());
     this.lastSyncTime = syncTime;
     this.lastRemindSyncTime = syncTime;

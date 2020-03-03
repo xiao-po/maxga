@@ -1,12 +1,11 @@
 import 'package:maxga/http/repo/utils/manga-http-utils.dart';
-import 'package:maxga/model/manga/manga.dart';
-
 import 'package:maxga/model/manga/manga-source.dart';
+import 'package:maxga/model/manga/manga.dart';
+import 'package:maxga/model/manga/simple-manga-info.dart';
 
 import '../maxga-data-http-repo.dart';
 import 'constant/hanhan-repo-value.dart';
 import 'parser/hanhan-html-parser.dart';
-
 
 class HanhanDateRepo extends MaxgaDataHttpRepo {
   MangaSource _source = HanhanMangaSource;
@@ -26,10 +25,9 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
   Future<List<SimpleMangaInfo>> getLatestUpdate([int page = 1]) async {
     return _httpUtils.requestMangaSourceApi<List<SimpleMangaInfo>>(
         '${_source.apiDomain}/dfcomiclist_${page + 1}.htm',
-        parser: (res) => parser.getMangaListFromLatestUpdate(res.data)
-          ..forEach((manga) {
-            manga.sourceKey = _source.key;
-          }));
+        parser: (res) => parser
+            .getMangaListFromLatestUpdate(res.data)
+            .map((manga) => manga.copyWith(sourceKey: _source.key)));
   }
 
   @override
@@ -37,25 +35,25 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
     await this.initRepo();
     return _httpUtils.requestMangaSourceApi<Manga>(url,
         parser: (res) =>
-            parser.getMangaFromInfoPate(res.data)..infoUrl = url);
+            parser.getMangaFromInfoPate(res.data).copyWith(infoUrl: url));
   }
 
   @override
   Future<List<SimpleMangaInfo>> getSearchManga(String keywords) async {
     return _httpUtils.requestMangaSourceApi<List<SimpleMangaInfo>>(
         '${_source.apiDomain}/comicsearch/s.aspx?s=$keywords',
-        parser: (res) => parser.getMangaListFromLatestUpdate(res.data)
-          ..forEach((manga) {
-            manga.sourceKey = _source.key;
-          }));
+        parser: (res) => parser
+            .getMangaListFromLatestUpdate(res.data)
+            .map((manga) => manga.copyWith(sourceKey: _source.key)));
   }
 
   @override
   Future<List<SimpleMangaInfo>> getRankedManga(int page) async {
     return _httpUtils.requestMangaSourceApi<List<SimpleMangaInfo>>(
         '${_source.apiDomain}/top/a-${page + 1}.htm',
-        parser: (res) => parser.getMangaListFromRank(res.data)
-          ..forEach((manga) => manga.sourceKey = _source.key));
+        parser: (res) => parser
+            .getMangaListFromRank(res.data)
+            .map((manga) => manga.copyWith(sourceKey: _source.key)));
   }
 
   @override

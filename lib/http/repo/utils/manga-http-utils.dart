@@ -44,6 +44,7 @@ class MangaHttpUtils {
       final T result = parser(response);
       return result;
     } catch (e) {
+      print(e);
       throw MangaRepoError(MangaHttpErrorType.PARSE_ERROR, source);
     }
   }

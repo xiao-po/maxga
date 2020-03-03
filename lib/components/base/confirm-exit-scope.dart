@@ -29,6 +29,10 @@ class _ConfirmExitScopeState extends State<ConfirmExitScope> {
   }
   DateTime _lastPressedAt; //上次点击时间
   Future<bool> onBack() async {
+    var scaffold =  Scaffold.of(context);
+    if (scaffold.isDrawerOpen || scaffold.isEndDrawerOpen) {
+      return true;
+    }
     if (_lastPressedAt == null ||
         DateTime.now().difference(_lastPressedAt) > Duration(seconds: 2)) {
       _lastPressedAt = DateTime.now();

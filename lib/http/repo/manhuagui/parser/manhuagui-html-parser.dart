@@ -3,6 +3,7 @@ import 'package:html/parser.dart';
 import 'package:maxga/utils/date-utils.dart';
 import 'package:maxga/http/repo/manhuagui/constants/manhuagui-manga-source.dart';
 import 'package:maxga/model/manga/chapter.dart';
+import 'package:maxga/model/manga/simple-manga-info.dart';
 import 'package:maxga/model/manga/manga.dart';
 
 class ManhuaguiHtmlParser {
@@ -33,10 +34,10 @@ class ManhuaguiHtmlParser {
     return mangaElList.map((el) {
       final infoEl = el.querySelector('a');
       final url = infoEl.attributes['href'];
-      final id = int.parse(url.substring(
+      final id = url.substring(
         url.indexOf('ic/') + 3,
         url.lastIndexOf('/'),
-      ));
+      );
       final coverImageUrl = infoEl.querySelector('img').attributes['data-src'];
       final title = infoEl.children[1].innerHtml;
       final authors =
@@ -47,7 +48,7 @@ class ManhuaguiHtmlParser {
       final lastUpdateChapterTitle =
           infoEl.children[4].querySelector('dd').innerHtml;
 
-      final lastUpdateTime = DateUtils.convertTimeStringToTimestamp(
+      final lastUpdateTime = DateUtils.convertTimeStringToDateTime(
           infoEl.children[5].querySelector('dd').innerHtml, 'YYYY-MM-dd');
 
       Chapter lastUpdateChapter = Chapter();
@@ -99,12 +100,13 @@ class ManhuaguiHtmlParser {
         types: typeList,
         introduce: bookIntro,
         title: title,
-        id: 0,
+        id: null,
         infoUrl: null,
         status: mangaStatus,
         coverImgUrl: coverImageUrl,
         sourceKey: ManhuaguiMangaSource.key,
-        chapterList: chapterList);
+        chapterList: chapterList,
+        latestChapter: chapterList.first);
   }
 
   Chapter _getChapter(Element el, int index) {

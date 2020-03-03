@@ -14,4 +14,6 @@ class MaxgaServerApi {
 
   static const String changePassword =
       "/user/password/change?password={password}&oldPassword={oldPassword}";
+
+  static String sync = '/user/sync';
 }

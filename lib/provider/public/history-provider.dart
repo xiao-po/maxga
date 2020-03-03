@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:maxga/model/manga/manga.dart';
+import 'package:maxga/model/manga/simple-manga-info.dart';
 import 'package:maxga/provider/base/base-provider.dart';
 import 'package:maxga/service/local-storage.service.dart';
 import 'package:maxga/service/manga-read-storage.service.dart';
@@ -28,14 +29,14 @@ class HistoryProvider extends BaseProvider {
     final List<SimpleMangaInfo> value = valueList != null ? valueList
         .map((manga) => SimpleMangaInfo.fromMangaInfo(
             sourceKey: manga.sourceKey,
-            author: manga.authors,
+            authors: manga.authors,
             id: manga.id,
             infoUrl: manga.infoUrl,
             status: manga.status,
             coverImgUrl: manga.coverImgUrl,
             title: manga.title,
             typeList: manga.typeList,
-            lastUpdateChapter: manga.chapterList.first))
+            lastUpdateChapter: manga.latestChapter))
         .toList() : [];
 
     _items = value ?? [];

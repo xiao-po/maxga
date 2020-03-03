@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:maxga/database/collect-manga-data.repo.dart';
+import 'package:maxga/database/collect-status.repo.dart';
 import 'package:maxga/route/android/hidden-manga/hidden-manga-page.dart';
 import 'package:maxga/route/android/search/search-page.dart';
 
@@ -37,9 +39,8 @@ class MaxgaTestButton extends StatelessWidget {
         Icons.details,
       ),
       onPressed: () async {
-        Navigator.push(context, MaterialPageRoute(
-          builder: (context) => HiddenMangaPage(),
-        ));
+        var data = await CollectMangaDataRepository.findAllSyncItem();
+        print(data.length);
       },
     );
   }
