@@ -15,7 +15,7 @@ class MangaModelDatabaseUtils {
       'introduce': manga.introduce,
       'typeList': manga.typeList.join(','),
       'lastChapterTitle': manga.latestChapter.title,
-      'lastChapterUpdateTime': manga.latestChapter.updateTime.toIso8601String(),
+      'lastChapterUpdateTime': manga.latestChapter?.updateTime?.toIso8601String() ?? null,
     };
   }
 

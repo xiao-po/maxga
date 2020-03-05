@@ -31,7 +31,7 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
         '${_source.apiDomain}/update/?page=${page + 1}',
         parser: (res) => parser
             .getMangaListFromLatestUpdate(res.data)
-            .map((manga) => manga.copyWith(sourceKey: _source.key)));
+            .map((manga) => manga.copyWith(sourceKey: _source.key)).toList());
   }
 
   @override
@@ -47,7 +47,7 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
         '${_source.apiDomain}/search/?keywords=$keywords',
         parser: (res) => parser
             .getMangaListFromSearch(res.data)
-            .map((manga) => manga.copyWith(sourceKey: _source.key)));
+            .map((manga) => manga.copyWith(sourceKey: _source.key)).toList());
   }
 
   @override
@@ -63,7 +63,7 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
         'https://m.manhuadui.com/rank/click/',
         parser: (res) => parser
             .getMangaListFromRank(res.data)
-            .map((manga) => manga.copyWith(sourceKey: _source.key)));
+            .map((manga) => manga.copyWith(sourceKey: _source.key)).toList());
   }
 
   @override

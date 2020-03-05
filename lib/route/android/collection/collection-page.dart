@@ -57,10 +57,12 @@ class _CollectionPageState extends State<CollectionPage> {
       this.isShowLoginBanner = true;
     }
     UserProvider.getInstance().isShouldSync().then((v) async {
-      await UserProvider.getInstance().setLastRemindSyncTime();
-      setState(() {
-        this.isShowSyncBanner = v;
-      });
+      if (v) {
+        await UserProvider.getInstance().setLastRemindSyncTime();
+        setState(() {
+          this.isShowSyncBanner = v;
+        });
+      }
     });
   }
 
@@ -76,7 +78,7 @@ class _CollectionPageState extends State<CollectionPage> {
       appBar: AppBar(
         title: Text('收藏'),
         elevation: 1,
-        actions: <Widget>[MaxgaSearchButton(),MaxgaTestButton()],
+        actions: <Widget>[MaxgaSearchButton()],
       ),
       key: scaffoldKey,
       body: ConfirmExitScope(

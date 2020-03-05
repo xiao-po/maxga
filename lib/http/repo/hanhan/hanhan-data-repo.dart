@@ -44,7 +44,7 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
         '${_source.apiDomain}/comicsearch/s.aspx?s=$keywords',
         parser: (res) => parser
             .getMangaListFromLatestUpdate(res.data)
-            .map((manga) => manga.copyWith(sourceKey: _source.key)));
+            .map((manga) => manga.copyWith(sourceKey: _source.key)).toList());
   }
 
   @override

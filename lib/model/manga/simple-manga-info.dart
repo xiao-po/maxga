@@ -95,7 +95,7 @@ class SimpleMangaInfo extends MangaBase {
     return SimpleMangaInfo.fromJson({
       'sourceKey': sourceKey ?? this.sourceKey,
       'authors': authors ?? this.authors,
-      'id': authors ?? this.authors,
+      'id': authors ?? this.id,
       'infoUrl': infoUrl ?? this.infoUrl,
       'status': status ?? this.status,
       'coverImgUrl': coverImgUrl ?? this.coverImgUrl,

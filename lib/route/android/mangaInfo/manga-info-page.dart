@@ -164,8 +164,9 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
               await MangaStorageService.getMangaStatusByUrl(url);
           final Manga resultMangaData = manga;
           chapterList = resultMangaData.chapterList;
-          if (!preMangaData.latestChapter.updateTime
-              .isBefore(preMangaData.latestChapter.updateTime)) {
+          if (preMangaData.latestChapter.updateTime == null ||
+              !preMangaData.latestChapter.updateTime
+                  .isBefore(preMangaData.latestChapter.updateTime)) {
             await MangaStorageService.saveManga(resultMangaData);
           }
           loading = _MangaInfoPageStatus.over;
