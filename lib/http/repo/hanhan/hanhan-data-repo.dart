@@ -27,7 +27,7 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
         '${_source.apiDomain}/dfcomiclist_${page + 1}.htm',
         parser: (res) => parser
             .getMangaListFromLatestUpdate(res.data)
-            .map((manga) => manga.copyWith(sourceKey: _source.key)));
+            .map((manga) => manga.copyWith(sourceKey: _source.key)).toList());
   }
 
   @override
@@ -53,7 +53,7 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
         '${_source.apiDomain}/top/a-${page + 1}.htm',
         parser: (res) => parser
             .getMangaListFromRank(res.data)
-            .map((manga) => manga.copyWith(sourceKey: _source.key)));
+            .map((manga) => manga.copyWith(sourceKey: _source.key)).toList());
   }
 
   @override
@@ -76,7 +76,7 @@ class HanhanDateRepo extends MaxgaDataHttpRepo {
   }
 
   @override
-  Future<String> generateShareLink(Manga manga) {
+  Future<String> generateShareLink(MangaBase manga) {
     return Future.value(manga.infoUrl);
   }
 }

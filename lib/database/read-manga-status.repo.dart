@@ -86,19 +86,20 @@ class MangaReadStatusRepository {
             where: '${MangaReadStatusTableColumns.infoUrl} = ?',
             whereArgs: [infoUrl]
         );
-        var data = await findByUrl(infoUrl);
         return true;
       },
       database: database,
     );
   }
 
-  static updateMangaUpdateTimeByInfoUrl(String infoUrl, DateTime dateTime, {Database database}) {
+  static updateMangaHasUpdateByInfoUrl(String infoUrl, bool hasUpdate, {Database database}) {
     return MaxgaDataBaseUtils.openUpdateTransaction(
       action: (database) async {
         await database.update(
             DatabaseTables.mangaReadStatus,
-            {MangaReadStatusTableColumns.mangaUpdateTime: dateTime.toIso8601String()},
+            {
+              MangaReadStatusTableColumns.mangaHasUpdate: hasUpdate ? 1 : 0,
+            },
             where: '${MangaReadStatusTableColumns.infoUrl} = ?',
             whereArgs: [infoUrl]
         );

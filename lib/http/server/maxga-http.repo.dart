@@ -14,4 +14,8 @@ class MaxgaMangaHttpRepo {
           .toList(growable: false),
     );
   }
+
+  static Future<void> reportHiddenManga(List<int> idList) {
+    return MaxgaServerHttpUtils.post(MaxgaServerApi.reportHiddenManga, idList);
+  }
 }

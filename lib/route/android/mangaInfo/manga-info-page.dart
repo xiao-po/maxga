@@ -58,8 +58,8 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
     _initInfo(url: widget.infoUrl, sourceKey: widget.sourceKey)
         .then((Manga manga) async {
       var isCollected = CollectionProvider.getInstance()
-              .collectionMangaList
-              .indexWhere((item) => item.infoUrl == manga.infoUrl) !=
+          .collectionMangaList
+          .indexWhere((item) => item.infoUrl ==  widget.infoUrl) !=
           -1;
       if (mounted) {
         setState(() {
@@ -125,7 +125,7 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
             MangaInfoCover(
               manga: manga,
               loadEnd: loadOver,
-              lastUpdateChapter: manga?.chapterList?.first ?? Chapter(),
+              lastUpdateChapter: manga?.latestChapter ?? Chapter(),
               source: source,
               coverImageBuilder: widget.coverImageBuilder,
             ),
@@ -173,9 +173,12 @@ class _MangaInfoPageState extends State<MangaInfoPage> {
           this.manga = manga;
           this.readMangaStatus = readMangaStatus;
         } catch (e) {
-          print(e);
-          loading = _MangaInfoPageStatus.error;
-          this.manga = null;
+          if (mounted) {
+            setState(() {
+              loading = _MangaInfoPageStatus.error;
+              this.manga = null;
+            });
+          }
         }
       }),
       Future.delayed(Duration(milliseconds: 500))

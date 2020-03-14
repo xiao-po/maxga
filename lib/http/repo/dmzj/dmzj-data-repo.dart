@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:maxga/http/repo/maxga-data-http-repo.dart';
 import 'package:maxga/http/repo/dmzj/model/dmzj-latest-update-manga.dart';
 import 'package:maxga/http/repo/dmzj/model/dmzj-manga-info.dart';
@@ -11,6 +12,7 @@ import 'package:maxga/model/manga/chapter.dart';
 import 'package:maxga/model/manga/simple-manga-info.dart';
 import 'package:maxga/model/manga/manga.dart';
 import 'package:maxga/model/manga/manga-source.dart';
+import 'package:maxga/service/maxga-server.service.dart';
 
 import 'constants/dmzj-manga-source.dart';
 import 'model/dmzj-search-suggestion.dart';
@@ -19,11 +21,20 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
   MangaSource _source = DmzjMangaSource;
   MangaHttpUtils _httpUtils = MangaHttpUtils(DmzjMangaSource);
 
+  final Function(DmzjMangaInfo mangaInfo) beforeInfoParse;
+
+  DmzjDataRepo({@required this.beforeInfoParse});
+
   @override
   Future<Manga> getMangaInfo(String url) async {
     return _httpUtils.requestMangaSourceApi<Manga>(url,
-        parser: (response) =>
-            DmzjMangaInfo.fromJson(json.decode(response.data)).convertToManga().copyWith(infoUrl: url));
+        parser: (response)  {
+          var mangaInfo = DmzjMangaInfo.fromJson(json.decode(response.data));
+          if(beforeInfoParse != null) {
+            beforeInfoParse(mangaInfo);
+          }
+          return mangaInfo.convertToManga().copyWith(infoUrl: url);
+        });
   }
 
   @override
@@ -89,7 +100,8 @@ class DmzjDataRepo extends MaxgaDataHttpRepo {
   get mangaSource => _source;
 
   @override
-  Future<String> generateShareLink(Manga manga) {
+  Future<String> generateShareLink(MangaBase manga) {
     return Future.value('${_source.domain}/info/${manga.id}.html');
   }
+
 }

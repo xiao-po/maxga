@@ -51,7 +51,7 @@ class HanhanHtmlParser {
     ];
     final chapterStatusList =
         mangaTextInfoEl.children[4].text.replaceFirst('状态：', '').split(' ');
-    final time = DateUtils.convertTimeStringToTimestamp(
+    final time = DateUtils.convertTimeStringToDateTime(
         mangaTextInfoEl.children[5].text.replaceFirst('更新日期：', ''),
         'YYYY-MM-dd');
 
@@ -79,6 +79,9 @@ class HanhanHtmlParser {
       return chapter;
     }).toList(growable: false);
 
+    var lastChapter = chapterList.first.copyWith(
+        updateTime: time
+    );
     return Manga.fromMangaInfoRequest(
         authors: authors,
         types: type,
@@ -90,7 +93,7 @@ class HanhanHtmlParser {
         coverImgUrl: coverImageUrl,
         sourceKey: HanhanMangaSource.key,
         chapterList: chapterList,
-        latestChapter: chapterList.first);
+        latestChapter: lastChapter);
   }
 
   List<String> getChapterImageList(String body, List<String> imageServerList) {

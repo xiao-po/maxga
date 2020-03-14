@@ -259,7 +259,7 @@ class ManhuaduiHtmlParser {
     final types = otherInfoEl.children[1].text.trim().split(' | ');
     final statusString = otherInfoEl.children[2].text.trim();
     final status = statusString.substring(statusString.lastIndexOf(' ') + 1);
-    final time = DateUtils.convertTimeStringToTimestamp(
+    final time = DateUtils.convertTimeStringToDateTime(
         otherInfoEl.children[4].children[1].innerHtml, 'YYYY-MM-dd HH:mm');
 
     final intro = bodyEl.querySelector('.txtDesc').innerHtml;
@@ -281,6 +281,7 @@ class ManhuaduiHtmlParser {
       return chapter;
     }).toList(growable: false)..sort((a, b) => b.order - a.order);
 
+    var lastUpdateChapter = chapterList.first.copyWith(updateTime: time);
     return Manga.fromMangaInfoRequest(
         authors: authors,
         types: types,
@@ -292,7 +293,7 @@ class ManhuaduiHtmlParser {
         coverImgUrl: coverImageUrl,
         sourceKey: ManhuaduiMangaSource.key,
         chapterList: chapterList,
-        latestChapter: chapterList.first);
+        latestChapter: lastUpdateChapter);
   }
 
   SimpleMangaInfo _parseMangaFromUpdate(Element comicNode) {

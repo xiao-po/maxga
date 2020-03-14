@@ -1,4 +1,3 @@
-import 'package:maxga/database/manga-data.repo.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'database-value.dart';
@@ -79,7 +78,7 @@ class _MaxgaDataBaseFirstVersionHelper {
         '${MangaReadStatusTableColumns.lastReadImageIndex} integer,'
         '${MangaReadStatusTableColumns.collected} integer,'
         '${MangaReadStatusTableColumns.collectUpdateTime} text,'
-        '${MangaReadStatusTableColumns.mangaUpdateTime} text'
+        '${MangaReadStatusTableColumns.mangaHasUpdate} integer DEFAULT 0 '
         ');');
   }
 }

@@ -27,7 +27,7 @@ class MangaModelDatabaseUtils {
     value['typeList'] = (map['typeList'] as String).split(',');
     value['latestChapter'] = Chapter.fromJson({
       'title': value['lastChapterTitle'],
-      'updateTime': DateTime.parse(value['lastChapterUpdateTime'])
+      'updateTime': value['lastChapterUpdateTime'] != null ? DateTime.parse(value['lastChapterUpdateTime']) : null
     });
     return Manga.fromJson(value);
   }

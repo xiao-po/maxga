@@ -81,7 +81,7 @@ class ManhuaguiHtmlParser {
     final lastUpdateChapterTitle =
         contList.children[1].querySelector('dd').innerHtml;
 
-    final lastUpdateTime = DateUtils.convertTimeStringToTimestamp(
+    final lastUpdateTime = DateUtils.convertTimeStringToDateTime(
         contList.children[2].querySelector('dd').innerHtml, 'YYYY-MM-dd');
 
     final authors = contList.children[3].querySelector('dd').text.split(',');
@@ -95,6 +95,7 @@ class ManhuaguiHtmlParser {
         .map((el) => _getChapter(el, index--))
         .toList(growable: false);
 
+    var lastUpdateChapter = chapterList.first.copyWith(updateTime: lastUpdateTime);
     return Manga.fromMangaInfoRequest(
         authors: authors,
         types: typeList,
@@ -106,7 +107,7 @@ class ManhuaguiHtmlParser {
         coverImgUrl: coverImageUrl,
         sourceKey: ManhuaguiMangaSource.key,
         chapterList: chapterList,
-        latestChapter: chapterList.first);
+        latestChapter: lastUpdateChapter);
   }
 
   Chapter _getChapter(Element el, int index) {

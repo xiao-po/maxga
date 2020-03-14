@@ -73,6 +73,10 @@ class MaxgaDrawerState extends State<MaxgaDrawer> {
   }
 
   _handleMenuItemChoose(MaxgaMenuItemType type) async {
+
+    if (widget.active == type) {
+      return Navigator.pop(context);
+    }
     switch (type) {
       case MaxgaMenuItemType.collect:
         Navigator.pop(context);

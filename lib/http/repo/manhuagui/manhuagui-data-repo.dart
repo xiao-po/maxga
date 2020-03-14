@@ -74,7 +74,7 @@ class ManhuaguiDataRepo extends MaxgaDataHttpRepo {
   }
 
   @override
-  Future<String> generateShareLink(Manga manga) {
+  Future<String> generateShareLink(MangaBase manga) {
     return Future.value(manga.infoUrl);
   }
 }

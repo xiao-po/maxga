@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 
 import 'chapter.dart';
@@ -7,6 +6,7 @@ import 'manga.dart';
 @immutable
 class SimpleMangaInfo extends MangaBase {
   final Chapter lastUpdateChapter;
+  final bool collected;
 
   /// 准备给 [Manga] 使用的 factory
   SimpleMangaInfo.fromMangaInfo({
@@ -19,19 +19,21 @@ class SimpleMangaInfo extends MangaBase {
     @required String title,
     @required List<String> typeList,
     @required Chapter lastUpdateChapter,
+    bool collected,
   })  : this.lastUpdateChapter = lastUpdateChapter,
+        this.collected = collected ?? false,
         super(
-          sourceKey: sourceKey,
-          authors: authors,
-          id: id,
-          infoUrl: infoUrl,
-          status: status,
-          coverImgUrl: coverImgUrl,
-          title: title,
-          introduce: null,
-          typeList: typeList);
+            sourceKey: sourceKey,
+            authors: authors,
+            id: id,
+            infoUrl: infoUrl,
+            status: status,
+            coverImgUrl: coverImgUrl,
+            title: title,
+            introduce: null,
+            typeList: typeList);
 
-  SimpleMangaInfo.fromMangaRepo({
+  factory SimpleMangaInfo.fromMangaRepo({
     @required String sourceKey,
     List<String> authors,
     @required String id,
@@ -41,43 +43,49 @@ class SimpleMangaInfo extends MangaBase {
     @required String title,
     List<String> typeList,
     Chapter lastUpdateChapter,
-  })  : this.lastUpdateChapter = lastUpdateChapter,
-        super(
-          sourceKey: sourceKey,
-          authors: authors,
-          id: id,
-          infoUrl: infoUrl,
-          status: status,
-          coverImgUrl: coverImgUrl,
-          title: title,
-          introduce: null,
-          typeList: typeList);
+  }) {
+    return SimpleMangaInfo.fromJson({
+      'lastUpdateChapter': lastUpdateChapter,
+      'sourceKey': sourceKey,
+      'authors': authors,
+      'id': id,
+      'infoUrl': infoUrl,
+      'status': status,
+      'coverImgUrl': coverImgUrl,
+      'title': title,
+      'introduce': null,
+      'typeList': typeList,
+    });
+  }
 
   SimpleMangaInfo.fromJson(Map<String, dynamic> json)
       : lastUpdateChapter = json['lastUpdateChapter'],
+
+        collected = json['collected'] ?? false,
         super(
-          sourceKey: json['sourceKey'],
-          authors: json['authors'].cast<String>(),
-          id: json['id'],
-          infoUrl: json['infoUrl'],
-          status: json['status'],
-          coverImgUrl: json['coverImgUrl'],
-          title: json['title'],
-          introduce: json['introduce'],
-          typeList: json['typeList'].cast<String>());
+            sourceKey: json['sourceKey'],
+            authors: json['authors'].cast<String>(),
+            id: json['id'],
+            infoUrl: json['infoUrl'],
+            status: json['status'],
+            coverImgUrl: json['coverImgUrl'],
+            title: json['title'],
+            introduce: json['introduce'],
+            typeList: json['typeList'].cast<String>());
 
   Map<String, dynamic> toJson() => {
-    'sourceKey': sourceKey,
-    'authors': authors,
-    'id': id,
-    'infoUrl': infoUrl,
-    'status': status,
-    'coverImgUrl': coverImgUrl,
-    'title': title,
-    'introduce': introduce,
-    'typeList': typeList,
-    'lastUpdateChapter': lastUpdateChapter
-  };
+        'collected': collected,
+        'sourceKey': sourceKey,
+        'authors': authors,
+        'id': id,
+        'infoUrl': infoUrl,
+        'status': status,
+        'coverImgUrl': coverImgUrl,
+        'title': title,
+        'introduce': introduce,
+        'typeList': typeList,
+        'lastUpdateChapter': lastUpdateChapter
+      };
 
   @override
   SimpleMangaInfo copyWith({
@@ -91,6 +99,7 @@ class SimpleMangaInfo extends MangaBase {
     String introduce,
     List<String> typeList,
     Chapter lastUpdateChapter,
+    bool collected
   }) {
     return SimpleMangaInfo.fromJson({
       'sourceKey': sourceKey ?? this.sourceKey,
@@ -102,7 +111,8 @@ class SimpleMangaInfo extends MangaBase {
       'title': title ?? this.title,
       'introduce': introduce ?? this.introduce,
       'typeList': typeList ?? this.typeList,
-      'lastUpdateChapter': lastUpdateChapter ?? this.lastUpdateChapter
+      'lastUpdateChapter': lastUpdateChapter ?? this.lastUpdateChapter,
+      'collected': collected ?? this.collected,
     });
   }
 }

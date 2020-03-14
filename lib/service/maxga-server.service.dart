@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:maxga/database/collect-manga-data.repo.dart';
 import 'package:maxga/database/collect-status.repo.dart';
 import 'package:maxga/database/manga-data.repo.dart';
 import 'package:maxga/database/read-manga-status.repo.dart';
+import 'package:maxga/http/server/maxga-http.repo.dart';
 import 'package:maxga/http/server/sync-http.repo.dart';
 import 'package:maxga/model/manga/manga.dart';
 import 'package:maxga/model/maxga/collect-status.dart';
@@ -40,9 +43,9 @@ class MaxgaServerService {
           (collectStatus.collectUpdateTime == null ||
               item.collectUpdateTime
                   .isAfter(collectStatus.collectUpdateTime))) {
-        await CollectStatusRepo.update(CollectStatus.fromSyncItem(item.toJson()));
+        await CollectStatusRepo.update(
+            CollectStatus.fromSyncItem(item.toJson()));
       }
-      await CollectionProvider.getInstance().init();
     }
 
 //    var collectStatusList = (await CollectStatusRepo.findAll()) ?? [];
@@ -57,5 +60,20 @@ class MaxgaServerService {
 //    }
 
     return true;
+  }
+
+  static Set<int> shouldReportMangaIdSet = new Set();
+  static Timer lastReportCallTimer;
+
+  static void reportDmzjManga(int id) {
+    if (lastReportCallTimer != null) {
+      lastReportCallTimer.cancel();
+    }
+    shouldReportMangaIdSet.add(id);
+    lastReportCallTimer = Timer(Duration(minutes: 1), () {
+      MaxgaMangaHttpRepo.reportHiddenManga(
+          shouldReportMangaIdSet.toList(growable: false));
+      lastReportCallTimer = null;
+    });
   }
 }

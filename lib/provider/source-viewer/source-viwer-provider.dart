@@ -4,6 +4,7 @@ import 'package:maxga/http/repo/maxga-data-http-repo.dart';
 import 'package:maxga/model/manga/manga.dart';
 import 'package:maxga/model/manga/manga-source.dart';
 import 'package:maxga/model/manga/simple-manga-info.dart';
+import 'package:maxga/provider/public/collection-provider.dart';
 
 import '../../manga-repo-pool.dart';
 
@@ -30,20 +31,29 @@ class MangaSourceViewerPage {
 
   MangaSourceViewerPage(this.title, this.type, this.source);
 
-  Future<List<SimpleMangaInfo>> getMangaList(int page) async {
+  Future<List<SimpleMangaInfo>> _getMangaList(int page) async {
     MaxgaDataHttpRepo repo =
     MangaRepoPool.getInstance().getRepo(key: source.key);
+    List<SimpleMangaInfo> mangaList = [];
     if (type == SourceViewType.latestUpdate) {
-      final mangaList = await repo.getLatestUpdate(page);
+      mangaList = await repo.getLatestUpdate(page);
       debugPrint('更新列表已经加载完毕， 数量：${mangaList.length}');
       initOver = true;
-      return mangaList;
     } else {
-      final mangaList = await repo.getRankedManga(page);
+      mangaList = await repo.getRankedManga(page);
       debugPrint('排行列表已经加载完毕， 数量：${mangaList.length}');
       initOver = true;
-      return mangaList.toList();
     }
+    var provider = CollectionProvider.getInstance();
+    for(var i = 0; i < mangaList.length; i++) {
+      final item = mangaList[i];
+      var index = provider.collectionMangaList.indexWhere((manga) => manga.infoUrl == item.infoUrl);
+      if (index >= 0) {
+        mangaList[i] = item.copyWith(collected: true);
+      }
+    }
+
+    return mangaList.toList();
   }
 
   Future<void> loadNextPage() async {
@@ -52,7 +62,7 @@ class MangaSourceViewerPage {
     }
     try {
       loadState = MangaSourceViewerPageLoadState.loading;
-      final mangaList = await getMangaList(page++);
+      final mangaList = await _getMangaList(page++);
       if (mangaList.length == 0) {
         isLast = true;
       }
@@ -74,7 +84,7 @@ class MangaSourceViewerPage {
     try {
       page = 0;
       loadState = MangaSourceViewerPageLoadState.loading;
-      final mangaList = await getMangaList(page++);
+      final mangaList = await _getMangaList(page++);
       if (mangaList.length == 0) {
         isLast = true;
       }

@@ -10,6 +10,7 @@ import 'package:maxga/service/maxga-server.service.dart';
 import 'package:maxga/service/user.service.dart';
 
 import '../base/base-provider.dart';
+import 'collection-provider.dart';
 
 class UserProvider  extends BaseProvider {
   User user;
@@ -75,7 +76,7 @@ class UserProvider  extends BaseProvider {
     if (diffDays.inDays - this.syncInterval > 1) {
       return true;
     } else  {
-      return DateTime.now().day - this.lastRemindSyncTime.day >= 1;
+      return ( DateTime.now().day - this.lastRemindSyncTime.day -  this.syncInterval) >= 1;
     }
   }
 
@@ -91,6 +92,7 @@ class UserProvider  extends BaseProvider {
   Future<void> sync() async {
     final syncTime = DateTime.now();
     await MaxgaServerService.sync();
+    await CollectionProvider.getInstance().init();
     await LocalStorage.setString(_syncTimeKey, syncTime.toIso8601String());
     this.lastSyncTime = syncTime;
     this.lastRemindSyncTime = syncTime;

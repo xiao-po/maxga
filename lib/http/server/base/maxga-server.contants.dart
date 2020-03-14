@@ -16,4 +16,6 @@ class MaxgaServerApi {
       "/user/password/change?password={password}&oldPassword={oldPassword}";
 
   static String sync = '/user/sync';
+
+  static String reportHiddenManga = '/report/dmzj/hiddenManga';
 }

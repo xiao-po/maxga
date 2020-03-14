@@ -123,3 +123,35 @@ class ForceUpdateDialog extends StatelessWidget{
 //
 //
 //}
+
+class OptionDialog extends StatelessWidget {
+  final String title;
+
+  final List<Widget> children;
+
+  const OptionDialog({Key key, @required this.title, this.children})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    const optionTextStyle = TextStyle(fontSize: 18);
+    return Dialog(
+      child: Padding(
+        padding: EdgeInsets.only(bottom: 10),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.only(left: 20, top: 20, bottom: 20),
+              child: Text(title,
+                  textAlign: TextAlign.left,
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            ),
+            ...children
+          ],
+        ),
+      ),
+    );
+  }
+}

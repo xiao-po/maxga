@@ -1,4 +1,7 @@
 import 'package:flutter/cupertino.dart';
+import 'package:maxga/base/delay.dart';
+import 'package:maxga/base/error/maxga-http-error.dart';
+import 'package:maxga/base/status/update-status.dart';
 import 'package:maxga/http/repo/maxga-data-http-repo.dart';
 import 'package:maxga/manga-repo-pool.dart';
 import 'package:maxga/model/manga/manga.dart';
@@ -6,7 +9,48 @@ import 'package:maxga/model/maxga/collected-manga.dart';
 import 'package:maxga/provider/base/base-provider.dart';
 import 'package:maxga/service/manga-read-storage.service.dart';
 
-enum CollectionLoadingState { loading, over, error, empty }
+class UpdateCollectionMangaResult {
+  int get failedCount =>
+      timeoutMangaList.length +
+      parserErrorMangaList.length +
+      unknownErrorMangaList.length;
+
+  int get updatedCount => updatedMangaList.length;
+
+  int get notUpdateCount => notUpdateMangaList.length;
+
+  final List<CollectedManga> timeoutMangaList = [];
+  final List<CollectedManga> parserErrorMangaList = [];
+  final List<CollectedManga> unknownErrorMangaList = [];
+  final List<CollectedManga> updatedMangaList = [];
+  final List<CollectedManga> notUpdateMangaList = [];
+
+  UpdateCollectionMangaResult();
+
+  addToResult(CollectedManga manga) {
+    switch (manga.updateStatus) {
+      case CollectedUpdateStatus.hasUpdate:
+        return updatedMangaList.add(manga);
+      case CollectedUpdateStatus.timeout:
+        return timeoutMangaList.add(manga);
+      case CollectedUpdateStatus.parserError:
+        return parserErrorMangaList.add(manga);
+      case CollectedUpdateStatus.unknownError:
+        return unknownErrorMangaList.add(manga);
+      case CollectedUpdateStatus.noUpdate:
+        return notUpdateMangaList.add(manga);
+    }
+  }
+
+  List<CollectedManga> getAllManga() {
+    return []
+      ..addAll(updatedMangaList)
+      ..addAll(timeoutMangaList)
+      ..addAll(parserErrorMangaList)
+      ..addAll(unknownErrorMangaList)
+      ..addAll(notUpdateMangaList);
+  }
+}
 
 class CollectionProvider extends BaseProvider {
   List<CollectedManga> _collectedMangaList;
@@ -16,9 +60,13 @@ class CollectionProvider extends BaseProvider {
   bool get loadOver => this._collectedMangaList != null;
 
   bool get isEmpty => this._collectedMangaList?.length == 0 ?? true;
-  bool _isOnUpdate = false;
+  CollectionUpdateStatus updateStatus = CollectionUpdateStatus.none;
+
+  UpdateCollectionMangaResult updateResult;
 
   static CollectionProvider _instance;
+
+  bool get hasCollectedManga => _collectedMangaList.length > 0;
 
   static CollectionProvider getInstance() {
     if (_instance == null) {
@@ -32,7 +80,11 @@ class CollectionProvider extends BaseProvider {
   Future<void> init() async {
     try {
       final collectedMangaList = await MangaStorageService.getCollectedManga();
+      collectedMangaList.sort((a, b) => b.lastUpdateChapter.updateTime
+          .compareTo(a.lastUpdateChapter.updateTime));
       this._collectedMangaList = collectedMangaList;
+      updateResult = null;
+      updateStatus = CollectionUpdateStatus.none;
     } catch (e) {
       this._collectedMangaList = [];
       debugPrint('加载 collection list 失败');
@@ -41,34 +93,32 @@ class CollectionProvider extends BaseProvider {
     }
   }
 
-  Future<CollectionMangaUpdateResult> checkAndUpdateCollectManga() async {
-    final CollectionMangaUpdateResult result = CollectionMangaUpdateResult();
-    var index = 0;
-    if (this._isOnUpdate) {
+  Future<void> checkAndUpdateCollectManga() async {
+    if (updateStatus == CollectionUpdateStatus.processing) {
       return null;
     }
-    this._isOnUpdate = true;
-
-    await Future.wait(
-        this._collectedMangaList.toList(growable: false).map((manga) async {
-      var sourceKey = manga.sourceKey;
-      var infoUrl = manga.infoUrl;
-      var i = index++;
-      Manga currentMangaInfo = await _getCurrentMangaStatus(sourceKey, infoUrl);
-      if (currentMangaInfo.latestChapter.updateTime.isAfter(manga.lastUpdateChapter.updateTime)) {
-        await MangaStorageService.updateManga(currentMangaInfo);
-        this._collectedMangaList[i] = CollectedManga.fromMangaInfo(
-          mangaUpdateTime: DateTime.now(),
-          manga: currentMangaInfo,
-          readUpdateTime: manga.readUpdateTime,
-        );
-      }
-      return currentMangaInfo;
-    }));
-
-    this._isOnUpdate = false;
+    this.updateStatus = CollectionUpdateStatus.processing;
     notifyListeners();
-    return result;
+    var updateResult = UpdateCollectionMangaResult();
+    var iterator = _collectedMangaList.iterator;
+
+    await Future.wait(List.generate(
+        5,
+        (i) => _updateChannel(iterator, afterUpdate: (result) {
+              updateResult.addToResult(result);
+            })));
+
+    this._collectedMangaList = updateResult.getAllManga()
+      ..sort((a, b) => b.lastUpdateChapter.updateTime
+          .compareTo(a.lastUpdateChapter.updateTime));
+    this.updateResult = updateResult;
+    if (updateResult.failedCount > 0) {
+      this.updateStatus = CollectionUpdateStatus.warning;
+    } else {
+      this.updateStatus = CollectionUpdateStatus.success;
+    }
+    await LongAnimationDelay();
+    notifyListeners();
   }
 
   Future<Manga> _getCurrentMangaStatus(String sourceKey, String infoUrl) async {
@@ -93,7 +143,9 @@ class CollectionProvider extends BaseProvider {
   Future<bool> setMangaNoUpdate(CollectedManga manga) async {
     await MangaStorageService.updateReadTime(manga);
     var index = this._collectedMangaList.indexOf(manga);
-    this._collectedMangaList[index] = manga.copyWith(readUpdateTime: DateTime.now());
+    this._collectedMangaList[index] = manga.copyWith(
+        readUpdateTime: DateTime.now(),
+        updateStatus: CollectedUpdateStatus.noUpdate);
     notifyListeners();
     return true;
   }
@@ -105,15 +157,10 @@ class CollectionProvider extends BaseProvider {
             .collectionMangaList
             .indexWhere((item) => manga.infoUrl == item.infoUrl);
         if (index == -1) {
-          this._collectedMangaList.add(CollectedManga.fromMangaInfo(
-                mangaUpdateTime: manga.chapterList.first.updateTime,
-                manga: manga,
-                readUpdateTime: DateTime.now(),
-              ));
+          this._collectedMangaList.add(CollectedManga.fromMangaInfo( manga: manga));
         }
       } else {
-        this
-            ._collectedMangaList
+        this._collectedMangaList
             .removeWhere((item) => item.infoUrl == manga.infoUrl);
       }
       await MangaStorageService.setMangaCollectedStatus(manga,
@@ -141,10 +188,51 @@ class CollectionProvider extends BaseProvider {
     this._collectedMangaList = [];
     notifyListeners();
   }
-}
 
-class CollectionMangaUpdateResult {
-  int updateCount = 0;
-  int failCount = 0;
-  int timeoutCount = 0;
+  _updateChannel(Iterator<CollectedManga> iterator,
+      {@required ValueChanged<CollectedManga> afterUpdate}) async {
+    var isLast = !(iterator.moveNext());
+    if (isLast) return null;
+    var manga = iterator.current;
+    var sourceKey = manga.sourceKey;
+    var infoUrl = manga.infoUrl;
+
+    try {
+      Manga currentMangaInfo = await _getCurrentMangaStatus(sourceKey, infoUrl);
+      if (currentMangaInfo.latestChapter.updateTime
+          .isAfter(manga.lastUpdateChapter.updateTime)) {
+        await MangaStorageService.updateManga(currentMangaInfo);
+        afterUpdate(CollectedManga.fromMangaInfo(
+          manga: currentMangaInfo,
+        ).copyWith(updateStatus: CollectedUpdateStatus.hasUpdate));
+      } else {
+        afterUpdate(CollectedManga.fromMangaInfo(
+          manga: currentMangaInfo,
+          hasUpdate: manga.hasUpdate,
+        ));
+      }
+    } on MangaRepoError catch (e) {
+      switch (e.type) {
+        case MangaHttpErrorType.NULL_PARAM:
+        case MangaHttpErrorType.ERROR_PARAM:
+        case MangaHttpErrorType.RESPONSE_ERROR:
+          afterUpdate(
+              manga.copyWith(updateStatus: CollectedUpdateStatus.unknownError));
+          break;
+        case MangaHttpErrorType.CONNECT_TIMEOUT:
+          afterUpdate(
+              manga.copyWith(updateStatus: CollectedUpdateStatus.timeout));
+          break;
+        case MangaHttpErrorType.PARSE_ERROR:
+          afterUpdate(
+              manga.copyWith(updateStatus: CollectedUpdateStatus.parserError));
+          break;
+      }
+    } catch (e) {
+      afterUpdate(
+          manga.copyWith(updateStatus: CollectedUpdateStatus.unknownError));
+    }
+
+    await _updateChannel(iterator, afterUpdate: afterUpdate);
+  }
 }

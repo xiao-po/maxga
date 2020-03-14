@@ -1,61 +1,62 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
+import 'package:maxga/base/status/update-status.dart';
+import 'package:maxga/database/database-value.dart';
 import 'package:maxga/model/manga/chapter.dart';
 import 'package:maxga/model/manga/manga.dart';
 import 'package:maxga/model/manga/simple-manga-info.dart';
 
 @immutable
 class CollectedManga extends SimpleMangaInfo {
-  final DateTime mangaUpdateTime;
-  final DateTime readUpdateTime;
+  final CollectedUpdateStatus updateStatus;
 
-  bool get hasUpdate => mangaUpdateTime?.isAfter(readUpdateTime ?? DateTime(2000)) ?? false;
+  bool get hasUpdate => updateStatus == CollectedUpdateStatus.hasUpdate;
 
   factory CollectedManga.fromDbJson(Map<String, dynamic> map) {
-    map['mangaUpdateTime'] = map['mangaUpdateTime'] != null
-        ? DateTime.parse(map['mangaUpdateTime'])
-        : null;
-    map['readUpdateTime'] = map['updateTime'] != null
-        ? DateTime.parse(map['updateTime'])
-        : null;
     var lastUpdateChapter = Chapter.fromJson({
       'title': map['lastChapterTitle'],
-      'updateTime':
-          DateTime.parse(map['lastChapterUpdateTime'])
+      'updateTime': map['lastChapterUpdateTime'] != null
+          ? DateTime.parse(map['lastChapterUpdateTime'])
+          : null,
     });
+    map['updateStatus'] = map[MangaReadStatusTableColumns.mangaHasUpdate] == 1
+        ? CollectedUpdateStatus.hasUpdate
+        : CollectedUpdateStatus.noUpdate;
     map['authors'] = (map['authors'] as String).split(',');
     map['typeList'] = (map['typeList'] as String).split(',');
     map['lastUpdateChapter'] = lastUpdateChapter;
+    map['collected'] = true;
     return CollectedManga.fromJson(map);
   }
 
-  Map<String, dynamic> toJson() => super.toJson()
-    ..addAll({
-      'mangaUpdateTime': mangaUpdateTime,
-      'readUpdateTime': readUpdateTime,
-    });
+  Map<String, dynamic> toJson() => super.toJson();
 
-  Map<String, dynamic> toDbJson() => toJson()
-    ..addAll({
-      'lastChapterTitle': lastUpdateChapter.title,
-      'lastChapterUpdateTime': lastUpdateChapter.updateTime.toIso8601String(),
-    });
+  Map<String, dynamic> toDbJson() {
+    var json = toJson()
+      ..addAll({
+        'lastChapterTitle': lastUpdateChapter.title,
+        'lastChapterUpdateTime': lastUpdateChapter.updateTime.toIso8601String(),
+      });
+    json[MangaReadStatusTableColumns.mangaHasUpdate] =
+        updateStatus == CollectedUpdateStatus.hasUpdate;
+    return json;
+  }
 
   @override
-  CollectedManga copyWith(
-      {String sourceKey,
-      List<String> authors,
-      String id,
-      String infoUrl,
-      String status,
-      String coverImgUrl,
-      String title,
-      String introduce,
-      List<String> typeList,
-      Chapter lastUpdateChapter,
-      DateTime mangaUpdateTime,
-      DateTime readUpdateTime}) {
+  CollectedManga copyWith({
+    String sourceKey,
+    List<String> authors,
+    String id,
+    String infoUrl,
+    String status,
+    String coverImgUrl,
+    String title,
+    CollectedUpdateStatus updateStatus,
+    String introduce,
+    List<String> typeList,
+    Chapter lastUpdateChapter,
+    DateTime readUpdateTime,
+    bool collected,
+  }) {
     return CollectedManga.fromJson({
       'sourceKey': sourceKey ?? this.sourceKey,
       'authors': authors ?? this.authors,
@@ -66,33 +67,32 @@ class CollectedManga extends SimpleMangaInfo {
       'title': title ?? this.title,
       'introduce': introduce ?? this.introduce,
       'typeList': typeList ?? this.typeList,
-      'mangaUpdateTime': mangaUpdateTime ?? this.mangaUpdateTime,
-      'readUpdateTime': readUpdateTime ?? this.readUpdateTime,
+      'updateStatus': updateStatus ?? this.updateStatus,
       'lastUpdateChapter': lastUpdateChapter ?? this.lastUpdateChapter,
+      'collected' : true,
     });
   }
 
   CollectedManga.fromJson(Map<String, Object> json)
-      : mangaUpdateTime = json['mangaUpdateTime'],
-        readUpdateTime =  json['readUpdateTime'],
-        super.fromJson(json);
+      : updateStatus = json['updateStatus'] ?? CollectedUpdateStatus.noUpdate,
+        super.fromJson(json..addAll({'collected': true}));
 
-  CollectedManga.fromMangaInfo(
-      {@required Manga manga,
-      DateTime mangaUpdateTime,
-      DateTime readUpdateTime})
-      : mangaUpdateTime = mangaUpdateTime,
-        readUpdateTime = readUpdateTime,
-        super.fromJson({
-          'sourceKey': manga.sourceKey,
-          'authors': manga.authors,
-          'id': manga.id,
-          'infoUrl': manga.infoUrl,
-          'status': manga.status,
-          'coverImgUrl': manga.coverImgUrl,
-          'title': manga.title,
-          'introduce': manga.introduce,
-          'typeList': manga.typeList,
-          'lastUpdateChapter': manga.latestChapter,
-        });
+  factory CollectedManga.fromMangaInfo(
+      {@required Manga manga, bool hasUpdate = false}) {
+    return CollectedManga.fromJson({
+      'sourceKey': manga.sourceKey,
+      'authors': manga.authors,
+      'id': manga.id,
+      'infoUrl': manga.infoUrl,
+      'status': manga.status,
+      'coverImgUrl': manga.coverImgUrl,
+      'title': manga.title,
+      'introduce': manga.introduce,
+      'typeList': manga.typeList,
+      'lastUpdateChapter': manga.latestChapter,
+      'updateStatus': hasUpdate
+          ? CollectedUpdateStatus.hasUpdate
+          : CollectedUpdateStatus.noUpdate,
+    });
+  }
 }

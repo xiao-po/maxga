@@ -16,7 +16,6 @@ class MaxgaSyncItem {
   DateTime readUpdateTime;
   bool collected;
   DateTime collectUpdateTime;
-  DateTime mangaUpdateTime;
 
   MaxgaSyncItem.fromJson(Map<String, dynamic> json)
       : sourceKey = json['sourceKey'],
@@ -34,8 +33,7 @@ class MaxgaSyncItem {
         lastReadImageIndex = json['lastReadImageIndex'],
         readUpdateTime = json['readUpdateTime'] != null ? DateTime.parse(json['readUpdateTime']):null,
         collected = json['collected'],
-        collectUpdateTime = json['collectUpdateTime'] != null ? DateTime.parse(json['collectUpdateTime']):null,
-        mangaUpdateTime = json['mangaUpdateTime'] != null ? DateTime.parse(json['mangaUpdateTime']):null;
+        collectUpdateTime = json['collectUpdateTime'] != null ? DateTime.parse(json['collectUpdateTime']):null;
 
   Map<String, dynamic> toJson() => {
         'sourceKey': sourceKey,
@@ -53,8 +51,7 @@ class MaxgaSyncItem {
         'lastReadImageIndex': lastReadImageIndex,
         'readUpdateTime': readUpdateTime?.toIso8601String() ?? null,
         'collected': collected,
-        'collectUpdateTime': collectUpdateTime?.toIso8601String() ?? null,
-        'mangaUpdateTime': mangaUpdateTime?.toIso8601String() ?? null
+        'collectUpdateTime': collectUpdateTime?.toIso8601String() ?? null
       };
 
 

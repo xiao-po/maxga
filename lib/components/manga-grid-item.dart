@@ -1,7 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:maxga/model/manga/manga.dart';
+import 'package:maxga/base/clipper/TriangleClipper.dart';
+import 'package:maxga/base/status/update-status.dart';
 import 'package:maxga/model/manga/manga-source.dart';
 import 'package:maxga/model/maxga/collected-manga.dart';
 
@@ -28,11 +29,7 @@ class MangaGridItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var gridCover = buildCover();
-    if (manga.hasUpdate) {
-      gridCover = Stack(
-          fit: StackFit.expand,
-          children: <Widget>[gridCover, buildHasUpdateIcon()]);
-    }
+    gridCover = addIconToCover(gridCover);
     return Container(
       margin: EdgeInsets.only(top: 10, bottom: 10, left: 5, right: 5),
       child: Column(
@@ -73,12 +70,49 @@ class MangaGridItem extends StatelessWidget {
               Text(source.name,
                   textAlign: TextAlign.left,
                   style: TextStyle(
-                      fontSize: 12,color: textColor, textBaseline: TextBaseline.alphabetic))
+                      fontSize: 12,
+                      color: textColor,
+                      textBaseline: TextBaseline.alphabetic))
             ],
           ),
         ],
       ),
     );
+  }
+
+  Widget addIconToCover(Widget gridCover) {
+    if (manga.updateStatus == CollectedUpdateStatus.noUpdate) {
+      return gridCover;
+    }
+    if (manga.updateStatus == CollectedUpdateStatus.hasUpdate) {
+      return  Stack(
+          fit: StackFit.expand,
+          children: <Widget>[gridCover, buildHasUpdateIcon()]);
+    }
+    Color errorColor =  Colors.orange;
+    switch (manga.updateStatus) {
+      case CollectedUpdateStatus.timeout:
+        errorColor =  Colors.orange;
+        break;
+      case CollectedUpdateStatus.parserError:
+      case CollectedUpdateStatus.unknownError:
+      default:
+        errorColor = Colors.deepPurpleAccent;
+    }
+    if (manga.updateStatus == CollectedUpdateStatus.hasUpdate) {}
+    return  Stack(fit: StackFit.expand, children: <Widget>[
+      gridCover,
+      Positioned(
+        right: 0,
+        child: ClipTriangle(
+          child: Container(
+            height: 20,
+            width: 20,
+            color: errorColor,
+          ),
+        ),
+      )
+    ]);;
   }
 
   Widget buildCover() {

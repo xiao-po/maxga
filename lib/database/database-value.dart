@@ -45,7 +45,7 @@ class MangaReadStatusTableColumns {
   static const String readUpdateTime = 'updateTime';
   static const String collected = 'collected';
   static const String collectUpdateTime = 'collectUpdateTime';
-  static const String mangaUpdateTime = 'mangaUpdateTime';
+  static const String mangaHasUpdate = 'mangaHasUpdate';
 
 
   static List<String> values() {
@@ -57,7 +57,7 @@ class MangaReadStatusTableColumns {
       MangaReadStatusTableColumns.readUpdateTime,
       MangaReadStatusTableColumns.collected,
       MangaReadStatusTableColumns.collectUpdateTime,
-      MangaReadStatusTableColumns.mangaUpdateTime
+      MangaReadStatusTableColumns.mangaHasUpdate,
     ];
   }
 }

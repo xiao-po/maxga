@@ -70,5 +70,21 @@ class MaxgaUtils {
     return false;
 
   }
+  static Future<bool> shareImage(String path) async {
+    if (Platform.isIOS) {
+      return false;
+    }
+
+    final platform = MethodChannel(CHANNEL);
+    //通知安卓返回,到手机桌面
+    try {
+      final bool out = await platform.invokeMethod('shareImage', path);
+      return out;
+    } on PlatformException catch (e) {
+      debugPrint(e.toString());
+    }
+    return false;
+
+  }
 }
 

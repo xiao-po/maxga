@@ -27,7 +27,7 @@ class MangaStorageService {
     bool isSaveToMangaTableSuccess = false;
     if (isMangaExist) {
       isSaveToMangaTableSuccess = await MangaDataRepository.update(manga);
-      isSaveToMangaTableSuccess = await updateMangaUpdateTime(manga);
+      isSaveToMangaTableSuccess = await updateMangaUpdateTime(manga.infoUrl, true);
     } else {
       throw MaxgaSqlError();
     }
@@ -131,11 +131,12 @@ class MangaStorageService {
     await MangaReadStatusRepository.deleteAll();
   }
 
-  static updateMangaUpdateTime(MangaBase mangaBase) async {
-    await MangaReadStatusRepository.updateMangaUpdateTimeByInfoUrl(mangaBase.infoUrl, DateTime.now());
+  static updateMangaUpdateTime(String infoUrl, bool hasUpdate) async {
+    await MangaReadStatusRepository.updateMangaHasUpdateByInfoUrl(infoUrl, hasUpdate);
   }
 
   static updateReadTime(MangaBase mangaBase) async {
     await MangaReadStatusRepository.updateReadUpdateTimeByInfoUrl(mangaBase.infoUrl, DateTime.now());
+    await updateMangaUpdateTime(mangaBase.infoUrl, false);
   }
 }

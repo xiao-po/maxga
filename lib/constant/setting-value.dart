@@ -29,6 +29,7 @@ enum MaxgaSettingItemType {
   clearData,
   defaultIndexPage,
   defaultMangaSource,
+  autoReportDmzjHiddenManga,
 }
 
 enum DefaultIndexPage {
@@ -122,6 +123,14 @@ const _ApplicationSettingValueList = [
     type: MaxgaSettingListTileType.select,
     title: '默认漫画源',
     value: DmzjMangaSourceKey,
+    category: MaxgaSettingCategoryType.application,
+  ),
+  MaxgaSettingItem(
+    key: MaxgaSettingItemType.autoReportDmzjHiddenManga,
+    type: MaxgaSettingListTileType.checkbox,
+    title: '自动上报被隐藏的漫画',
+    subTitle: '协助我们更新被动漫之家隐藏的漫画',
+    value: '0',
     category: MaxgaSettingCategoryType.application,
   ),
   MaxgaSettingItem(

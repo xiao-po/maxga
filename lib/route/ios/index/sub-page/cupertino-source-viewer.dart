@@ -190,7 +190,7 @@ class _CupertinoTabItem extends StatelessWidget {
           child: Text(label, style: defaultTextStyle.copyWith(color: theme.accentColor)),
         ),
           Container(
-            child: Icon(MaxgaIcons.deltaTop, size: 10, color: theme.primaryColor,),
+//            child: Icon(MaxgaIcons.deltaTop, size: 10, color: theme.primaryColor,),
           )
       ];
     } else {

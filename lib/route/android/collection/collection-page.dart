@@ -2,24 +2,23 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:maxga/manga-repo-pool.dart';
 import 'package:maxga/base/delay.dart';
 import 'package:maxga/base/drawer/drawer-menu-item.dart';
-import 'package:maxga/components/manga-grid-item.dart';
-import 'package:maxga/components/base/manga-cover-image.dart';
 import 'package:maxga/components/base/confirm-exit-scope.dart';
+import 'package:maxga/components/base/manga-cover-image.dart';
+import 'package:maxga/components/button/float-loading-button.dart';
 import 'package:maxga/components/button/search-button.dart';
 import 'package:maxga/components/dialog/circular-progress-dialog.dart';
 import 'package:maxga/components/dialog/dialog.dart';
-import 'package:maxga/model/manga/manga.dart';
+import 'package:maxga/components/manga-grid-item.dart';
+import 'package:maxga/manga-repo-pool.dart';
 import 'package:maxga/model/maxga/collected-manga.dart';
 import 'package:maxga/model/maxga/maxga-release-info.dart';
 import 'package:maxga/provider/public/collection-provider.dart';
 import 'package:maxga/provider/public/user-provider.dart';
 import 'package:maxga/route/android/collection/components/banner.dart';
-import 'package:maxga/route/android/user/base/login-page-result.dart';
 import 'package:maxga/route/android/user/auth-page.dart';
-import 'package:maxga/route/android/error-page/error-page.dart';
+import 'package:maxga/route/android/user/base/login-page-result.dart';
 import 'package:maxga/service/update-service.dart';
 import 'package:provider/provider.dart';
 
@@ -39,6 +38,9 @@ class _CollectionPageState extends State<CollectionPage> {
 
   MaxgaReleaseInfo nextVersion;
 
+  ScrollController controller;
+  bool showFab = true;
+
   bool isShowUpdateBanner = false;
   bool isShowLoginBanner = false;
   bool isShowSyncBanner = false;
@@ -46,6 +48,30 @@ class _CollectionPageState extends State<CollectionPage> {
   @override
   void initState() {
     super.initState();
+    controller = ScrollController();
+    double scrollUpDistance = 0;
+    double scrollDownDistance = 0;
+    double lastOffset = 0;
+    controller.addListener(() {
+      if (lastOffset > controller.offset) {
+        scrollUpDistance += lastOffset - controller.offset;
+        scrollDownDistance = 0;
+        if (scrollUpDistance > 50) {
+          setState(() {
+            showFab = true;
+          });
+        }
+      } else {
+        scrollDownDistance += controller.offset - lastOffset;
+        scrollUpDistance = 0;
+        if (scrollDownDistance > 50) {
+          setState(() {
+            showFab = false;
+          });
+        }
+      }
+      lastOffset = controller.offset;
+    });
     if (Platform.isAndroid) {
       UpdateService.isTodayChecked().then((v) {
         if (!v) {
@@ -68,8 +94,7 @@ class _CollectionPageState extends State<CollectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    Color textColor = Colors.grey[500];
-
+    CollectionProvider provider = Provider.of<CollectionProvider>(context);
     return Scaffold(
       drawer: MaxgaDrawer(
         active: MaxgaMenuItemType.collect,
@@ -82,8 +107,11 @@ class _CollectionPageState extends State<CollectionPage> {
       ),
       key: scaffoldKey,
       body: ConfirmExitScope(
-        child: buildBody(),
+        child: buildBody(provider),
       ),
+      floatingActionButton: provider.hasCollectedManga && showFab
+          ? FloatingRefreshButton()
+          : null,
     );
   }
 
@@ -95,7 +123,9 @@ class _CollectionPageState extends State<CollectionPage> {
     try {
       final result = await UpdateService.checkUpdateStatus();
       if (result.status == MaxgaUpdateStatus.mustUpdate) {
-        showDialog(context: context, child: ForceUpdateDialog(url: result.releaseInfo.url));
+        showDialog(
+            context: context,
+            child: ForceUpdateDialog(url: result.releaseInfo.url));
       } else if (result.status == MaxgaUpdateStatus.hasUpdate) {
         isShowUpdateBanner = true;
       }
@@ -114,8 +144,7 @@ class _CollectionPageState extends State<CollectionPage> {
             ));
   }
 
-  Widget buildBody() {
-    CollectionProvider provider = Provider.of<CollectionProvider>(context);
+  Widget buildBody(CollectionProvider provider) {
     if (!provider.loadOver) {
       return Column(
         children: <Widget>[
@@ -158,18 +187,16 @@ class _CollectionPageState extends State<CollectionPage> {
             .toList(growable: false),
       );
 
-      return RefreshIndicator(
-          onRefresh: () => this.updateCollectedManga(),
-          child: CustomScrollView(
-            slivers: <Widget>[
-              ...buildBannerList()
-                  .map((banner) => SliverToBoxAdapter(
-                        child: banner,
-                      ))
-                  .toList(),
-              gridView,
-            ],
-          ));
+      return CustomScrollView(
+        slivers: <Widget>[
+          ...buildBannerList()
+              .map((banner) => SliverToBoxAdapter(
+                    child: banner,
+                  ))
+              .toList(),
+          gridView,
+        ],
+      );
     }
   }
 
@@ -237,46 +264,24 @@ class _CollectionPageState extends State<CollectionPage> {
   }
 
   startRead(CollectedManga item) async {
-    Provider.of<CollectionProvider>(context).setMangaNoUpdate(item);
+    if (item.hasUpdate) {
+      LongAnimationDelay().then(
+              (v) => Provider.of<CollectionProvider>(context).setMangaNoUpdate(item));
+    }
     await Navigator.push(context, MaterialPageRoute(builder: (context) {
       return MangaInfoPage(
-          infoUrl: item.infoUrl,
-          sourceKey: item.sourceKey,
-          title: item.title,
-          coverImageBuilder: (context) => MangaCoverImage(
-                source: MangaRepoPool.getInstance()
-                    .getMangaSourceByKey(item.sourceKey),
-                url: item.coverImgUrl,
-                tagPrefix: widget.name,
-                fit: BoxFit.cover,
-              ), );
+        infoUrl: item.infoUrl,
+        sourceKey: item.sourceKey,
+        title: item.title,
+        coverImageBuilder: (context) => MangaCoverImage(
+          source:
+              MangaRepoPool.getInstance().getMangaSourceByKey(item.sourceKey),
+          url: item.coverImgUrl,
+          tagPrefix: widget.name,
+          fit: BoxFit.cover,
+        ),
+      );
     }));
-  }
-
-  updateCollectedManga() {
-    final c = new Completer<bool>();
-    updateCollectionAction().then((v) {
-      if (!c.isCompleted) {
-        c.complete(true);
-      }
-    });
-    Future.delayed(Duration(seconds: 3)).then((v) {
-      if (!c.isCompleted) {
-        c.complete(true);
-      }
-    });
-    return c.future;
-  }
-
-  Future updateCollectionAction() async {
-    final CollectionProvider collectionState =
-        Provider.of<CollectionProvider>(context);
-    final result = await collectionState.checkAndUpdateCollectManga();
-    if (result != null) {
-      scaffoldKey.currentState.showSnackBar(SnackBar(
-        content: Text('收藏漫画已经更新结束'),
-      ));
-    }
   }
 
   void toLogin() async {

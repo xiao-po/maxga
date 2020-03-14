@@ -18,6 +18,7 @@ class MangaListTile extends StatelessWidget {
 
   MangaListTile(
       {this.onTap,
+
       this.cover,
       this.coverBuilder,
       @required this.title,
@@ -211,12 +212,15 @@ class MangaListTileExtra extends StatelessWidget {
           alignment: Alignment.centerRight,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
-            children: [manga.lastUpdateChapter.title ?? '', updateTime]
-                .map((el) => Text(el,
-                    textAlign: TextAlign.right,
-                    overflow: TextOverflow.ellipsis,
-                    style: textStyle))
-                .toList(growable: false),
+            children: [
+              if (manga.collected) Icon(Icons.favorite, color: textColor),
+              ... [manga.lastUpdateChapter.title ?? '', updateTime]
+                  .map((el) => Text(el,
+                  textAlign: TextAlign.right,
+                  overflow: TextOverflow.ellipsis,
+                  style: textStyle))
+                  .toList(growable: false)
+            ],
           ));
     }
     return MangaExtra(
