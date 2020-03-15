@@ -143,7 +143,7 @@ class OptionDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.only(left: 20, top: 20, bottom: 20),
+              padding: EdgeInsets.all(20.0),
               child: Text(title,
                   textAlign: TextAlign.left,
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),

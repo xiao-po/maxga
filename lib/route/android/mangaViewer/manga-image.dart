@@ -65,13 +65,11 @@ class _MangaImageState extends State<MangaImage>
     switch (state.extendedImageLoadState) {
       case LoadState.loading:
         return MangaImagePlaceHolder(index: widget.index);
-
       case LoadState.completed:
-        return ExtendedImageGesture(state, null);
+        return  ExtendedImageGesture(state, null);
       case LoadState.failed:
-        return buildFailedPlaceHolder(state);
       default:
-        throw Error();
+        return buildFailedPlaceHolder(state);
     }
   }
 

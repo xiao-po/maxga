@@ -47,7 +47,7 @@ class UserProvider  extends BaseProvider {
     if (lastRemindSyncTimeString != null) {
       this.lastRemindSyncTime = DateTime.parse(lastRemindSyncTimeString);
     } else {
-      this.lastRemindSyncTime = DateTime.now();
+      this.lastRemindSyncTime = null;
     }
     if (this.isFirstOpen) {
       await this._setFirstOpenTime();

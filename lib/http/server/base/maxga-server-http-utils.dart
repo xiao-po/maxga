@@ -11,7 +11,7 @@ import 'maxga-server-response-status.dart';
 
 typedef _ModelFactory<T> = T Function(dynamic json);
 
-const MaxgaServer = "http://xiaopo.xyz:8080";
+const MaxgaServer = "https://maxga.xiaopo.moe";
 
 class MaxgaServerHttpUtils {
 

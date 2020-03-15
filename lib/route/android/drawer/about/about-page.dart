@@ -144,9 +144,16 @@ class _AboutPageState extends State<AboutPage> {
     setState(() {});
     final result = await UpdateService.checkUpdateStatusWithoutIgnore();
     if (result != null) {
-      this.checkUpdateLoading = CheckUpdateStatus.shouldUpdate;
-    } else {
-      this.checkUpdateLoading = CheckUpdateStatus.notUpdate;
+      switch(result.status) {
+
+        case MaxgaUpdateStatus.hasUpdate:
+        case MaxgaUpdateStatus.mustUpdate:
+          this.checkUpdateLoading = CheckUpdateStatus.shouldUpdate;
+          break;
+        case MaxgaUpdateStatus.noUpdate:
+          this.checkUpdateLoading = CheckUpdateStatus.notUpdate;
+          break;
+      }
     }
     this.nextVersion = result.releaseInfo;
     if (mounted) {

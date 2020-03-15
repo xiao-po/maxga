@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maxga/components/base/zero-divider.dart';
 import 'package:maxga/manga-repo-pool.dart';
 import 'package:maxga/components/card/card.dart';
 import 'package:maxga/components/base/manga-cover-image.dart';
@@ -62,7 +63,7 @@ class _HistToryPageState extends State<HistoryPage> {
             onTap: () => this.goMangaInfoPage(item),
           );
         },
-        separatorBuilder: (context, index) => Divider(color: Colors.black38,),
+        separatorBuilder: (context, index) => ZeroDivider(),
       )
           : EmptyPage('暂无历史记录'),
     );
