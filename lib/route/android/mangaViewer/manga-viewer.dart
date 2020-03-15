@@ -1,21 +1,24 @@
 import 'dart:async';
 import 'dart:ui';
+
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:maxga/manga-repo-pool.dart';
-import 'package:maxga/utils/maxga-utils.dart';
+import 'package:flutter_widgets/flutter_widgets.dart';
 import 'package:maxga/base/delay.dart';
 import 'package:maxga/constant/setting-value.dart';
 import 'package:maxga/http/repo/maxga-data-http-repo.dart';
+import 'package:maxga/manga-repo-pool.dart';
 import 'package:maxga/model/manga/chapter.dart';
 import 'package:maxga/model/manga/manga.dart';
 import 'package:maxga/provider/public/setting-provider.dart';
 import 'package:maxga/route/android/error-page/error-page.dart';
+import 'package:maxga/utils/maxga-utils.dart';
 import 'package:provider/provider.dart';
 
-import '../mangaViewer/manga-image.dart';
 import '../mangaViewer/components/base/manga-viewer-future-view.dart';
+import '../mangaViewer/manga-image.dart';
+import 'manga-image-list-viewer.dart';
 import 'manga-status-bar.dart';
 import 'manga-tab.dart';
 
@@ -51,7 +54,8 @@ class MangaViewer extends StatefulWidget {
   State<StatefulWidget> createState() => _MangaViewerState();
 }
 
-class _MangaViewerState extends State<MangaViewer> {
+class _MangaViewerState extends State<MangaViewer>
+    with SingleTickerProviderStateMixin {
   final mangaViewerKey = GlobalKey<ScaffoldState>();
   final futureViewAnimationDuration = Duration(milliseconds: 200);
   MaxgaDataHttpRepo dataHttpRepo;
@@ -59,8 +63,10 @@ class _MangaViewerState extends State<MangaViewer> {
 
   PageController pageController;
 
-//  ItemScrollController itemScrollController;
-//  ItemPositionsListener positionsListener = ItemPositionsListener.create();
+  AnimationController animationController;
+
+  ItemScrollController itemScrollController;
+  ItemPositionsListener positionsListener = ItemPositionsListener.create();
 
   int chapterIndex;
   Map<int, Chapter> cachedChapterData = {};
@@ -76,10 +82,6 @@ class _MangaViewerState extends State<MangaViewer> {
 
   _ChapterUpdateOrigin _chapterUpdateOrigin = _ChapterUpdateOrigin.none;
   _MangaViewerLoadState loadStatus = _MangaViewerLoadState.loadingMangaData;
-
-  Timer futureViewVisitableTimer;
-  bool mangaFutureViewVisitable = false;
-  double mangaFutureViewOpacity = 0;
 
   int _pageIndex = 0;
 
@@ -126,6 +128,9 @@ class _MangaViewerState extends State<MangaViewer> {
     MaxgaUtils.hiddenStatusBar();
     dataHttpRepo =
         MangaRepoPool.getInstance().getRepo(key: widget.manga.sourceKey);
+
+    animationController =
+        AnimationController(duration: Duration(milliseconds: 150), vsync: this);
     Connectivity().checkConnectivity().then((connectivityResult) async {
       final readOnWiFi = Provider.of<SettingProvider>(context)
           .getItem(MaxgaSettingItemType.readOnlyOnWiFi);
@@ -245,13 +250,12 @@ class _MangaViewerState extends State<MangaViewer> {
               hasPrechapter: preChapter != null,
               itemCount: imagePageUrlList.length,
               itemBuilder: (context, index) => Tab(
-                child: MangaImage(
-                  url: imagePageUrlList[index],
-                  headers: dataHttpRepo.mangaSource.headers,
-                  index: index - pageOffsetFix + 1,
-                ),
-              )
-          );
+                    child: MangaImage(
+                      url: imagePageUrlList[index],
+                      headers: dataHttpRepo.mangaSource.headers,
+                      index: index - pageOffsetFix + 1,
+                    ),
+                  ));
 //          var tabMangaViewer = MangaListViewer(
 //            itemPositionsListener: positionsListener,
 //            imageUrlList: imagePageUrlList,
@@ -264,23 +268,19 @@ class _MangaViewerState extends State<MangaViewer> {
               NotificationListener<ScrollNotification>(
                   onNotification: (scrollNotification) =>
                       handleTabViewScroll(scrollNotification),
-                  child: GestureDetector(
-                    onTapUp: (details) => dispatchTapUpEvent(details, context),
-                    child: tabMangaViewer,
-                  )),
+                  child: tabMangaViewer),
               MangaStatusBar(currentChapter, viewerPageStatus.pageIndex + 1),
-              AnimatedOpacity(
-                opacity: mangaFutureViewOpacity,
-                duration: futureViewAnimationDuration,
-                child: mangaFutureViewVisitable
-                    ? MangaFeatureView(
-                        onPageChange: (index) =>
-                            changePage(index.floor() + (pageOffsetFix)),
-                        imageCount: viewerPageStatus.chapter.imgUrlList.length,
-                        pageIndex: viewerPageStatus.pageIndex,
-                        title: viewerPageStatus.chapter.title,
-                      )
-                    : null,
+              GestureDetector(
+                onTapUp: (details) => dispatchTapUpEvent(details, context),
+                behavior: HitTestBehavior.translucent,
+                child: MangaFeatureView(
+                  animation: animationController,
+                  onPageChange: (index) =>
+                      changePage(index.floor() + (pageOffsetFix)),
+                  imageCount: viewerPageStatus.chapter.imgUrlList.length,
+                  pageIndex: viewerPageStatus.pageIndex,
+                  title: viewerPageStatus.chapter.title,
+                ),
               )
             ],
           );
@@ -351,7 +351,15 @@ class _MangaViewerState extends State<MangaViewer> {
 
     if (details.localPosition.dx / width > 0.33 &&
         details.localPosition.dx / width < 0.66) {
-      updateFutureViewVisitable();
+      switch (animationController.status) {
+        case AnimationStatus.completed:
+        case AnimationStatus.forward:
+          animationController.reverse();
+          break;
+        case AnimationStatus.reverse:
+        default:
+          animationController.forward();
+      }
     } else {
       if (details.localPosition.dx / width < 0.33) {
         goPreviousPage();
@@ -359,24 +367,6 @@ class _MangaViewerState extends State<MangaViewer> {
         goNextPage();
       }
     }
-  }
-
-  void updateFutureViewVisitable() {
-    mangaFutureViewOpacity = mangaFutureViewOpacity == 0 ? 1 : 0;
-    if (futureViewVisitableTimer != null) {
-      futureViewVisitableTimer.cancel();
-    }
-    if (mangaFutureViewOpacity == 1) {
-      this.mangaFutureViewVisitable = !this.mangaFutureViewVisitable;
-    } else {
-      futureViewVisitableTimer = Timer(futureViewAnimationDuration, () {
-        setState(() {
-          this.mangaFutureViewVisitable = !this.mangaFutureViewVisitable;
-        });
-      });
-    }
-
-    setState(() {});
   }
 
   void toastMessage(String s, [TextAlign alignment = TextAlign.left]) {
@@ -399,7 +389,7 @@ class _MangaViewerState extends State<MangaViewer> {
       changePage(target);
     }
   }
-  
+
   goPreviousPage() {
     int target = pageIndex - 1;
     var action = checkIndexStatus(pageIndex, pageIndex);
@@ -440,7 +430,6 @@ class _MangaViewerState extends State<MangaViewer> {
   }
 
   Key pageKey;
-
 
   bool isChapterLoad(Chapter willLoadChapter) =>
       this
@@ -611,8 +600,7 @@ class _MangaViewerState extends State<MangaViewer> {
     }
   }
 
-
-  _ChangeChapterAction checkIndexStatus(int min,int max) {
+  _ChangeChapterAction checkIndexStatus(int min, int max) {
     if (nextChapter == null && max == (imagePageUrlList.length - 1)) {
       return _ChangeChapterAction.lastImage;
     } else if (preChapter == null && min == 0) {
@@ -621,8 +609,7 @@ class _MangaViewerState extends State<MangaViewer> {
       return _ChangeChapterAction.goPreviousChapter;
     } else if (min <= (pageOffsetFix) && preChapter != null) {
       return _ChangeChapterAction.loadPreviousChapter;
-    } else if (max ==
-        (pageOffsetFix + currentChapter.imgUrlList.length)) {
+    } else if (max == (pageOffsetFix + currentChapter.imgUrlList.length)) {
       return _ChangeChapterAction.goNextChapter;
     } else if (max == (imagePageUrlList.length - 1)) {
       return _ChangeChapterAction.loadNextChapter;
@@ -630,8 +617,6 @@ class _MangaViewerState extends State<MangaViewer> {
       return _ChangeChapterAction.none;
     }
   }
-
-
 }
 
 class AllowMultipleGestureRecognizer extends TapGestureRecognizer {

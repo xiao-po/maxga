@@ -103,7 +103,7 @@ class _CollectionPageState extends State<CollectionPage> {
       appBar: AppBar(
         title: Text('收藏'),
         elevation: 1,
-        actions: <Widget>[MaxgaSearchButton()],
+        actions: <Widget>[MaxgaSearchButton(), MaxgaTestButton()],
       ),
       key: scaffoldKey,
       body: ConfirmExitScope(

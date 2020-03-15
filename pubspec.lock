@@ -212,6 +212,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.1.4"
+  indexed_list_view:
+    dependency: "direct main"
+    description:
+      name: indexed_list_view
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.0.8"
   lzstring:
     dependency: "direct main"
     description:
