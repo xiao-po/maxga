@@ -17,12 +17,23 @@ import 'package:maxga/utils/maxga-utils.dart';
 import 'package:provider/provider.dart';
 
 import '../mangaViewer/components/base/manga-viewer-future-view.dart';
-import '../mangaViewer/manga-image.dart';
 import 'manga-image-list-viewer.dart';
+import 'manga-image.dart';
 import 'manga-status-bar.dart';
 import 'manga-tab.dart';
 
 enum _MangaViewerLoadState { checkNetState, loadingMangaData, over, error }
+
+enum _MangaOrientation {
+  leftToRight,
+  rightToLeft,
+  topToBottom,
+}
+
+_MangaOrientation getOrientationFromIndex(int value) {
+  return _MangaOrientation.values[value] ?? _MangaOrientation.leftToRight;
+}
+
 
 enum _ChangeChapterAction {
   loadNextChapter,
@@ -65,8 +76,10 @@ class _MangaViewerState extends State<MangaViewer>
 
   AnimationController animationController;
 
-  ItemScrollController itemScrollController;
+  ItemScrollController itemScrollController = ItemScrollController();
   ItemPositionsListener positionsListener = ItemPositionsListener.create();
+
+  _MangaOrientation orientation = _MangaOrientation.leftToRight;
 
   int chapterIndex;
   Map<int, Chapter> cachedChapterData = {};
@@ -91,7 +104,12 @@ class _MangaViewerState extends State<MangaViewer>
     _pageIndex = val;
     pageKey = UniqueKey();
     if (viewerPageStatus != null) {
-      viewerPageStatus.pageIndex = (val - pageOffsetFix);
+      if (orientation != _MangaOrientation.rightToLeft) {
+        viewerPageStatus.pageIndex = (val - pageOffsetFix);
+      } else {
+        viewerPageStatus.pageIndex =
+            imagePageUrlList.length - 1 - pageOffsetFix - val;
+      }
     }
   }
 
@@ -106,15 +124,29 @@ class _MangaViewerState extends State<MangaViewer>
     if (viewerPageStatus != null && chapterChangeKey == viewerPageStatus.key) {
       return _pageOffsetFix;
     } else {
-      final index =
-          onPageListChapters.indexWhere((el) => currentChapter.url == el.url);
-      var length = 0;
-      for (var i = 0; i < index; i++) {
-        length += onPageListChapters[i].imgUrlList.length;
+      switch (orientation) {
+        case _MangaOrientation.leftToRight:
+        case _MangaOrientation.topToBottom:
+          final index = onPageListChapters
+              .indexWhere((el) => currentChapter.url == el.url);
+          var length = 0;
+          for (var i = 0; i < index; i++) {
+            length += onPageListChapters[i].imgUrlList.length;
+          }
+          _pageOffsetFix = length;
+          chapterChangeKey = viewerPageStatus?.key ?? UniqueKey();
+          return length;
+        case _MangaOrientation.rightToLeft:
+          final index = onPageListChapters
+              .indexWhere((el) => currentChapter.url == el.url);
+          var length = 0;
+          for (var i = onPageListChapters.length; i > index; i--) {
+            length += onPageListChapters[i].imgUrlList.length;
+          }
+          _pageOffsetFix = length;
+          chapterChangeKey = viewerPageStatus?.key ?? UniqueKey();
+          return length;
       }
-      _pageOffsetFix = length;
-      chapterChangeKey = viewerPageStatus?.key ?? UniqueKey();
-      return length;
     }
   }
 
@@ -130,7 +162,7 @@ class _MangaViewerState extends State<MangaViewer>
         MangaRepoPool.getInstance().getRepo(key: widget.manga.sourceKey);
 
     animationController =
-        AnimationController(duration: Duration(milliseconds: 150), vsync: this);
+        AnimationController(duration: Duration(milliseconds: 300), vsync: this);
     Connectivity().checkConnectivity().then((connectivityResult) async {
       final readOnWiFi = Provider.of<SettingProvider>(context)
           .getItem(MaxgaSettingItemType.readOnlyOnWiFi);
@@ -147,32 +179,12 @@ class _MangaViewerState extends State<MangaViewer>
 
   void initMangaViewer() async {
     loadStatus = _MangaViewerLoadState.loadingMangaData;
-//    positionsListener.itemPositions.addListener(() {
-//      if (!isOnScroll) {
-//        return null;
-//      }
-//      var positions = positionsListener.itemPositions.value;
-//      int min;
-//      int max;
-//      if (positions.isNotEmpty) {
-//        min = positions
-//            .where((ItemPosition position) => position.itemTrailingEdge > 0)
-//            .reduce((ItemPosition min, ItemPosition position) =>
-//        position.itemTrailingEdge < min.itemTrailingEdge
-//            ? position
-//            : min)
-//            .index;
-//        max = positions
-//            .where((ItemPosition position) => position.itemLeadingEdge < 1)
-//            .reduce((ItemPosition max, ItemPosition position) =>
-//        position.itemLeadingEdge > max.itemLeadingEdge
-//            ? position
-//            : max)
-//            .index;
-//        this.onPageViewScroll(min, max);
-//      }
-//    });
     setState(() {});
+    var settingProvider = Provider.of<SettingProvider>(context);
+    final orientationValue = int.parse(
+        settingProvider.getItemValue(MaxgaSettingItemType.defaultOrientation)
+    );
+
     try {
       chapterList = widget.chapterList
           .map((item) => Chapter.fromJson(item.toJson()))
@@ -190,16 +202,14 @@ class _MangaViewerState extends State<MangaViewer>
       Chapter currentChapterData = resultChapterList[0] as Chapter;
 
       if (mounted) {
+        changeMangaOrientation(
+            getOrientationFromIndex(orientationValue)
+        );
         setState(() {
           currentChapter = currentChapterData;
           this.imagePageUrlList.addAll(currentChapter.imgUrlList);
           this.onPageListChapters.add(currentChapter);
           pageIndex = widget.initIndex;
-          // ---------------
-//          itemScrollController = ItemScrollController();
-          // ---------------
-          pageController = PageController(initialPage: pageIndex);
-
           viewerPageStatus =
               ViewerReadProcess(currentChapterData, viewerImageIndex);
           this.loadStatus = _MangaViewerLoadState.over;
@@ -245,9 +255,10 @@ class _MangaViewerState extends State<MangaViewer>
         }
       case _MangaViewerLoadState.over:
         {
-          var tabMangaViewer = MangaTabView(
+          Widget tabMangaViewer = MangaTabView(
               controller: pageController,
               hasPrechapter: preChapter != null,
+              onPageChanged: (page) => onPageViewScroll(page, page),
               itemCount: imagePageUrlList.length,
               itemBuilder: (context, index) => Tab(
                     child: MangaImage(
@@ -256,13 +267,15 @@ class _MangaViewerState extends State<MangaViewer>
                       index: index - pageOffsetFix + 1,
                     ),
                   ));
-//          var tabMangaViewer = MangaListViewer(
-//            itemPositionsListener: positionsListener,
-//            imageUrlList: imagePageUrlList,
-//            itemScrollController: itemScrollController,
-//            initialScrollIndex: pageIndex,
-//            headers: dataHttpRepo.mangaSource.headers,
-//          );
+          if (orientation == _MangaOrientation.topToBottom) {
+            tabMangaViewer = MangaListViewer(
+              itemPositionsListener: positionsListener,
+              imageUrlList: imagePageUrlList,
+              itemScrollController: itemScrollController,
+              initialScrollIndex: pageIndex,
+              headers: dataHttpRepo.mangaSource.headers,
+            );
+          }
           body = Stack(
             children: <Widget>[
               NotificationListener<ScrollNotification>(
@@ -272,6 +285,7 @@ class _MangaViewerState extends State<MangaViewer>
               MangaStatusBar(currentChapter, viewerPageStatus.pageIndex + 1),
               GestureDetector(
                 onTapUp: (details) => dispatchTapUpEvent(details, context),
+                onLongPress: () => openMenuDialog(),
                 behavior: HitTestBehavior.translucent,
                 child: MangaFeatureView(
                   animation: animationController,
@@ -346,7 +360,7 @@ class _MangaViewerState extends State<MangaViewer>
     }
   }
 
-  dispatchTapUpEvent(TapUpDetails details, BuildContext context) {
+  dispatchTapUpEvent(TapUpDetails details, BuildContext context) async {
     final width = MediaQuery.of(context).size.width;
 
     if (details.localPosition.dx / width > 0.33 &&
@@ -354,17 +368,21 @@ class _MangaViewerState extends State<MangaViewer>
       switch (animationController.status) {
         case AnimationStatus.completed:
         case AnimationStatus.forward:
+          await MaxgaUtils.hiddenStatusBar();
           animationController.reverse();
           break;
         case AnimationStatus.reverse:
         default:
+          await MaxgaUtils.showStatusBar();
           animationController.forward();
       }
     } else {
-      if (details.localPosition.dx / width < 0.33) {
-        goPreviousPage();
-      } else if (details.localPosition.dx / width > 0.66) {
-        goNextPage();
+      if (orientation != _MangaOrientation.topToBottom) {
+        if (details.localPosition.dx / width < 0.33) {
+          goPreviousPage();
+        } else if (details.localPosition.dx / width > 0.66) {
+          goNextPage();
+        }
       }
     }
   }
@@ -407,8 +425,17 @@ class _MangaViewerState extends State<MangaViewer>
     if (mounted) {
       setState(() {
         pageIndex = target;
-        pageController.jumpToPage(target);
       });
+
+      switch (orientation) {
+        case _MangaOrientation.rightToLeft:
+        case _MangaOrientation.leftToRight:
+          pageController.jumpToPage(target);
+          break;
+        case _MangaOrientation.topToBottom:
+          itemScrollController.jumpTo(index: target);
+          break;
+      }
     }
   }
 
@@ -437,14 +464,46 @@ class _MangaViewerState extends State<MangaViewer>
           .indexWhere((el) => willLoadChapter.url == el.url) !=
       -1;
 
-  onPageViewScroll(int min, int max) async {
+  onPageViewScroll(int min, int max, [double offset]) async {
     if (_chapterUpdateOrigin == _ChapterUpdateOrigin.none) {
       setState(() {
         pageIndex = min;
       });
+      var act = checkIndexStatus(min, max);
+      switch (act) {
+        case _ChangeChapterAction.goNextChapter:
+          setState(() {
+            currentChapter = nextChapter;
+            chapterIndex++;
+            viewerPageStatus = ViewerReadProcess(currentChapter, 0);
+          });
+          break;
+        case _ChangeChapterAction.goPreviousChapter:
+          setState(() {
+            currentChapter = preChapter;
+            chapterIndex--;
+            viewerPageStatus = ViewerReadProcess(
+                currentChapter, currentChapter.imgUrlList.length - 1);
+          });
+          break;
+        case _ChangeChapterAction.firstImage:
+          toastMessage('已经是第一页了');
+          break;
+        case _ChangeChapterAction.lastImage:
+          toastMessage('已经是最后一页了', TextAlign.right);
+          break;
+        case _ChangeChapterAction.none:
+          break;
+        default:
+      }
     }
-    var act = checkIndexStatus(min, max);
+
+    return true;
+  }
+
+  onScrollEnd(int min, int max) async {
     Key fireKey = pageKey;
+    var act = checkIndexStatus(min, max);
     switch (act) {
       case _ChangeChapterAction.loadNextChapter:
         {
@@ -457,13 +516,25 @@ class _MangaViewerState extends State<MangaViewer>
           if (!mounted && pageKey != null) {
             return null;
           }
-          if (!isOnScroll && pageKey == fireKey) {
+          if ((!isOnScroll && pageKey == fireKey)) {
             setState(() {
               if (this.onPageListChapters.indexOf(nextChapter) == -1) {
-                toastMessage('加载完毕', TextAlign.right);
-                this.onPageListChapters.add(nextChapterData);
+                toastMessage('加载完毕');
                 viewerPageStatus.key = UniqueKey();
-                imagePageUrlList.addAll(nextChapterData.imgUrlList);
+                switch (orientation) {
+                  case _MangaOrientation.rightToLeft:
+                    this.onPageListChapters.insert(0, nextChapterData);
+                    imagePageUrlList.insertAll(
+                        0, nextChapterData.imgUrlList.reversed.toList());
+                    pageIndex += nextChapterData.imgUrlList.length;
+                    pageController.jumpToPage(pageIndex);
+                    break;
+                  case _MangaOrientation.leftToRight:
+                  case _MangaOrientation.topToBottom:
+                    this.onPageListChapters.add(nextChapterData);
+                    imagePageUrlList.addAll(nextChapterData.imgUrlList);
+                    break;
+                }
               }
               _chapterUpdateOrigin = _ChapterUpdateOrigin.scroll;
             });
@@ -477,6 +548,9 @@ class _MangaViewerState extends State<MangaViewer>
         break;
       case _ChangeChapterAction.loadPreviousChapter:
         {
+          if (orientation == _MangaOrientation.topToBottom) {
+            break;
+          }
           var willLoadChapter = preChapter;
           if (!mounted && pageKey != null) {
             return null;
@@ -491,15 +565,25 @@ class _MangaViewerState extends State<MangaViewer>
           if (!isOnScroll && pageKey == fireKey) {
             if (this.onPageListChapters.indexOf(preChapterData) == -1) {
               setState(() {
-                toastMessage('加载完毕', TextAlign.left);
-                this.onPageListChapters.insert(0, preChapterData);
-                imagePageUrlList.insertAll(0, preChapterData.imgUrlList);
+                toastMessage('加载完毕');
                 viewerPageStatus.key = UniqueKey();
-                pageIndex += preChapterData.imgUrlList.length;
+                switch (orientation) {
+                  case _MangaOrientation.rightToLeft:
+                    this.onPageListChapters.add(preChapterData);
+                    imagePageUrlList
+                        .addAll(preChapterData.imgUrlList.reversed.toList());
+                    break;
+                  case _MangaOrientation.leftToRight:
+                  case _MangaOrientation.topToBottom:
+                    this.onPageListChapters.insert(0, preChapterData);
+                    imagePageUrlList.insertAll(0, preChapterData.imgUrlList);
+                    pageIndex += preChapterData.imgUrlList.length;
+                    pageController.jumpToPage(pageIndex);
+                    break;
+                }
                 _chapterUpdateOrigin = _ChapterUpdateOrigin.scroll;
               });
             }
-            pageController.jumpToPage(pageIndex);
             Future.delayed(Duration(milliseconds: 50)).then((v) {
               setState(() {
                 _chapterUpdateOrigin = _ChapterUpdateOrigin.none;
@@ -510,38 +594,14 @@ class _MangaViewerState extends State<MangaViewer>
           }
           break;
         }
-      case _ChangeChapterAction.goNextChapter:
-        setState(() {
-          currentChapter = nextChapter;
-          chapterIndex++;
-          viewerPageStatus = ViewerReadProcess(currentChapter, 0);
-        });
-        break;
-      case _ChangeChapterAction.goPreviousChapter:
-        setState(() {
-          currentChapter = preChapter;
-          chapterIndex--;
-          viewerPageStatus = ViewerReadProcess(
-              currentChapter, currentChapter.imgUrlList.length - 1);
-        });
-        break;
-      case _ChangeChapterAction.firstImage:
-        toastMessage('已经是第一页了');
-        break;
-      case _ChangeChapterAction.lastImage:
-        toastMessage('已经是最后一页了', TextAlign.right);
-        break;
-      case _ChangeChapterAction.none:
-        break;
+      default:
     }
-
-    return true;
   }
 
   @override
   void dispose() {
-    super.dispose();
     pageController?.dispose();
+    super.dispose();
   }
 
   onBack() {
@@ -593,36 +653,233 @@ class _MangaViewerState extends State<MangaViewer>
   handleTabViewScroll(ScrollNotification scrollNotification) {
     if (scrollNotification is ScrollEndNotification) {
       isOnScroll = false;
-      final tabControllerPage = pageController.page.floor();
-      onPageViewScroll(tabControllerPage, tabControllerPage);
+
+      if (orientation != _MangaOrientation.topToBottom) {
+        final tabControllerPage = pageController.page.round();
+        onScrollEnd(tabControllerPage, tabControllerPage);
+      } else {
+        if (scrollNotification.metrics.maxScrollExtent -
+                scrollNotification.metrics.pixels <
+            0) {
+          return null;
+        }
+        final positions = positionsListener.itemPositions.value.toList();
+        final min = positions.first.index;
+        final max = positions.last.index;
+        this.onScrollEnd(min, max);
+      }
     } else if (scrollNotification is ScrollStartNotification) {
       isOnScroll = true;
     }
   }
 
   _ChangeChapterAction checkIndexStatus(int min, int max) {
-    if (nextChapter == null && max == (imagePageUrlList.length - 1)) {
-      return _ChangeChapterAction.lastImage;
-    } else if (preChapter == null && min == 0) {
-      return _ChangeChapterAction.firstImage;
-    } else if (min < pageOffsetFix) {
-      return _ChangeChapterAction.goPreviousChapter;
-    } else if (min <= (pageOffsetFix) && preChapter != null) {
-      return _ChangeChapterAction.loadPreviousChapter;
-    } else if (max == (pageOffsetFix + currentChapter.imgUrlList.length)) {
-      return _ChangeChapterAction.goNextChapter;
-    } else if (max == (imagePageUrlList.length - 1)) {
-      return _ChangeChapterAction.loadNextChapter;
-    } else {
-      return _ChangeChapterAction.none;
+    switch (orientation) {
+      case _MangaOrientation.rightToLeft:
+        if (nextChapter == null && max == (imagePageUrlList.length - 1)) {
+          return _ChangeChapterAction.lastImage;
+        } else if (preChapter == null && min == 0) {
+          return _ChangeChapterAction.firstImage;
+        } else if (min < pageOffsetFix) {
+          return _ChangeChapterAction.goPreviousChapter;
+        } else if (min <= (pageOffsetFix) && preChapter != null) {
+          return _ChangeChapterAction.loadPreviousChapter;
+        } else if (min == (pageOffsetFix + currentChapter.imgUrlList.length)) {
+          return _ChangeChapterAction.goNextChapter;
+        } else if (max == (imagePageUrlList.length - 1)) {
+          return _ChangeChapterAction.loadNextChapter;
+        } else {
+          return _ChangeChapterAction.none;
+        }
+        break;
+      case _MangaOrientation.leftToRight:
+        if (nextChapter == null && max == (imagePageUrlList.length - 1)) {
+          return _ChangeChapterAction.lastImage;
+        } else if (preChapter == null && min == 0) {
+          return _ChangeChapterAction.firstImage;
+        } else if (min < pageOffsetFix) {
+          return _ChangeChapterAction.goPreviousChapter;
+        } else if (min <= (pageOffsetFix) && preChapter != null) {
+          return _ChangeChapterAction.loadPreviousChapter;
+        } else if (max == (pageOffsetFix + currentChapter.imgUrlList.length)) {
+          return _ChangeChapterAction.goNextChapter;
+        } else if (max == (imagePageUrlList.length - 1)) {
+          return _ChangeChapterAction.loadNextChapter;
+        } else {
+          return _ChangeChapterAction.none;
+        }
+        break;
+      case _MangaOrientation.topToBottom:
+      default:
+        if (nextChapter == null &&
+            (max - min < 2) &&
+            max == (imagePageUrlList.length - 1)) {
+          return _ChangeChapterAction.lastImage;
+        } else if (preChapter == null && min == 0) {
+          return _ChangeChapterAction.firstImage;
+        } else if (min < pageOffsetFix) {
+          return _ChangeChapterAction.goPreviousChapter;
+        } else if (min <= (pageOffsetFix) && preChapter != null) {
+          return _ChangeChapterAction.loadPreviousChapter;
+        } else if (min == (pageOffsetFix + currentChapter.imgUrlList.length)) {
+          return _ChangeChapterAction.goNextChapter;
+        } else if (max == (imagePageUrlList.length - 1)) {
+          return _ChangeChapterAction.loadNextChapter;
+        } else {
+          return _ChangeChapterAction.none;
+        }
+        break;
     }
   }
-}
 
-class AllowMultipleGestureRecognizer extends TapGestureRecognizer {
-  @override
-  void rejectGesture(int pointer) {
-    acceptGesture(pointer);
+  changeMangaOrientation(_MangaOrientation orientation) {
+    final previousOrientation = this.orientation;
+    if (orientation == previousOrientation) {
+      return null;
+    }
+    var isShouldReversed =
+        previousOrientation == _MangaOrientation.rightToLeft ||
+            orientation == _MangaOrientation.rightToLeft;
+    var pageIndex = this.pageIndex;
+    var imagePageUrlList = this.imagePageUrlList;
+    var onPageListChapters = this.onPageListChapters;
+    if (isShouldReversed) {
+      pageIndex = imagePageUrlList.length - 1 - pageIndex;
+      imagePageUrlList = imagePageUrlList.reversed.toList();
+      onPageListChapters = onPageListChapters.reversed.toList();
+    }
+    switch (orientation) {
+      case _MangaOrientation.rightToLeft:
+        latestMin = -1;
+        latestMax = -1;
+        positionsListener.itemPositions
+            .removeListener(this.listenScrollableList);
+        setState(() {
+          this.orientation = _MangaOrientation.rightToLeft;
+          this.pageIndex = pageIndex;
+          this.imagePageUrlList = imagePageUrlList;
+          this.onPageListChapters = onPageListChapters;
+          if (pageController == null) {
+            this.pageController = PageController(initialPage: pageIndex);
+          } else {
+            this.pageController.jumpToPage(pageIndex);
+          }
+        });
+        break;
+      case _MangaOrientation.leftToRight:
+        latestMin = -1;
+        latestMax = -1;
+        positionsListener.itemPositions
+            .removeListener(this.listenScrollableList);
+        setState(() {
+          this.orientation = _MangaOrientation.leftToRight;
+          this.pageIndex = pageIndex;
+          this.imagePageUrlList = imagePageUrlList;
+          this.onPageListChapters = onPageListChapters;
+          if (pageController == null) {
+            this.pageController = PageController(initialPage: pageIndex);
+          } else {
+            this.pageController.jumpToPage(pageIndex);
+          }
+        });
+        break;
+      case _MangaOrientation.topToBottom:
+        setState(() {
+          this.pageIndex = pageIndex;
+          this.onPageListChapters = onPageListChapters;
+          this.orientation = _MangaOrientation.topToBottom;
+          this.imagePageUrlList = imagePageUrlList;
+          pageController?.dispose();
+          pageController = null;
+        });
+        positionsListener.itemPositions.addListener(this.listenScrollableList);
+        break;
+    }
+  }
+
+  var latestMin = -1;
+  var latestMax = -1;
+
+  listenScrollableList() {
+    var positions = positionsListener.itemPositions.value;
+    int min;
+    int max;
+    if (positions.isNotEmpty) {
+      min = positions.first.index;
+      max = positions.last.index;
+      if (min == latestMin && max == latestMax) {
+        return null;
+      }
+      latestMin = min ?? -1;
+      latestMax = max ?? -1;
+      this.onPageViewScroll(min, max);
+    }
+  }
+
+  openMenuDialog() async {
+    _MangaOrientation ori = orientation;
+    final result = await showDialog(
+        context: context,
+        child: AlertDialog(
+          title: const Text('菜单'),
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: 300),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                ListTile(
+                  title: const Text('阅读方向'),
+                  trailing: SizedBox(
+                    width: 100,
+                    child: DropdownButtonFormField<int>(
+                      value: orientation.index,
+                      onChanged: (value) {
+                        ori = getOrientationFromIndex(value);
+                      },
+                      items: [
+                        DropdownMenuItem(
+                          value: 0,
+                          child: const Text('从左至右'),
+                        ),
+//                        DropdownMenuItem(
+//                          value: 1,
+//                          child: const Text('从右至左'),
+//                        ),
+                        DropdownMenuItem(
+                          value: 2,
+                          child: const Text('卷纸模式'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                ListTile(
+                  onTap: () {},
+                  title: const Text('卷纸模式下图片存在间隔'),
+                  trailing: Switch(value: true, onChanged: (bool value) {  },),
+                )
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('取消'),
+            ),
+            FlatButton(
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+              child: const Text('确定'),
+            ),
+          ],
+        ));
+
+    if (result != null) {
+      changeMangaOrientation(ori);
+    }
   }
 }
 

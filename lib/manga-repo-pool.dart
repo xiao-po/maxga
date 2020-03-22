@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:maxga/constant/setting-value.dart';
 import 'package:maxga/http/repo/dmzj/model/dmzj-manga-info.dart';
+import 'package:maxga/http/repo/hanmanjia/hanmanjia-data-repo.dart';
 import 'package:maxga/provider/public/setting-provider.dart';
 import 'package:maxga/service/maxga-server.service.dart';
 
@@ -42,10 +43,12 @@ class MangaRepoPool {
     );
     final hanhanDateRepo = HanhanDateRepo();
     final manhuaguiDateRepo = ManhuaguiDataRepo();
+    final hanmanjiaDataRepo = HanmanjiaDataRepo();
     registryRepo(dmzjDataRepo);
     registryRepo(hanhanDateRepo);
     registryRepo(manhuaduiDataRepo);
     registryRepo(manhuaguiDateRepo);
+    registryRepo(hanmanjiaDataRepo);
   }
 
   registryRepo(MaxgaDataHttpRepo repo) {

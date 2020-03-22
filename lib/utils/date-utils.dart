@@ -24,7 +24,7 @@ class DateUtils {
   }
   static DateTime convertTimeStringToDateTime(String time, String template) {
     try {
-      int yearTemplateIndex = template.indexOf('YYYY');
+      int yearTemplateIndex = template.indexOf('YYYY') ??  template.indexOf('yyyy') ;
       int yearValue = yearTemplateIndex >= 0 ? int.parse(
           time.substring(yearTemplateIndex, yearTemplateIndex + 4)
       ) : 0;

@@ -23,6 +23,7 @@ class MangaListViewer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return ScrollablePositionedList.separated(
       itemPositionsListener: itemPositionsListener,
       itemScrollController: itemScrollController,
@@ -30,7 +31,11 @@ class MangaListViewer extends StatelessWidget {
       itemBuilder: (c, index) => CachedNetworkImage(
         imageUrl: imageUrlList[index],
         httpHeaders: headers,
-        placeholder: (context, url) => MangaImagePlaceHolder(index: index),
+        placeholder: (context, url) => Container(
+          height: 400,
+          width: size.width,
+          child:  MangaImagePlaceHolder(index: index),
+        ),
       ),
       itemCount: imageUrlList.length,
       separatorBuilder: (BuildContext context, int index) => Divider(

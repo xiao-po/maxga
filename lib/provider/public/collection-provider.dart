@@ -2,12 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:maxga/base/delay.dart';
 import 'package:maxga/base/error/maxga-http-error.dart';
 import 'package:maxga/base/status/update-status.dart';
+import 'package:maxga/constant/setting-value.dart';
 import 'package:maxga/http/repo/maxga-data-http-repo.dart';
 import 'package:maxga/manga-repo-pool.dart';
 import 'package:maxga/model/manga/manga.dart';
 import 'package:maxga/model/maxga/collected-manga.dart';
 import 'package:maxga/provider/base/base-provider.dart';
+import 'package:maxga/provider/public/setting-provider.dart';
 import 'package:maxga/service/manga-read-storage.service.dart';
+import 'package:maxga/service/setting.service.dart';
 
 class UpdateCollectionMangaResult {
   int get failedCount =>
@@ -101,9 +104,12 @@ class CollectionProvider extends BaseProvider {
     notifyListeners();
     var updateResult = UpdateCollectionMangaResult();
     var iterator = _collectedMangaList.iterator;
-
+    final counts = int.parse(
+        SettingProvider.getInstance().getItem(MaxgaSettingItemType.updateChannelCount).value
+    );
+    print('unpdate channel counts is $counts');
     await Future.wait(List.generate(
-        5,
+        counts,
         (i) => _updateChannel(iterator, afterUpdate: (result) {
               updateResult.addToResult(result);
             })));

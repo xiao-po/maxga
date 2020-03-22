@@ -6,6 +6,7 @@ import 'package:maxga/http/repo/manhuadui/constants/manhuadui-manga-source.dart'
 import 'package:maxga/http/repo/manhuagui/constants/manhuagui-manga-source.dart';
 
 enum MaxgaSettingCategoryType {
+  read,
   application,
   network,
   other,
@@ -21,6 +22,8 @@ enum MaxgaSettingListTileType {
 }
 
 enum MaxgaSettingItemType {
+  defaultOrientation,
+  imageZoomMaxRatio,
   readOnlyOnWiFi,
   timeoutLimit,
   cleanCache,
@@ -29,25 +32,41 @@ enum MaxgaSettingItemType {
   clearData,
   defaultIndexPage,
   defaultMangaSource,
+  updateChannelCount,
   autoReportDmzjHiddenManga,
 }
 
-enum DefaultIndexPage {
-  collect,
-  sourceViewer
-}
+enum DefaultIndexPage { collect, sourceViewer }
 
 class SelectOption<T> {
   final String title;
   final T value;
   final String content;
 
-  const SelectOption({@required this.title,@required this.value, this.content});
-
+  const SelectOption(
+      {@required this.title, @required this.value, this.content});
 }
 
-const Map<MaxgaSettingItemType, List<SelectOption<String>>>
-    MaxgaSelectOptionsMap = const {
+// ignore: non_constant_identifier_names
+Map<MaxgaSettingItemType, List<SelectOption<String>>> MaxgaSelectOptionsMap = {
+  MaxgaSettingItemType.defaultOrientation: [
+    SelectOption(
+      value: '0',
+      title: '从左到右',
+    ),
+//    SelectOption(
+//      value: '1',
+//      title: '从右到左',
+//    ),
+    SelectOption(
+      value: '2',
+      title: '卷纸模式',
+    ),
+  ],
+  MaxgaSettingItemType.updateChannelCount:
+      List.generate(11, (index) => index + 5)
+          .map((e) => SelectOption(value: '$e', title: '$e'))
+          .toList(),
   MaxgaSettingItemType.timeoutLimit: [
     SelectOption(
       value: '5000',
@@ -65,7 +84,6 @@ const Map<MaxgaSettingItemType, List<SelectOption<String>>>
       value: '30000',
       title: '30s',
     ),
-
     SelectOption(
       value: '60000',
       title: '60s',
@@ -101,16 +119,29 @@ const Map<MaxgaSettingItemType, List<SelectOption<String>>>
   ]
 };
 
-
 // ignore: non_constant_identifier_names
 final Map<MaxgaSettingCategoryType, String> SettingCategoryList = {
+  MaxgaSettingCategoryType.read: '阅读配置',
   MaxgaSettingCategoryType.application: '应用设置',
   MaxgaSettingCategoryType.network: '网络设置',
   MaxgaSettingCategoryType.other: '其他设置',
 };
 
-
 const _ApplicationSettingValueList = [
+  MaxgaSettingItem(
+    key: MaxgaSettingItemType.defaultOrientation,
+    type: MaxgaSettingListTileType.select,
+    title: '默认阅读方向',
+    value: '0',
+    category: MaxgaSettingCategoryType.read,
+  ),
+//  MaxgaSettingItem(
+//    key: MaxgaSettingItemType.imageZoomMaxRatio,
+//    type: MaxgaSettingListTileType.select,
+//    title: '最大放大倍数',
+//    value: '2',
+//    category: MaxgaSettingCategoryType.read,
+//  ),
   MaxgaSettingItem(
     key: MaxgaSettingItemType.defaultIndexPage,
     type: MaxgaSettingListTileType.select,
@@ -152,6 +183,16 @@ const _ApplicationSettingValueList = [
 ];
 
 const _NetworkSettingItemList = [
+  MaxgaSettingItem(
+    key: MaxgaSettingItemType.updateChannelCount,
+    title: '漫画更新线程数量',
+    type: MaxgaSettingListTileType.select,
+    subTitle: '漫画检测更新时，同时检测的数量  \n'
+        '过小可能卡在某些漫画源加载导致加载过慢 \n'
+        '过大可能会有性能问题',
+    value: '5',
+    category: MaxgaSettingCategoryType.network,
+  ),
   MaxgaSettingItem(
     key: MaxgaSettingItemType.useMaxgaProxy,
     title: '使用内置代理',
@@ -198,6 +239,6 @@ class SettingItemListValue {
 
   static get allValue => _value;
 
-  static get hiddenValue => _value.toList()..removeWhere((item) => !item.hidden);
-
+  static get hiddenValue =>
+      _value.toList()..removeWhere((item) => !item.hidden);
 }

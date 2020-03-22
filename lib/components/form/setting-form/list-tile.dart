@@ -85,7 +85,7 @@ class MaxgaConfigListTile extends StatelessWidget {
 
     var backgroundColor;
     if (isDark) {
-      backgroundColor = !disabled ? Colors.grey[800] : Colors.black26;
+      backgroundColor = !disabled ? Colors.grey[800] : Color(0x0FFFFFFF);
     } else {
       backgroundColor = !disabled ? Colors.white : Colors.grey[100];
     }

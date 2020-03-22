@@ -8,7 +8,6 @@ import '../maxga-data-http-repo.dart';
 import 'constants/manhuadui-manga-source.dart';
 
 class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
-  MangaSource _source = ManhuaduiMangaSource;
   ManhuaduiHtmlParser parser = ManhuaduiHtmlParser.getInstance();
   MangaHttpUtils _httpUtils = MangaHttpUtils(ManhuaduiMangaSource);
 
@@ -21,17 +20,17 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
   @override
   Future<List<String>> getChapterImageList(String url) async {
     return _httpUtils.requestMangaSourceApi<List<String>>(
-        '${_source.apiDomain}$url',
+        '${mangaSource.apiDomain}$url',
         parser: (res) => parser.getMangaImageListFromMangaPage(res.data));
   }
 
   @override
   Future<List<SimpleMangaInfo>> getLatestUpdate(int page) async {
     return _httpUtils.requestMangaSourceApi<List<SimpleMangaInfo>>(
-        '${_source.apiDomain}/update/?page=${page + 1}',
+        '${mangaSource.apiDomain}/update/?page=${page + 1}',
         parser: (res) => parser
             .getMangaListFromLatestUpdate(res.data)
-            .map((manga) => manga.copyWith(sourceKey: _source.key)).toList());
+            .map((manga) => manga.copyWith(sourceKey: mangaSource.key)).toList());
   }
 
   @override
@@ -44,14 +43,14 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
   @override
   Future<List<SimpleMangaInfo>> getSearchManga(String keywords) async {
     return _httpUtils.requestMangaSourceApi<List<SimpleMangaInfo>>(
-        '${_source.apiDomain}/search/?keywords=$keywords',
+        '${mangaSource.apiDomain}/search/?keywords=$keywords',
         parser: (res) => parser
             .getMangaListFromSearch(res.data)
-            .map((manga) => manga.copyWith(sourceKey: _source.key)).toList());
+            .map((manga) => manga.copyWith(sourceKey: mangaSource.key)).toList());
   }
 
   @override
-  MangaSource get mangaSource => _source;
+  MangaSource get mangaSource => ManhuaduiMangaSource;
 
   @override
   Future<List<SimpleMangaInfo>> getRankedManga(int page) async {
@@ -63,7 +62,7 @@ class ManhuaduiDataRepo extends MaxgaDataHttpRepo {
         'https://m.manhuadui.com/rank/click/',
         parser: (res) => parser
             .getMangaListFromRank(res.data)
-            .map((manga) => manga.copyWith(sourceKey: _source.key)).toList());
+            .map((manga) => manga.copyWith(sourceKey: mangaSource.key)).toList());
   }
 
   @override

@@ -19,28 +19,39 @@ class _TestPageState extends State<TestPage> with SingleTickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(),
-        body: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: ()  {
-            if (!animateIsForward) {
-              controller.forward();
-              animateIsForward = true;
-            } else {
-              animateIsForward = false;
-              controller.reverse();
-            }
-          },
-          child: Container(
-            height: double.infinity,
-            width: double.infinity,
-            child:  AnimatedBuilder(
-              animation: controller,
-              builder: (context, child) => Transform.translate(offset: Offset(0, controller.value * 100), child: child,),
-              child:  Text('231'),
+      appBar: AppBar(
+      ),
+      body: Builder(
+        // Create an inner BuildContext so that the snackBar onPressed methods
+        // can refer to the Scaffold with Scaffold.of().
+        builder: (context) {
+          return Center(
+            child: RaisedButton(
+              child: Text('123'),
+              onPressed: () {
+                Scaffold.of(context).hideCurrentSnackBar();
+                Scaffold.of(context).showSnackBar(SnackBar(
+                  content: Text('123'),
+                  action: SnackBarAction(
+                    label: '123',
+                    onPressed: () {
+                      Scaffold.of(context).hideCurrentSnackBar();
+                      Scaffold.of(context).showSnackBar(SnackBar(
+                        content: Text(
+                          '213'
+                        ),
+                      ));
+                    },
+                  ),
+                  behavior: SnackBarBehavior.floating,
+                )
+
+                );
+              },
             ),
-          ),
-        )
+          );
+        },
+      ),
     );
   }
 

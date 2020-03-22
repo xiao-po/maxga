@@ -38,6 +38,9 @@ class ThemeProvider extends BaseProvider {
   _setBrightness(bool isDarkMode) {
     this._changeBrightness(isDarkMode);
     this._theme = ThemeData(
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating
+      ),
       brightness: isDarkMode ? Brightness.dark : Brightness.light,
       accentColor: isDarkMode ? Colors.teal : Colors.cyan,
       primaryColor: isDarkMode ? Colors.grey[800] : Colors.white,
