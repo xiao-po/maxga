@@ -203,9 +203,10 @@ class MangaListTileExtra extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textStyle = TextStyle(color: textColor);
-    final updateTime = manga.lastUpdateChapter.updateTime != null
-        ? DateUtils.formatTime(time: manga.lastUpdateChapter.updateTime, template: 'YYYY-MM-dd')
-        : '';
+    var updateTime = '';
+    if (manga?.lastUpdateChapter?.updateTime != null) {
+      updateTime = DateUtils.formatTime(time: manga.lastUpdateChapter.updateTime, template: 'YYYY-MM-dd');
+    }
     var bottomText;
     if (manga.lastUpdateChapter != null) {
       bottomText = Align(

@@ -6,6 +6,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 import 'package:maxga/base/delay.dart';
+import 'package:maxga/components/dialog/dialog.dart';
 import 'package:maxga/constant/setting-value.dart';
 import 'package:maxga/http/repo/maxga-data-http-repo.dart';
 import 'package:maxga/manga-repo-pool.dart';
@@ -17,6 +18,7 @@ import 'package:maxga/utils/maxga-utils.dart';
 import 'package:provider/provider.dart';
 
 import '../mangaViewer/components/base/manga-viewer-future-view.dart';
+import 'base/manga-viewer-divider-width.dart';
 import 'manga-image-list-viewer.dart';
 import 'manga-image.dart';
 import 'manga-status-bar.dart';
@@ -53,12 +55,11 @@ class MangaViewer extends StatefulWidget {
   final List<Chapter> chapterList;
   final int initIndex;
 
-  const MangaViewer(
-      {Key key,
-      this.manga,
-      this.currentChapter,
-      this.initIndex = 0,
-      this.chapterList})
+  const MangaViewer({Key key,
+    this.manga,
+    this.currentChapter,
+    this.initIndex = 0,
+    this.chapterList})
       : super(key: key);
 
   @override
@@ -79,19 +80,23 @@ class _MangaViewerState extends State<MangaViewer>
   ItemScrollController itemScrollController = ItemScrollController();
   ItemPositionsListener positionsListener = ItemPositionsListener.create();
 
-  _MangaOrientation orientation = _MangaOrientation.leftToRight;
+  _MangaOrientation orientation;
 
   int chapterIndex;
   Map<int, Chapter> cachedChapterData = {};
   bool isOnScroll = false;
   Chapter currentChapter;
 
+
+  MangaViewerDividerWidth mangaViewerDividerWidth;
+
   Chapter get preChapter =>
       chapterIndex != 0 ? chapterList[chapterIndex - 1] : null;
 
-  Chapter get nextChapter => chapterIndex != (chapterList.length - 1)
-      ? chapterList[chapterIndex + 1]
-      : null;
+  Chapter get nextChapter =>
+      chapterIndex != (chapterList.length - 1)
+          ? chapterList[chapterIndex + 1]
+          : null;
 
   _ChapterUpdateOrigin _chapterUpdateOrigin = _ChapterUpdateOrigin.none;
   _MangaViewerLoadState loadStatus = _MangaViewerLoadState.loadingMangaData;
@@ -175,6 +180,13 @@ class _MangaViewerState extends State<MangaViewer>
         });
       }
     });
+    final SettingProvider settingProvider = SettingProvider.getInstance();
+    final MangaViewerDividerWidth mangaViewerDividerWidth = getDividerWidthFromString(
+        settingProvider.getItemValue(
+            MaxgaSettingItemType.defaultVerticalDividerWidth)
+    );
+
+    this.mangaViewerDividerWidth = mangaViewerDividerWidth;
   }
 
   void initMangaViewer() async {
@@ -189,7 +201,7 @@ class _MangaViewerState extends State<MangaViewer>
       chapterList = widget.chapterList
           .map((item) => Chapter.fromJson(item.toJson()))
           .toList()
-            ..sort((a, b) => a.order.compareTo(b.order));
+        ..sort((a, b) => a.order.compareTo(b.order));
       chapterIndex =
           chapterList.indexWhere((el) => el.url == widget.currentChapter.url);
       currentChapter = chapterList[chapterIndex];
@@ -202,7 +214,7 @@ class _MangaViewerState extends State<MangaViewer>
       Chapter currentChapterData = resultChapterList[0] as Chapter;
 
       if (mounted) {
-        changeMangaOrientation(
+        setMangaOrientation(
             getOrientationFromIndex(orientationValue)
         );
         setState(() {
@@ -260,7 +272,8 @@ class _MangaViewerState extends State<MangaViewer>
               hasPrechapter: preChapter != null,
               onPageChanged: (page) => onPageViewScroll(page, page),
               itemCount: imagePageUrlList.length,
-              itemBuilder: (context, index) => Tab(
+              itemBuilder: (context, index) =>
+                  Tab(
                     child: MangaImage(
                       url: imagePageUrlList[index],
                       headers: dataHttpRepo.mangaSource.headers,
@@ -271,6 +284,7 @@ class _MangaViewerState extends State<MangaViewer>
             tabMangaViewer = MangaListViewer(
               itemPositionsListener: positionsListener,
               imageUrlList: imagePageUrlList,
+              mangaViewerDividerWidth: mangaViewerDividerWidth,
               itemScrollController: itemScrollController,
               initialScrollIndex: pageIndex,
               headers: dataHttpRepo.mangaSource.headers,
@@ -340,8 +354,7 @@ class _MangaViewerState extends State<MangaViewer>
     );
   }
 
-  Future<Chapter> getChapterData(
-    Chapter chapter, {
+  Future<Chapter> getChapterData(Chapter chapter, {
     void Function() onLoad,
   }) async {
     if (chapter == null) {
@@ -361,7 +374,10 @@ class _MangaViewerState extends State<MangaViewer>
   }
 
   dispatchTapUpEvent(TapUpDetails details, BuildContext context) async {
-    final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     if (details.localPosition.dx / width > 0.33 &&
         details.localPosition.dx / width < 0.66) {
@@ -462,7 +478,7 @@ class _MangaViewerState extends State<MangaViewer>
       this
           .onPageListChapters
           .indexWhere((el) => willLoadChapter.url == el.url) !=
-      -1;
+          -1;
 
   onPageViewScroll(int min, int max, [double offset]) async {
     if (_chapterUpdateOrigin == _ChapterUpdateOrigin.none) {
@@ -556,7 +572,7 @@ class _MangaViewerState extends State<MangaViewer>
             return null;
           }
           var preChapterData =
-              await getChapterData(willLoadChapter, onLoad: () {
+          await getChapterData(willLoadChapter, onLoad: () {
             toastMessage('正在加载上一章节');
           });
           if (!mounted && pageKey != null) {
@@ -641,7 +657,8 @@ class _MangaViewerState extends State<MangaViewer>
     );
   }
 
-  Widget buildCenterText(String text) => Padding(
+  Widget buildCenterText(String text) =>
+      Padding(
         padding: EdgeInsets.only(top: 5, bottom: 5),
         child: Text(
           text,
@@ -659,7 +676,7 @@ class _MangaViewerState extends State<MangaViewer>
         onScrollEnd(tabControllerPage, tabControllerPage);
       } else {
         if (scrollNotification.metrics.maxScrollExtent -
-                scrollNotification.metrics.pixels <
+            scrollNotification.metrics.pixels <
             0) {
           return null;
         }
@@ -732,7 +749,7 @@ class _MangaViewerState extends State<MangaViewer>
     }
   }
 
-  changeMangaOrientation(_MangaOrientation orientation) {
+  setMangaOrientation(_MangaOrientation orientation) {
     final previousOrientation = this.orientation;
     if (orientation == previousOrientation) {
       return null;
@@ -818,49 +835,55 @@ class _MangaViewerState extends State<MangaViewer>
 
   openMenuDialog() async {
     _MangaOrientation ori = orientation;
+    MangaViewerDividerWidth dividerWidth = mangaViewerDividerWidth;
     final result = await showDialog(
         context: context,
-        child: AlertDialog(
-          title: const Text('菜单'),
-          content: ConstrainedBox(
-            constraints: const BoxConstraints(minWidth: 300),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                ListTile(
-                  title: const Text('阅读方向'),
-                  trailing: SizedBox(
-                    width: 100,
-                    child: DropdownButtonFormField<int>(
-                      value: orientation.index,
-                      onChanged: (value) {
-                        ori = getOrientationFromIndex(value);
-                      },
-                      items: [
-                        DropdownMenuItem(
-                          value: 0,
-                          child: const Text('从左至右'),
-                        ),
+        child: OptionDialog(
+          title: '菜单',
+          children: <Widget>[
+            ListTile(
+              title: const Text('阅读方向'),
+              trailing: SizedBox(
+                width: 100,
+                child: DropdownButtonFormField<int>(
+                  value: orientation.index,
+                  onChanged: (value) {
+                    ori = getOrientationFromIndex(value);
+                  },
+                  items: [
+                    DropdownMenuItem(
+                      value: 0,
+                      child: const Text('从左至右'),
+                    ),
 //                        DropdownMenuItem(
 //                          value: 1,
 //                          child: const Text('从右至左'),
 //                        ),
-                        DropdownMenuItem(
-                          value: 2,
-                          child: const Text('卷纸模式'),
-                        ),
-                      ],
+                    DropdownMenuItem(
+                      value: 2,
+                      child: const Text('卷纸模式'),
                     ),
-                  ),
+                  ],
                 ),
-                ListTile(
-                  onTap: () {},
-                  title: const Text('卷纸模式下图片存在间隔'),
-                  trailing: Switch(value: true, onChanged: (bool value) {  },),
-                )
-              ],
+              ),
             ),
-          ),
+            ListTile(
+              title: const Text('图片间隔'),
+              trailing:  SizedBox(
+                width: 100,
+                child: DropdownButtonFormField<String>(
+                    value: '${mangaViewerDividerWidth.index}',
+                    onChanged: (value) {
+                      dividerWidth = getDividerWidthFromString(value);
+                    },
+                    items: MaxgaSelectOptionsMap[MaxgaSettingItemType.defaultVerticalDividerWidth].map((e) => DropdownMenuItem(
+                      value: e.value,
+                      child: Text(e.title),
+                    )).toList()
+                ),
+              ),
+            )
+          ],
           actions: <Widget>[
             FlatButton(
               onPressed: () {
@@ -878,7 +901,26 @@ class _MangaViewerState extends State<MangaViewer>
         ));
 
     if (result != null) {
-      changeMangaOrientation(ori);
+      setMangaOrientation(ori);
+      setState(() {
+        this.mangaViewerDividerWidth = dividerWidth;
+      });
+    }
+  }
+
+  MangaViewerDividerWidth getDividerWidthFromString(String value) {
+
+    switch (value) {
+      case '0':
+        return MangaViewerDividerWidth.none;
+      case '1':
+        return MangaViewerDividerWidth.small;
+      case '2':
+        return MangaViewerDividerWidth.middle;
+      case '3':
+        return MangaViewerDividerWidth.large;
+      default:
+        return MangaViewerDividerWidth.none;
     }
   }
 }

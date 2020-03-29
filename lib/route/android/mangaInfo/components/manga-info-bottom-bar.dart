@@ -23,8 +23,8 @@ class MangaInfoBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final iconActiveColor = theme.brightness == Brightness.dark
-        ? Colors.orange
-        : Colors.orangeAccent;
+        ? Colors.pink[200]
+        : Colors.pink[200];
 
     final textColor = theme.brightness == Brightness.light ? Color(0xFF424242) : Colors.white54;
     return Container(
@@ -43,10 +43,10 @@ class MangaInfoBottomBar extends StatelessWidget {
                   onPressed: onCollect,
                   icon: !collected
                       ? Icon(
-                          Icons.star_border,
+                          Icons.favorite_border,
                           color: theme.hintColor,
                         )
-                      : Icon(Icons.star, color: iconActiveColor),
+                      : Icon(Icons.favorite, color: iconActiveColor),
                   label: Text('收藏',
                       style: TextStyle(color: textColor))),
               _SearchOtherSourceButton(

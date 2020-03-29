@@ -1,0 +1,1 @@
+enum ListLoadingStatus { beforeInit, over, error, loading, noMore }

@@ -128,8 +128,9 @@ class OptionDialog extends StatelessWidget {
   final String title;
 
   final List<Widget> children;
+  final List<Widget> actions;
 
-  const OptionDialog({Key key, @required this.title, this.children})
+  const OptionDialog({Key key, @required this.title, this.children, this.actions})
       : super(key: key);
 
   @override
@@ -148,7 +149,14 @@ class OptionDialog extends StatelessWidget {
                   textAlign: TextAlign.left,
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
             ),
-            ...children
+            ...children,
+            if(actions != null) Padding(
+              padding: EdgeInsets.only(left: 10, top: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: actions,
+              ),
+            )
           ],
         ),
       ),

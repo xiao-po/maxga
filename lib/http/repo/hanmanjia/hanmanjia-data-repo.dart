@@ -1,3 +1,4 @@
+import 'package:maxga/base/error/maxga-http-error.dart';
 import 'package:maxga/http/repo/hanmanjia/parser/hanmanjia-html-parser.dart';
 import 'package:maxga/http/repo/maxga-data-http-repo.dart';
 import 'package:maxga/http/repo/utils/manga-http-utils.dart';
@@ -14,8 +15,7 @@ class HanmanjiaDataRepo implements MaxgaDataHttpRepo {
 
   @override
   Future<String> generateShareLink(MangaBase manga) {
-    // TODO: implement generateShareLink
-    throw UnimplementedError();
+    return Future.value(manga.infoUrl);
   }
 
   @override
@@ -47,20 +47,24 @@ class HanmanjiaDataRepo implements MaxgaDataHttpRepo {
 
   @override
   Future<List<SimpleMangaInfo>> getRankedManga(int page) {
-    // TODO: implement getRankedManga
-    throw UnimplementedError();
+    throw MangaRepoError(MangaHttpErrorType.CAN_NOT_PROVIDE, mangaSource);
   }
 
   @override
   Future<List<SimpleMangaInfo>> getSearchManga(String keywords) {
-    // TODO: implement getSearchManga
-    throw UnimplementedError();
+    return _httpUtils.requestMangaSourceApi<List<SimpleMangaInfo>>(
+      '${mangaSource.domain}/search?keyword=$keywords',
+        parser: (res) => parser
+            .getMangaListFormSearch(res.data)
+            .map((e) => e.copyWith(infoUrl: '${mangaSource.apiDomain}${e.infoUrl}'))
+            .toList()
+    );
+//    throw UnimplementedError();
   }
 
   @override
   Future<List<String>> getSuggestion(String words) {
-    // TODO: implement getSuggestion
-    throw UnimplementedError();
+    throw MangaRepoError(MangaHttpErrorType.CAN_NOT_PROVIDE, mangaSource);
   }
 
   @override

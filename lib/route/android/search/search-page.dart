@@ -146,10 +146,10 @@ class _SearchPageState extends State<SearchPage> {
   Timer _debounce;
 
   void inputChange(String words) {
+    if (_debounce?.isActive ?? false) _debounce.cancel();
     if (words.length != 0) {
       this.hasWords = true;
 
-      if (_debounce?.isActive ?? false) _debounce.cancel();
       _debounce = Timer(const Duration(milliseconds: 300), () {
         this.getSuggestionAction(words);
       });

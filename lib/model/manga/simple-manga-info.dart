@@ -47,14 +47,14 @@ class SimpleMangaInfo extends MangaBase {
     return SimpleMangaInfo.fromJson({
       'lastUpdateChapter': lastUpdateChapter,
       'sourceKey': sourceKey,
-      'authors': authors,
+      'authors': authors ?? [],
       'id': id,
       'infoUrl': infoUrl,
       'status': status,
       'coverImgUrl': coverImgUrl,
       'title': title,
       'introduce': null,
-      'typeList': typeList,
+      'typeList': typeList ?? [],
     });
   }
 

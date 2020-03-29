@@ -7,6 +7,9 @@ enum MangaHttpErrorType {
   CONNECT_TIMEOUT,
   PARSE_ERROR,
 
+
+  CAN_NOT_PROVIDE,
+
 }
 
 

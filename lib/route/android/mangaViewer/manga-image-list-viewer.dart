@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 
+import 'base/manga-viewer-divider-width.dart';
 import 'components/manga-image-place-holder.dart';
 
 class MangaListViewer extends StatelessWidget {
@@ -11,6 +12,7 @@ class MangaListViewer extends StatelessWidget {
   final int initialScrollIndex;
   final ItemPositionsListener itemPositionsListener;
   final ItemScrollController itemScrollController;
+  final MangaViewerDividerWidth mangaViewerDividerWidth;
 
   const MangaListViewer(
       {Key key,
@@ -18,12 +20,14 @@ class MangaListViewer extends StatelessWidget {
       @required this.headers,
       this.itemPositionsListener,
       this.itemScrollController,
-      this.initialScrollIndex})
+      this.initialScrollIndex,
+        this.mangaViewerDividerWidth = MangaViewerDividerWidth.small})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final dividerWidth = mangaViewerDividerWidth.index * 3;
     return ScrollablePositionedList.separated(
       itemPositionsListener: itemPositionsListener,
       itemScrollController: itemScrollController,
@@ -39,7 +43,7 @@ class MangaListViewer extends StatelessWidget {
       ),
       itemCount: imageUrlList.length,
       separatorBuilder: (BuildContext context, int index) => Divider(
-        height: 5,
+        height: dividerWidth.toDouble(),
         color: Colors.transparent,
       ),
     );

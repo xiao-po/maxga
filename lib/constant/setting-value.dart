@@ -34,6 +34,7 @@ enum MaxgaSettingItemType {
   defaultMangaSource,
   updateChannelCount,
   autoReportDmzjHiddenManga,
+  defaultVerticalDividerWidth,
 }
 
 enum DefaultIndexPage { collect, sourceViewer }
@@ -116,6 +117,24 @@ Map<MaxgaSettingItemType, List<SelectOption<String>>> MaxgaSelectOptionsMap = {
       value: ManhuaduiMangaSourceKey,
       title: '漫画堆',
     ),
+  ],
+  MaxgaSettingItemType.defaultVerticalDividerWidth: [
+    SelectOption(
+      value: '0',
+      title: '无',
+    ),
+    SelectOption(
+      value: '1',
+      title: '较小',
+    ),
+    SelectOption(
+      value: '2',
+      title: '中等',
+    ),
+    SelectOption(
+      value: '3',
+      title: '较大',
+    ),
   ]
 };
 
@@ -133,6 +152,13 @@ const _ApplicationSettingValueList = [
     type: MaxgaSettingListTileType.select,
     title: '默认阅读方向',
     value: '0',
+    category: MaxgaSettingCategoryType.read,
+  ),
+  MaxgaSettingItem(
+    key: MaxgaSettingItemType.defaultVerticalDividerWidth,
+    type: MaxgaSettingListTileType.select,
+    title: '默认卷纸模式的图片间隔宽度',
+    value: '1',
     category: MaxgaSettingCategoryType.read,
   ),
 //  MaxgaSettingItem(

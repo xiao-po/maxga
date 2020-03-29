@@ -5,6 +5,7 @@ import 'package:maxga/components/base/manga-cover-image.dart';
 import 'package:maxga/components/base/zero-divider.dart';
 import 'package:maxga/components/card/card.dart';
 import 'package:maxga/components/card/maxga-list-view-loading-footer.dart';
+import 'package:maxga/constant/list-load-status.dart';
 import 'package:maxga/http/repo/dmzj/constants/dmzj-manga-source.dart';
 import 'package:maxga/http/server/maxga-http.repo.dart';
 import 'package:maxga/manga-repo-pool.dart';
@@ -12,9 +13,10 @@ import 'package:maxga/model/manga/manga-source.dart';
 import 'package:maxga/model/maxga/hidden-manga.dart';
 import 'package:maxga/route/android/mangaInfo/manga-info-page.dart';
 
+import 'hidden-manga-search-page.dart';
+
 enum _LoadingStatus { over, error, loading }
 
-enum _ListLoadingStatus { over, error, loading, noMore }
 
 class HiddenMangaPage extends StatefulWidget {
   final name = "hiddenmanga";
@@ -26,7 +28,7 @@ class HiddenMangaPage extends StatefulWidget {
 class _HiddenMangaPageState extends State<HiddenMangaPage> {
   var initStatus = _LoadingStatus.loading;
 
-  var pageLoadStatus = _ListLoadingStatus.over;
+  var pageLoadStatus = ListLoadingStatus.over;
   var source =
       MangaRepoPool.getInstance().getMangaSourceByKey(DmzjMangaSourceKey);
 
@@ -78,6 +80,7 @@ class _HiddenMangaPageState extends State<HiddenMangaPage> {
       case _LoadingStatus.error:
         body = Align(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Text("服务器接口暂时大姨妈了~~"),
               const SizedBox(height: 8.0),
@@ -94,14 +97,14 @@ class _HiddenMangaPageState extends State<HiddenMangaPage> {
             itemBuilder: (context, index) {
               if (index == hiddenMangaList.length) {
                 switch(pageLoadStatus) {
-                  case _ListLoadingStatus.error:
+                  case ListLoadingStatus.error:
                     return Text('加载错误');
                     break;
-                  case _ListLoadingStatus.loading:
+                  case ListLoadingStatus.loading:
                     return MaxgaListViewLoadingFooter();
                     break;
-                  case _ListLoadingStatus.noMore:
-                  case _ListLoadingStatus.over:
+                  case ListLoadingStatus.noMore:
+                  case ListLoadingStatus.over:
                   default:
                     return null;
                 }
@@ -146,6 +149,9 @@ class _HiddenMangaPageState extends State<HiddenMangaPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("隐藏漫画"),
+        actions: <Widget>[
+          IconButton(icon: Icon(Icons.search), onPressed: toHiddenMangaSearch,)
+        ],
       ),
       body: body,
     );
@@ -158,27 +164,27 @@ class _HiddenMangaPageState extends State<HiddenMangaPage> {
   }
 
   void loadMoreHiddenManga() async {
-    if (this.pageLoadStatus != _ListLoadingStatus.over) {
+    if (this.pageLoadStatus != ListLoadingStatus.over) {
       return null;
     }
     try {
       setState(() {
-        this.pageLoadStatus = _ListLoadingStatus.loading;
+        this.pageLoadStatus = ListLoadingStatus.loading;
       });
       var list = await MaxgaMangaHttpRepo.getHiddenManga(page);
       if (list == null || list.length == 0) {
         setState(() {
-          this.pageLoadStatus = _ListLoadingStatus.noMore;
+          this.pageLoadStatus = ListLoadingStatus.noMore;
         });
       } else {
         setState(() {
           this.hiddenMangaList.addAll(list);
           this.page++;
-          this.pageLoadStatus = _ListLoadingStatus.over;
+          this.pageLoadStatus = ListLoadingStatus.over;
         });
       }
     } catch (e) {
-      this.pageLoadStatus = _ListLoadingStatus.error;
+      this.pageLoadStatus = ListLoadingStatus.error;
     }
   }
 
@@ -196,6 +202,12 @@ class _HiddenMangaPageState extends State<HiddenMangaPage> {
         sourceKey: mangaInfo.sourceKey,
       );
     }));
+  }
+
+  void toHiddenMangaSearch() {
+    Navigator.push(context, MaterialPageRoute(
+      builder: (context) => HiddenMangaSearchPage()
+    ));
   }
 }
 

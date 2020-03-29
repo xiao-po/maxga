@@ -33,6 +33,10 @@ class MangaSourceViewerErrorPage extends StatelessWidget {
               '请等待更新或者联系作者',
           onTap: this.onTap,
         );
+      case MangaHttpErrorType.CAN_NOT_PROVIDE:
+        return ErrorPage(
+          '${source.name} 无法提供相应的功能，抱歉 \n'
+        );
       default:
         return ErrorPage('未知错误，暂时无法使用');
     }
